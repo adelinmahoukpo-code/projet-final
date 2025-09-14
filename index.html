@@ -22,6 +22,8 @@
     align-items: center;
     z-index: 9999;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 #login-container {
@@ -29,7 +31,8 @@
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    width: 350px;
+    width: 100%;
+    max-width: 350px;
     text-align: center;
 }
 
@@ -82,51 +85,279 @@
     font-weight: 500;
 }
 
-/* Styles pour l'application principale (masquée initialement) */
+/* Styles pour l'application principale */
 #app-container {
     display: none;
 }
 
-body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f5f5f5; }
-#header { display:flex; justify-content:center; align-items:center; background:#007bff; color:white; padding:15px; box-shadow:0 2px 6px rgba(0,0,0,0.3); position:relative; z-index:1001; }
-#header img { width:50px; margin-right:15px; }
-#header h1 { margin:0; font-size:1.8em; text-shadow:1px 1px 2px #000; }
-#map { height: calc(100vh - 80px); }
-#sidebar { position:absolute; top:80px; left:0; bottom:0; width:280px; z-index:1000; background:rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding:15px; overflow-y:auto; display:flex; flex-direction:column; border-radius:0 12px 12px 0; box-shadow:2px 4px 12px rgba(0,0,0,0.15); }
-#sidebar h3 { margin-top:0; text-align:center; color:#007bff; }
-#sidebar input, #sidebar select { width: calc(100% - 16px); padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #ccc; font-size:0.95em; transition:0.2s all; }
-#sidebar input:focus, #sidebar select:focus { border-color:#007bff; box-shadow:0 0 6px rgba(0,123,255,0.4); outline:none; }
-#sidebar button { width:100%; padding:10px; margin-bottom:8px; border:none; border-radius:8px; color:white; cursor:pointer; font-weight:600; transition:0.25s all; background: linear-gradient(145deg,#007bff,#0056b3); box-shadow:0 2px 4px rgba(0,0,0,0.2); }
-#sidebar button:hover { background: linear-gradient(145deg,#0056b3,#003f7f); transform: translateY(-2px); }
-#companyList { display:none; list-style:none; padding:0; margin:0; max-height:200px; overflow-y:auto; border:1px solid #ddd; border-radius:5px; }
-#companyList li { padding:8px 10px; cursor:pointer; border-bottom:1px solid #eee; transition:0.2s; border-radius:3px; }
-#companyList li:hover, #companyList li.active { background:#007bff; color:white; }
-#routeControls { margin-top:auto; border-top:1px solid #eee; padding-top:15px; }
-#routeControls h3 { color:#28a745; }
-#pauseRoute { background:#ffc107; color:black; }
-#resumeRoute { background:#17a2b8; }
-#stopRoute { background:#dc3545; }
-#locateBtn { background:#28a745; }
-#layer-container { position:absolute; top:90px; right:10px; z-index:1000; background:rgba(255,255,255,0.95); backdrop-filter: blur(8px); padding:10px; border-radius:12px; display:flex; flex-direction:column; box-shadow:0 4px 12px rgba(0,0,0,0.25); }
-.layer-preview { width:50px; height:50px; margin:5px; cursor:pointer; border:2px solid #ccc; background-size:cover; background-position:center; border-radius:8px; transition:0.3s all; }
-.layer-preview.active, .layer-preview:hover { transform: scale(1.1); border-color:#007bff; box-shadow:0 2px 8px rgba(0,123,255,0.4); }
-#instructions-container { position:absolute; bottom:10px; right:10px; z-index:1001; max-width:300px; background:rgba(255,255,255,0.9); backdrop-filter: blur(10px); border-radius:10px; box-shadow:0 4px 14px rgba(0,0,0,0.25); padding:15px; font-size:0.9em; transition: transform 0.3s ease, opacity 0.3s ease; transform: translateY(20px); opacity: 0.95; }
-#instructions-container.show { transform: translateY(0); opacity: 1; }
-#toggleInstructions { background:#007bff; border:none; color:white; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:0.85em; margin-bottom:5px; }
-#instructionsList { max-height:200px; overflow-y:auto; padding-left:10px; }
-#instructionsList li { padding:6px 8px; margin-bottom:4px; border-radius:6px; transition:0.2s; }
-#instructionsList li.current { background:#007bff; color:white; font-weight:bold; box-shadow:0 2px 6px rgba(0,123,255,0.4); }
-/* Curseur style Google Maps */
-.leaflet-container { cursor: url('https://maps.gstatic.com/mapfiles/openhand_8_8.cur'), move; }
-#toggleLayersBtn { position:absolute; top:50px; right:10px; z-index:1002; padding:8px 12px; border:none; background:#007bff; color:white; border-radius:8px; cursor:pointer; }
-/* Supprimer les cadres des tuiles (si présents) */
-.leaflet-tile-container img { border: none !important; outline: none !important; }
-/* Supprimer les grilles */
+body { 
+    margin: 0; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    background: #f5f5f5;
+    overflow-x: hidden;
+}
 
+#header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    background: #007bff; 
+    color: white; 
+    padding: 15px; 
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3); 
+    position: relative; 
+    z-index: 1001;
+}
 
-/* Styles pour le système de rapport de livraison */
+#header .header-content {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    justify-content: center;
+}
+
+#header img { 
+    width: 40px; 
+    margin-right: 15px; 
+}
+
+#header h1 { 
+    margin: 0; 
+    font-size: 1.4em; 
+    text-shadow: 1px 1px 2px #000;
+    text-align: center;
+}
+
+/* Bouton hamburger pour mobile */
+#menu-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 8px;
+    z-index: 1002;
+}
+
+#map { 
+    height: calc(100vh - 80px);
+    transition: margin-left 0.3s ease;
+}
+
+#sidebar { 
+    position: fixed;
+    top: 80px; 
+    left: 0; 
+    bottom: 0; 
+    width: 280px; 
+    z-index: 1000; 
+    background: rgba(255,255,255,0.95); 
+    backdrop-filter: blur(10px); 
+    padding: 15px; 
+    overflow-y: auto; 
+    display: flex; 
+    flex-direction: column; 
+    border-radius: 0 12px 12px 0; 
+    box-shadow: 2px 4px 12px rgba(0,0,0,0.15);
+    transform: translateX(0);
+    transition: transform 0.3s ease;
+}
+
+#sidebar.hidden {
+    transform: translateX(-100%);
+}
+
+#sidebar h3 { 
+    margin-top: 0; 
+    text-align: center; 
+    color: #007bff;
+    font-size: 1.1em;
+}
+
+#sidebar input, #sidebar select { 
+    width: calc(100% - 16px); 
+    padding: 10px; 
+    margin-bottom: 10px; 
+    border-radius: 8px; 
+    border: 1px solid #ccc; 
+    font-size: 0.95em; 
+    transition: 0.2s all;
+    box-sizing: border-box;
+}
+
+#sidebar input:focus, #sidebar select:focus { 
+    border-color: #007bff; 
+    box-shadow: 0 0 6px rgba(0,123,255,0.4); 
+    outline: none; 
+}
+
+#sidebar button { 
+    width: 100%; 
+    padding: 10px; 
+    margin-bottom: 8px; 
+    border: none; 
+    border-radius: 8px; 
+    color: white; 
+    cursor: pointer; 
+    font-weight: 600; 
+    transition: 0.25s all; 
+    background: linear-gradient(145deg,#007bff,#0056b3); 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    font-size: 0.9em;
+}
+
+#sidebar button:hover { 
+    background: linear-gradient(145deg,#0056b3,#003f7f); 
+    transform: translateY(-2px); 
+}
+
+#companyList { 
+    display: none; 
+    list-style: none; 
+    padding: 0; 
+    margin: 0; 
+    max-height: 200px; 
+    overflow-y: auto; 
+    border: 1px solid #ddd; 
+    border-radius: 5px; 
+}
+
+#companyList li { 
+    padding: 8px 10px; 
+    cursor: pointer; 
+    border-bottom: 1px solid #eee; 
+    transition: 0.2s; 
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+
+#companyList li:hover, #companyList li.active { 
+    background: #007bff; 
+    color: white; 
+}
+
+#routeControls { 
+    margin-top: auto; 
+    border-top: 1px solid #eee; 
+    padding-top: 15px; 
+}
+
+#routeControls h3 { 
+    color: #28a745; 
+}
+
+#pauseRoute { background: #ffc107; color: black; }
+#resumeRoute { background: #17a2b8; }
+#stopRoute { background: #dc3545; }
+#locateBtn { background: #28a745; }
+
+#layer-container { 
+    position: absolute; 
+    top: 90px; 
+    right: 10px; 
+    z-index: 1000; 
+    background: rgba(255,255,255,0.95); 
+    backdrop-filter: blur(8px); 
+    padding: 10px; 
+    border-radius: 12px; 
+    display: flex; 
+    flex-direction: column; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25); 
+}
+
+.layer-preview { 
+    width: 50px; 
+    height: 50px; 
+    margin: 5px; 
+    cursor: pointer; 
+    border: 2px solid #ccc; 
+    background-size: cover; 
+    background-position: center; 
+    border-radius: 8px; 
+    transition: 0.3s all; 
+}
+
+.layer-preview.active, .layer-preview:hover { 
+    transform: scale(1.1); 
+    border-color: #007bff; 
+    box-shadow: 0 2px 8px rgba(0,123,255,0.4); 
+}
+
+#instructions-container { 
+    position: absolute; 
+    bottom: 10px; 
+    right: 10px; 
+    z-index: 1001; 
+    max-width: 300px; 
+    background: rgba(255,255,255,0.9); 
+    backdrop-filter: blur(10px); 
+    border-radius: 10px; 
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25); 
+    padding: 15px; 
+    font-size: 0.9em; 
+    transition: transform 0.3s ease, opacity 0.3s ease; 
+    transform: translateY(20px); 
+    opacity: 0.95; 
+}
+
+#instructions-container.show { 
+    transform: translateY(0); 
+    opacity: 1; 
+}
+
+#toggleInstructions { 
+    background: #007bff; 
+    border: none; 
+    color: white; 
+    padding: 5px 10px; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    font-size: 0.85em; 
+    margin-bottom: 5px; 
+}
+
+#instructionsList { 
+    max-height: 200px; 
+    overflow-y: auto; 
+    padding-left: 10px; 
+}
+
+#instructionsList li { 
+    padding: 6px 8px; 
+    margin-bottom: 4px; 
+    border-radius: 6px; 
+    transition: 0.2s; 
+}
+
+#instructionsList li.current { 
+    background: #007bff; 
+    color: white; 
+    font-weight: bold; 
+    box-shadow: 0 2px 6px rgba(0,123,255,0.4); 
+}
+
+.leaflet-container { 
+    cursor: url('https://maps.gstatic.com/mapfiles/openhand_8_8.cur'), move; 
+}
+
+#toggleLayersBtn { 
+    position: absolute; 
+    top: 50px; 
+    right: 10px; 
+    z-index: 1002; 
+    padding: 8px 12px; 
+    border: none; 
+    background: #007bff; 
+    color: white; 
+    border-radius: 8px; 
+    cursor: pointer;
+    font-size: 0.85em;
+}
+
+/* Rapport de livraison */
 #delivery-report-container {
-    position: absolute;
+    position: fixed;
     top: 90px;
     left: 300px;
     z-index: 1000;
@@ -136,8 +367,11 @@ body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; ba
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     width: 350px;
+    max-width: calc(100vw - 40px);
     display: none;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
 }
 
 #delivery-report-container h3 {
@@ -187,6 +421,7 @@ body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; ba
     min-height: 80px;
     font-family: inherit;
     font-size: 0.9em;
+    box-sizing: border-box;
 }
 
 #reason-text:focus {
@@ -206,7 +441,7 @@ body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; ba
     color: #333;
 }
 
-.form-group input {
+.form-group input, .form-group textarea {
     width: 100%;
     padding: 10px;
     border: 1px solid #ddd;
@@ -215,7 +450,7 @@ body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; ba
     box-sizing: border-box;
 }
 
-.form-group input:focus {
+.form-group input:focus, .form-group textarea:focus {
     border-color: #007bff;
     outline: none;
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
@@ -276,74 +511,161 @@ body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; ba
     transform: translateY(-2px);
 }
 
-.success-message {
-    background: #d4edda;
-    color: #155724;
+.success-message, .error-message {
     padding: 10px;
     border-radius: 8px;
     margin-bottom: 15px;
-    border: 1px solid #c3e6cb;
     display: none;
+}
+
+.success-message {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
 }
 
 .error-message {
     background: #f8d7da;
     color: #721c24;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 15px;
     border: 1px solid #f5c6cb;
-    display: none;
 }
 
-/* ====================== AJOUT : Interface Admin ====================== */
-#admin-container { display:none; }
+/* Interface Admin */
+#admin-container { display: none; }
 #admin-header {
-    display:flex; align-items:center; justify-content:space-between;
-    background:#343a40; color:#fff; padding:12px 16px;
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    background: #343a40; 
+    color: #fff; 
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 10px;
 }
-#admin-header .title { display:flex; align-items:center; gap:12px; }
-#admin-header img { width:36px; }
-#admin-actions { display:flex; gap:8px; }
+#admin-header .title { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    flex: 1;
+}
+#admin-header img { width: 36px; }
+#admin-actions { 
+    display: flex; 
+    gap: 8px; 
+    flex-wrap: wrap;
+}
 .admin-btn {
-    padding:8px 12px; border:none; border-radius:8px; cursor:pointer; color:#fff;
-    background: #007bff; font-weight:600;
+    padding: 8px 12px; 
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    color: #fff;
+    background: #007bff; 
+    font-weight: 600;
+    font-size: 0.9em;
 }
-.admin-btn.secondary { background:#6c757d; }
-.admin-btn.danger { background:#dc3545; }
-#admin-main { display:grid; grid-template-columns: 420px 1fr; gap:12px; padding:12px; }
+.admin-btn.secondary { background: #6c757d; }
+.admin-btn.danger { background: #dc3545; }
+#admin-main { 
+    display: grid; 
+    grid-template-columns: 1fr; 
+    gap: 12px; 
+    padding: 12px; 
+}
 #admin-panel {
-    background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); padding:12px;
+    background: #fff; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+    padding: 12px;
+    order: 2;
 }
-#admin-panel h2 { margin:0 0 10px; color:#007bff; font-size:1.3em; }
-#admin-search { width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:8px; }
-#reports-table { width:100%; border-collapse:collapse; font-size:0.92em; }
-#reports-table th, #reports-table td { border-bottom:1px solid #eee; padding:8px 6px; text-align:left; }
-#reports-table th { position:sticky; top:0; background:#f7f9fc; z-index:1; }
-.status-badge { padding:2px 8px; border-radius:999px; font-weight:700; font-size:0.8em; }
-.status-ok { background:#d4edda; color:#155724; }
-.status-ko { background:#f8d7da; color:#721c24; }
-.row-actions button { border:none; border-radius:6px; padding:4px 8px; margin-right:4px; cursor:pointer; }
-.row-actions .focus { background:#17a2b8; color:#fff; }
-.row-actions .delete { background:#ffc107; color:#000; }
-#admin-map { height: calc(100vh - 120px); border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
-#empty-state { font-size:0.95em; color:#555; padding:8px 0 0; }
+#admin-panel h2 { 
+    margin: 0 0 10px; 
+    color: #007bff; 
+    font-size: 1.3em; 
+}
+#admin-search { 
+    width: 100%; 
+    padding: 10px; 
+    border: 1px solid #ddd; 
+    border-radius: 8px; 
+    margin-bottom: 8px;
+    box-sizing: border-box;
+}
+#reports-table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    font-size: 0.85em;
+    overflow-x: auto;
+}
+#reports-table th, #reports-table td { 
+    border-bottom: 1px solid #eee; 
+    padding: 6px 4px; 
+    text-align: left;
+    word-wrap: break-word;
+}
+#reports-table th { 
+    position: sticky; 
+    top: 0; 
+    background: #f7f9fc; 
+    z-index: 1; 
+    font-size: 0.8em;
+}
+.status-badge { 
+    padding: 2px 6px; 
+    border-radius: 999px; 
+    font-weight: 700; 
+    font-size: 0.7em;
+    white-space: nowrap;
+}
+.status-ok { background: #d4edda; color: #155724; }
+.status-ko { background: #f8d7da; color: #721c24; }
+.row-actions button { 
+    border: none; 
+    border-radius: 6px; 
+    padding: 3px 6px; 
+    margin-right: 2px; 
+    cursor: pointer;
+    font-size: 0.7em;
+}
+.row-actions .focus { background: #17a2b8; color: #fff; }
+.row-actions .edit { background: #28a745; color: #fff; }
+.row-actions .delete { background: #ffc107; color: #000; }
+#admin-map { 
+    height: 400px; 
+    border-radius: 12px; 
+    overflow: hidden; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    order: 1;
+}
+#empty-state { 
+    font-size: 0.95em; 
+    color: #555; 
+    padding: 8px 0 0; 
+}
 
-/* Boutons d'entête (basculer/déconnexion) visuels */
 #top-actions {
-    position:absolute; right:12px; top:12px; display:flex; gap:8px; z-index:1100;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 .top-btn {
-    padding:8px 12px; border:none; border-radius:999px; cursor:pointer; font-weight:700;
-    background:#ffffff; color:#007bff; box-shadow:0 2px 6px rgba(0,0,0,0.2);
+    padding: 6px 10px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 700;
+    background: #ffffff;
+    color: #007bff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    font-size: 0.85em;
 }
-.top-btn.danger { color:#fff; background:#dc3545; }
-.top-btn.dark { color:#fff; background:#343a40; }
-/* ==================================================================== */
+.top-btn.danger { color: #fff; background: #dc3545; }
+.top-btn.dark { color: #fff; background: #343a40; }
 
-/* ====================== ENVOI FACTURE ====================== */
+/* Envoi Facture */
 #invoice-send-container {
-    position: absolute;
+    position: fixed;
     top: 90px;
     left: 300px;
     z-index: 1000;
@@ -353,8 +675,11 @@ body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; ba
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     width: 350px;
+    max-width: calc(100vw - 40px);
     display: none;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
 }
 #invoice-send-container h3 {
     margin-top: 0;
@@ -365,9 +690,16 @@ body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; ba
 }
 #toggle-invoice-send {
     background: linear-gradient(145deg, #0069d9, #004a9f);
-    color: #fff; border-radius: 8px; cursor:pointer; font-weight:600;
-    transition: all .3s; box-shadow:0 2px 6px rgba(0,0,0,.2);
-    width:100%; padding:10px; margin-bottom:8px; border:none;
+    color: #fff; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-weight: 600;
+    transition: all .3s; 
+    box-shadow: 0 2px 6px rgba(0,0,0,.2);
+    width: 100%; 
+    padding: 10px; 
+    margin-bottom: 8px; 
+    border: none;
 }
 #toggle-invoice-send:hover {
     background: linear-gradient(145deg, #004a9f, #003a80);
@@ -386,32 +718,43 @@ body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; ba
     transition: all 0.3s;
     margin-top: 8px;
 }
-#send-invoice:hover { background: linear-gradient(145deg, #004a9f, #003a80); transform: translateY(-2px); }
-#send-invoice:disabled { background:#6c757d; cursor:not-allowed; transform:none; }
+#send-invoice:hover { 
+    background: linear-gradient(145deg, #004a9f, #003a80); 
+    transform: translateY(-2px); 
+}
+#send-invoice:disabled { 
+    background: #6c757d; 
+    cursor: not-allowed; 
+    transform: none; 
+}
 #invoice-success-msg, #invoice-error-msg {
-    padding:10px; border-radius:8px; margin-bottom:12px; display:none; border:1px solid transparent;
+    padding: 10px; 
+    border-radius: 8px; 
+    margin-bottom: 12px; 
+    display: none; 
+    border: 1px solid transparent;
 }
-#invoice-success-msg { background:#d4edda; color:#155724; border-color:#c3e6cb; }
-#invoice-error-msg   { background:#f8d7da; color:#721c24; border-color:#f5c6cb; }
-.small-muted { font-size:.85em; color:#666; }
-.accepted-types { font-size:.85em; color:#007bff; }
-/* ========================================================== */
-
-/* Suppression totale des cadres ou lignes entre tuiles */
-.leaflet-tile {
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
+#invoice-success-msg { 
+    background: #d4edda; 
+    color: #155724; 
+    border-color: #c3e6cb; 
 }
-.leaflet-tile-container img {
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
+#invoice-error-msg { 
+    background: #f8d7da; 
+    color: #721c24; 
+    border-color: #f5c6cb; 
+}
+.small-muted { 
+    font-size: .85em; 
+    color: #666; 
+}
+.accepted-types { 
+    font-size: .85em; 
+    color: #007bff; 
 }
 
-
-/* Suppression forcée de tout quadrillage / bordures des fonds Leaflet */
-.leaflet-tile, 
+/* Suppression des bordures des tuiles */
+.leaflet-tile,
 .leaflet-tile-container img,
 .leaflet-layer,
 .leaflet-tile-pane,
@@ -423,34 +766,305 @@ body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; ba
     background: none !important;
 }
 
+/* ====================== MEDIA QUERIES RESPONSIVE ====================== */
+
+/* Tablettes */
+@media screen and (max-width: 1024px) {
+    #admin-main {
+        grid-template-columns: 1fr;
+    }
+    
+    #layer-container {
+        right: 5px;
+        top: 85px;
+    }
+    
+    .layer-preview {
+        width: 40px;
+        height: 40px;
+    }
+    
+    #instructions-container {
+        max-width: 250px;
+        bottom: 5px;
+        right: 5px;
+    }
+}
+
+/* Smartphones et petites tablettes */
+@media screen and (max-width: 768px) {
+    /* Header responsive */
+    #header {
+        padding: 10px 15px;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    
+    #header .header-content {
+        justify-content: flex-start;
+        flex: 1;
+    }
+    
+    #header h1 {
+        font-size: 1.2em;
+        text-align: left;
+    }
+    
+    #header img {
+        width: 35px;
+        margin-right: 10px;
+    }
+    
+    /* Bouton hamburger visible */
+    #menu-toggle {
+        display: block;
+        order: 3;
+    }
+    
+    #top-actions {
+        order: 2;
+        margin-right: 10px;
+    }
+    
+    .top-btn {
+        padding: 4px 8px;
+        font-size: 0.75em;
+    }
+    
+    /* Sidebar devient overlay sur mobile */
+    #sidebar {
+        width: 100%;
+        max-width: 320px;
+        transform: translateX(-100%);
+        z-index: 1100;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+        border-radius: 0;
+    }
+    
+    #sidebar.show {
+        transform: translateX(0);
+    }
+    
+    /* Overlay pour fermer la sidebar */
+    #sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1050;
+        display: none;
+    }
+    
+    #sidebar-overlay.show {
+        display: block;
+    }
+    
+    /* Map prend toute la largeur sur mobile */
+    #map {
+        margin-left: 0;
+    }
+    
+    /* Repositionnement des containers de rapport et facture */
+    #delivery-report-container,
+    #invoice-send-container {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 350px;
+        max-height: 80vh;
+        z-index: 1200;
+    }
+    
+    /* Layer container adapté */
+    #layer-container {
+        top: 85px;
+        right: 5px;
+        padding: 5px;
+    }
+    
+    .layer-preview {
+        width: 35px;
+        height: 35px;
+        margin: 3px;
+    }
+    
+    /* Instructions container */
+    #instructions-container {
+        bottom: 5px;
+        right: 5px;
+        left: 5px;
+        max-width: none;
+        font-size: 0.8em;
+        padding: 10px;
+    }
+    
+    #toggleInstructions {
+        font-size: 0.75em;
+    }
+    
+    #instructionsList {
+        max-height: 150px;
+    }
+    
+    /* Toggle layers button */
+    #toggleLayersBtn {
+        top: 85px;
+        right: 50px;
+        padding: 6px 8px;
+        font-size: 0.75em;
+    }
+    
+    /* Interface Admin responsive */
+    #admin-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    #admin-header .title {
+        justify-content: center;
+        text-align: center;
+    }
+    
+    #admin-actions {
+        justify-content: center;
+    }
+    
+    #admin-main {
+        padding: 8px;
+        gap: 8px;
+    }
+    
+    #admin-panel {
+        padding: 8px;
+    }
+    
+    #reports-table {
+        font-size: 0.75em;
+    }
+    
+    #reports-table th,
+    #reports-table td {
+        padding: 4px 2px;
+    }
+    
+    .status-badge {
+        font-size: 0.65em;
+        padding: 1px 4px;
+    }
+    
+    .row-actions button {
+        padding: 2px 4px;
+        font-size: 0.65em;
+        margin-right: 1px;
+    }
+    
+    #admin-map {
+        height: 300px;
+    }
+    
+    /* Form groups responsive */
+    .datetime-group {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    /* Login responsive */
+    #login-container {
+        padding: 20px;
+        margin: 10px;
+    }
+    
+    #login-container h2 {
+        font-size: 1.5em;
+    }
+}
+
+/* Très petits écrans */
+@media screen and (max-width: 480px) {
+    #header h1 {
+        font-size: 1em;
+    }
+    
+    #header img {
+        width: 30px;
+        margin-right: 8px;
+    }
+    
+    #sidebar {
+        max-width: 280px;
+        padding: 10px;
+    }
+    
+    #sidebar h3 {
+        font-size: 1em;
+    }
+    
+    #sidebar button {
+        padding: 8px;
+        font-size: 0.85em;
+    }
+    
+    #delivery-report-container,
+    #invoice-send-container {
+        width: 95%;
+        padding: 15px;
+        max-height: 85vh;
+    }
+    
+    .layer-preview {
+        width: 30px;
+        height: 30px;
+        margin: 2px;
+    }
+    
+    #instructions-container {
+        font-size: 0.75em;
+        padding: 8px;
+    }
+    
+    #reports-table {
+        font-size: 0.7em;
+    }
+    
+    .status-badge {
+        font-size: 0.6em;
+    }
+    
+    .row-actions button {
+        font-size: 0.6em;
+        padding: 1px 3px;
+    }
+}
+
+/* Paysage mobile */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    #delivery-report-container,
+    #invoice-send-container {
+        max-height: 90vh;
+        top: 5%;
+        transform: translate(-50%, 0);
+    }
+    
+    #instructions-container {
+        max-height: 120px;
+    }
+    
+    #instructionsList {
+        max-height: 100px;
+    }
+}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js">
-// --- Fonctions Admin supplémentaires ---
-function modifierEnregistrement() {
-  alert("Fonction de modification à implémenter (admin pourra corriger un enregistrement).");
-}
-
-function exporterCSV() {
-  let rows = [];
-  document.querySelectorAll("#companyList li").forEach(li => {
-    rows.push([li.textContent, li.title]);
-  });
-  let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
-  let link = document.createElement("a");
-  link.setAttribute("href", csvContent);
-  link.setAttribute("download", "entreprises_export.csv");
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
-function rafraichirDonnees() {
-  location.reload();
-}
-
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 </head>
 <body>
+<!-- Overlay sidebar pour mobile -->
+<div id="sidebar-overlay"></div>
+
 <!-- Page de connexion -->
 <div id="login-overlay">
     <div id="login-container">
@@ -459,7 +1073,7 @@ function rafraichirDonnees() {
         <input type="password" id="password" class="login-input" placeholder="Mot de passe" autocomplete="off">
         <button id="login-btn">Se connecter</button>
         <div id="login-error">Identifiants incorrects. Veuillez réessayer.</div>
-        <!-- Astuce d'identifiants (optionnel à retirer en prod) -->
+        <!-- Astuce d'identifiants -->
         <div style="margin-top:10px;color:#ffffffcc;font-size:0.9em">
             <div><strong>Agent :</strong> IMPOTS / IMPOTS 229</div>
             <div><strong>Admin :</strong> ADMIN / ADMIN229</div>
@@ -470,14 +1084,17 @@ function rafraichirDonnees() {
 <!-- Application principale (Agent) -->
 <div id="app-container">
     <div id="header">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin">
-        <h1>Système de Distribution des Factures impôts</h1>
-        <!-- AJOUT : actions globales (affiché selon rôle) -->
+        <button id="menu-toggle">☰</button>
+        <div class="header-content">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin">
+            <h1>Système de Distribution des Factures impôts</h1>
+        </div>
         <div id="top-actions" style="display:none;">
-            <button id="switch-to-admin" class="top-btn dark">Interface Admin</button>
+            <button id="switch-to-admin" class="top-btn dark">Admin</button>
             <button id="logout-btn" class="top-btn danger">Déconnexion</button>
         </div>
     </div>
+    
     <div id="sidebar">
         <div id="coordContainer">
             <h3>Recherche par coordonnées</h3>
@@ -505,9 +1122,7 @@ function rafraichirDonnees() {
             <button id="pauseRoute">⏸ Pause</button>
             <button id="resumeRoute">▶️ Reprendre</button>
             <button id="stopRoute">🛑 Arrêter</button>
-            <!-- Bouton pour afficher/masquer le rapport de livraison placé après Arrêter -->
             <button id="toggle-delivery-report">📋 Rapport Livraison</button>
-            <!-- AJOUT : Bouton Envoi Facture sous Rapport Livraison -->
             <button id="toggle-invoice-send">✉️ Envoi Facture</button>
         </div>
     </div>
@@ -560,12 +1175,12 @@ function rafraichirDonnees() {
             </div>
         </div>
         
-        
         <div class="form-group">
             <label for="structure-name" style="display:none;">Structure ayant reçu la facture :</label>
             <input type="text" id="structure-name" placeholder="Nom de la structure" style="display:none;">
         </div>
-<button id="submit-report">📤 Envoyer le Rapport</button>
+        
+        <button id="submit-report">📤 Envoyer le Rapport</button>
     </div>
 
     <!-- Container pour l'envoi de facture -->
@@ -597,7 +1212,6 @@ function rafraichirDonnees() {
           <textarea id="invoice-message" name="message" placeholder="Message d'accompagnement..."></textarea>
         </div>
 
-        <!-- Champs cachés pour le modèle d'email -->
         <input type="hidden" name="from_name" id="invoice-from-name" value="">
         <input type="hidden" name="agent_contact" id="invoice-from-contact" value="">
         <input type="hidden" name="subject" id="invoice-subject" value="">
@@ -611,14 +1225,14 @@ function rafraichirDonnees() {
     
     <div id="layer-container"></div>
     <div id="map"></div>
-    <div id="toggleLayersBtn">Masquer/Afficher fonds</div>
+    <div id="toggleLayersBtn">Fonds</div>
     <div id="instructions-container">
-        <button id="toggleInstructions">Afficher/Cacher instructions</button>
+        <button id="toggleInstructions">Instructions</button>
         <ul id="instructionsList" style="display:none;"></ul>
     </div>
 </div>
 
-<!-- ====================== AJOUT : Interface Administrateur ====================== -->
+<!-- Interface Administrateur -->
 <div id="admin-container">
     <div id="admin-header">
         <div class="title">
@@ -632,10 +1246,11 @@ function rafraichirDonnees() {
         </div>
     </div>
     <div id="admin-main">
+        <div id="admin-map"></div>
         <div id="admin-panel">
             <h2>📑 Rapports reçus</h2>
             <input id="admin-search" placeholder="Rechercher (agent, statut, raison, contact, date, heure)...">
-            <div style="max-height: calc(100vh - 210px); overflow:auto; border:1px solid #eee; border-radius:8px;">
+            <div style="max-height: calc(100vh - 300px); overflow:auto; border:1px solid #eee; border-radius:8px;">
                 <table id="reports-table">
                     <thead>
                         <tr>
@@ -659,10 +1274,31 @@ function rafraichirDonnees() {
             </div>
             <div id="empty-state" style="display:none;">Aucun rapport pour le moment.</div>
         </div>
-        <div id="admin-map"></div>
     </div>
 </div>
-<!-- ============================================================================ -->
+
+<!-- Modal édition administrateur -->
+<div id="edit-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:12000; padding:20px;">
+  <div style="background:#fff; padding:16px; border-radius:8px; width:100%; max-width:420px; box-shadow:0 6px 18px rgba(0,0,0,0.2); max-height:90vh; overflow-y:auto;">
+    <h3 style="margin-top:0;">✏️ Modifier le rapport</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <input id="edit-id" type="hidden" />
+      <label>Statut:
+        <select id="edit-status" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;"><option value="delivered">Livrée</option><option value="not-delivered">Non livrée</option></select>
+      </label>
+      <label>Agent: <input id="edit-agentName" type="text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;" /></label>
+      <label>Contact: <input id="edit-agentContact" type="text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;" /></label>
+      <label>Structure: <input id="edit-structure" type="text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;" /></label>
+      <label>Date: <input id="edit-deliveryDate" type="date" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;" /></label>
+      <label>Heure: <input id="edit-deliveryTime" type="time" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;" /></label>
+      <label>Raison: <textarea id="edit-reason" style="min-height:60px;width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;"></textarea></label>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;">
+        <button onclick="closeEditModal()" style="background:#6c757d;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;">Annuler</button>
+        <button onclick="saveEdit()" style="background:#007bff;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
@@ -671,7 +1307,7 @@ function rafraichirDonnees() {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.8.0/proj4.js"></script>
 <script>
 // ====================== AUTH / MODE ======================
-let currentUserRole = null; // 'agent' | 'admin'
+let currentUserRole = null;
 const LS_KEY = 'deliveryReports_v1';
 
 function saveReportsToLS(reports) {
@@ -681,7 +1317,36 @@ function loadReportsFromLS() {
     try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch(e){ return []; }
 }
 
-// --- GESTION DE LA CONNEXION ---
+// ====================== MENU MOBILE ======================
+function initMobileMenu() {
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    
+    menuToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('show');
+        sidebarOverlay.classList.toggle('show');
+    });
+    
+    sidebarOverlay.addEventListener('click', function() {
+        sidebar.classList.remove('show');
+        sidebarOverlay.classList.remove('show');
+    });
+    
+    // Fermer la sidebar quand on clique sur un élément de navigation
+    sidebar.addEventListener('click', function(e) {
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'LI') {
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    sidebar.classList.remove('show');
+                    sidebarOverlay.classList.remove('show');
+                }, 300);
+            }
+        }
+    });
+}
+
+// ====================== GESTION DE LA CONNEXION ======================
 document.addEventListener('DOMContentLoaded', function() {
     const loginOverlay = document.getElementById('login-overlay');
     const appContainer = document.getElementById('app-container');
@@ -691,7 +1356,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const loginBtn = document.getElementById('login-btn');
     const loginError = document.getElementById('login-error');
     
-    // Fonction de vérification des identifiants (AJOUT : renvoie le rôle)
     function checkCredentials(username, password) {
         const u = (username || '').trim().toUpperCase();
         const p = (password || '').trim();
@@ -700,7 +1364,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return null;
     }
     
-    // Événement de connexion
     loginBtn.addEventListener('click', function() {
         const username = usernameInput.value;
         const password = passwordInput.value;
@@ -711,20 +1374,17 @@ document.addEventListener('DOMContentLoaded', function() {
             loginOverlay.style.display = 'none';
 
             if (role === 'admin') {
-                // Afficher directement l'interface admin
                 adminContainer.style.display = 'block';
                 appContainer.style.display = 'none';
-                initializeAdmin(); // init admin
+                initializeAdmin();
             } else {
-                // Mode agent
                 appContainer.style.display = 'block';
                 adminContainer.style.display = 'none';
-                // Afficher boutons entête si c'est un admin (ici non)
                 document.getElementById('top-actions').style.display = 'none';
                 initializeApp();
+                initMobileMenu();
             }
         } else {
-            // Échec de connexion
             loginError.style.display = 'block';
             usernameInput.value = '';
             passwordInput.value = '';
@@ -734,7 +1394,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Permettre la connexion avec la touche Entrée
     passwordInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             loginBtn.click();
@@ -742,7 +1401,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Boutons de bascule / déconnexion (affichage selon rôle)
 function setupTopActionsForRole() {
     const topActions = document.getElementById('top-actions');
     const switchToAdminBtn = document.getElementById('switch-to-admin');
@@ -750,7 +1408,6 @@ function setupTopActionsForRole() {
     const appContainer = document.getElementById('app-container');
     const adminContainer = document.getElementById('admin-container');
 
-    // Visible uniquement si admin
     if (currentUserRole === 'admin') {
         topActions.style.display = 'flex';
         switchToAdminBtn.onclick = () => {
@@ -770,8 +1427,9 @@ function setupTopActionsForRole() {
     if (switchToAgent) {
         switchToAgent.onclick = () => {
             adminContainer.style.display = 'none';
-            document.getElementById('app-container').style.display = 'block';
-            initializeApp(); // (ré)initialiser si besoin
+            appContainer.style.display = 'block';
+            initializeApp();
+            initMobileMenu();
             setupTopActionsForRole();
         };
     }
@@ -784,42 +1442,36 @@ function globalLogout() {
     document.getElementById('login-overlay').style.display = 'flex';
 }
 
-// ====================== CODE D'ORIGINE (APPLICATION AGENT) ======================
-// --- INITIALISATION DE L'APPLICATION (après connexion) ---
+// ====================== CODE APPLICATION AGENT ======================
 function initializeApp() {
-// --- VARIABLES GLOBALES (à ajouter ou modifier) ---
 var speech = window.speechSynthesis;
 var voiceEnabled = true;
-var lastSpokenInstructionTimestamp = 0; // Timestamp de la dernière fois qu'une instruction a été prononcée
-const MIN_SPEAK_INTERVAL = 5000; // Minimum 5 secondes entre deux instructions vocales (en ms)
+var lastSpokenInstructionTimestamp = 0;
+const MIN_SPEAK_INTERVAL = 5000;
 
-// --- VARIABLES ---
 var map = L.map('map').setView([9.3077,2.3158],7);
 var allCompanies = [];
-var selectedCompany = null; // AJOUT: structure sélectionnée (pour pré-remplir l'email)
+var selectedCompany = null;
 var routingControl=null, movingMarkerStart=null, movingMarkerEnd=null, movingCursor=null, routeLine=null;
 var routeCoords=[], routeInstructions=[], currentStep=0, routeInterval=null, isPaused=false;
 var userMarker=null;
-var gpsWatchId = null; // Pour stocker l'ID du watchPosition
-var currentInstructionIndex = 0; // Index de l'instruction courante à lire
-var lastSpokenInstruction = -1; // Index de la dernière instruction prononcée
-var voiceGuidanceInterval = null; // Intervalle pour le guidage vocal
+var gpsWatchId = null;
+var currentInstructionIndex = 0;
+var lastSpokenInstruction = -1;
+var voiceGuidanceInterval = null;
 
-// --- INFRASTRUCTURES FIXES ---
 var infrastructures = [
   { nom: "École Primaire Z", lat: 9.3100, lng: 2.3200, alerteFait: false },
   { nom: "Pont principal", lat: 9.3150, lng: 2.3250, alerteFait: false },
   { nom: "Rond-point central", lat: 9.3125, lng: 2.3180, alerteFait: false },
   { nom: "Hôpital Général", lat: 9.3170, lng: 2.3100, alerteFait: false }
 ];
-var infraAlertDistance = 25; // distance en mètres pour alerte
+var infraAlertDistance = 25;
 
-// --- ICONS ---
 var greenIcon = new L.Icon({ iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/green-dot.png', iconSize:[32,32], iconAnchor:[16,32] });
 var redIcon = new L.Icon({ iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png', iconSize:[32,32], iconAnchor:[16,32] });
 var googleCursorIcon = new L.Icon({ iconUrl:'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png', iconSize:[32,32], iconAnchor:[16,32] });
 
-// --- BASE MAPS ---
 var baseLayers = {
 "OSM": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:25, maxNativeZoom: 19, attribution:'', errorTileUrl:''}).addTo(map),
 "Google Satellite": L.tileLayer('https://mt.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{maxZoom:25, maxNativeZoom: 19, attribution:'', errorTileUrl:''}),
@@ -827,15 +1479,15 @@ var baseLayers = {
 "Google Terrain": L.tileLayer('https://mt.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{maxZoom:25, maxNativeZoom: 19, attribution:'', errorTileUrl:''})
 };
 
-// --- MINIATURES ---
 var layerThumbs = {
 "OSM":"https://tile.openstreetmap.org/5/15/10.png",
 "Google Satellite":"https://mt.google.com/vt/lyrs=s&x=10&y=10&z=5",
 "Google Earth":"https://mt.google.com/vt/lyrs=y&x=10&y=10&z=5",
 "Google Terrain":"https://mt.google.com/vt/lyrs=p&x=10&y=10&z=5"
 };
+
 var layerContainer=document.getElementById('layer-container');
-layerContainer.innerHTML = ''; // reset si on réinit
+layerContainer.innerHTML = '';
 Object.keys(baseLayers).forEach((key,idx)=>{
     var div=document.createElement('div');
     div.className="layer-preview"+(idx===0?" active":"");
@@ -850,14 +1502,12 @@ Object.keys(baseLayers).forEach((key,idx)=>{
     layerContainer.appendChild(div);
 });
 
-// --- BOUTON MASQUER / AFFICHER FONDS ---
 var layerContainerVisible = true;
 document.getElementById('toggleLayersBtn').onclick = () => {
     layerContainerVisible = !layerContainerVisible;
     layerContainer.style.display = layerContainerVisible ? 'flex' : 'none';
 };
 
-// --- VOICE ---
 function speak(text){
     if(!voiceEnabled) return;
     if (speech.speaking) { return; }
@@ -871,7 +1521,6 @@ function speak(text){
 }
 document.getElementById('toggleVoice').onclick=()=>{ voiceEnabled=!voiceEnabled; alert('Voix '+(voiceEnabled?'activée':'désactivée')); };
 
-// --- LOCALISATION ---
 document.getElementById('locateBtn').onclick=()=>{ map.locate({setView:true,maxZoom:25}); };
 map.on('locationfound', e => {
     if(userMarker) map.removeLayer(userMarker);
@@ -880,7 +1529,6 @@ map.on('locationfound', e => {
 });
 map.on('locationerror',()=>{ alert("Impossible de vous localiser."); });
 
-// --- ENTREPRISES ---
 fetch('/api/entreprises')
   .then(r => r.json())
   .then(data => {
@@ -905,7 +1553,6 @@ document.getElementById('toggleCompanies').onclick = () => {
     list.style.display = (window.getComputedStyle(list).display === "none") ? "block" : "none";
 };
 
-// --- RECHERCHE STRUCTURE ---
 document.getElementById('searchStructureBtn').onclick = () => {
     const query = document.getElementById('searchStructureInput').value.trim().toLowerCase();
     if (!query) { alert("Veuillez saisir le nom d'une structure."); return; }
@@ -915,8 +1562,6 @@ document.getElementById('searchStructureBtn').onclick = () => {
     startRoute(parseFloat(match.Latitude), parseFloat(match.Longitude), match.Nom_Entreprise);
 };
 
-
-// --- RECHERCHE PAR COORDONNÉES AVEC ITINÉRAIRE (CORRIGÉE POUR UTM) ---
 document.getElementById('coordBtnSidebar').onclick = () => {
     const lat = parseFloat(document.getElementById('latInput').value);
     const lng = parseFloat(document.getElementById('lngInput').value);
@@ -928,10 +1573,9 @@ document.getElementById('coordBtnSidebar').onclick = () => {
     let destLat = lat, destLng = lng;
     if (coordType === "utm") {
         try {
-            // Exemple: fuseau 31N pour le Bénin (à ajuster si besoin)
             const utmProj = "+proj=utm +zone=31 +datum=WGS84 +units=m +no_defs";
             const geoProj = "+proj=longlat +datum=WGS84 +no_defs";
-            const res = proj4(utmProj, geoProj, [lng, lat]); // [Est, Nord]
+            const res = proj4(utmProj, geoProj, [lng, lat]);
             destLng = res[0];
             destLat = res[1];
         } catch(e){ alert("Erreur de conversion UTM: " + e); return; }
@@ -940,8 +1584,6 @@ document.getElementById('coordBtnSidebar').onclick = () => {
     startRouteWithoutVoice(destLat, destLng, `Destination (${destLat.toFixed(5)}, ${destLng.toFixed(5)})`);
 };
 
-
-// --- ROUTE ET ANIMATIONS ---
 function clearRoute(){
     clearInterval(routeInterval);
     if (voiceGuidanceInterval) clearInterval(voiceGuidanceInterval);
@@ -972,13 +1614,13 @@ function clearRoute(){
 }
 
 function distance(latlng1,latlng2){
-    const R=6371000; // m
+    const R=6371000;
     const toRad=d=>d*Math.PI/180;
     const dLat=toRad(latlng2[0]-latlng1[0]);
     const dLon=toRad(latlng2[1]-latlng1[1]);
     const lat1=toRad(latlng1[0]); const lat2=toRad(latlng2[0]);
     const a=Math.sin(dLat/2)**2 + Math.sin(dLon/2)**2 * Math.cos(lat1)*Math.cos(lat2);
-    return 2*R*Math.atan2(Math.sqrt(a),Math.atan2(Math.sqrt(1-a),1)); // stable
+    return 2*R*Math.atan2(Math.sqrt(a),Math.atan2(Math.sqrt(1-a),1));
 }
 
 function resumeRouteAnimation(){
@@ -997,7 +1639,6 @@ function resumeRouteAnimation(){
     },200);
 }
 
-// --- VOICE GUIDANCE + INFRA ---
 function startVoiceGuidance(){
     if(!routeInstructions || routeInstructions.length===0) return;
     if (gpsWatchId) navigator.geolocation.clearWatch(gpsWatchId);
@@ -1048,7 +1689,6 @@ function startVoiceGuidance(){
     });
 }
 
-// --- DÉMARRER ROUTE (avec voix) ---
 function startRoute(lat,lng,name){
     clearRoute();
     if(voiceEnabled) speak(`Itinéraire vers ${name} en cours`);
@@ -1096,7 +1736,6 @@ function startRoute(lat,lng,name){
     },()=>{ alert("Position introuvable"); });
 }
 
-// --- DÉMARRER ROUTE SANS VOIX ---
 function startRouteWithoutVoice(lat,lng,name){
     clearRoute();
     infrastructures.forEach(i => i.alerteFait = false);
@@ -1142,7 +1781,6 @@ function startRouteWithoutVoice(lat,lng,name){
     },()=>{ alert("Position introuvable"); });
 }
 
-// --- BOUTONS ---
 document.getElementById("pauseRoute").onclick=()=>{
     if(routeInterval && !isPaused){
         clearInterval(routeInterval);
@@ -1165,12 +1803,10 @@ document.getElementById("stopRoute").onclick=()=>{
     clearRoute(); 
 };
 
-// --- SYSTÈME DE RAPPORT DE LIVRAISON ---
+// Rapport de livraison
 var deliveryReportVisible = false;
-// IMPORTANT : on charge l'existant depuis localStorage
 var deliveryReports = loadReportsFromLS();
 
-// Initialiser les dates et heures par défaut
 function initializeDateTime() {
     const now = new Date();
     const today = now.toISOString().split('T')[0];
@@ -1179,20 +1815,17 @@ function initializeDateTime() {
     document.getElementById('delivery-time').value = currentTime;
 }
 
-// Afficher/masquer le container de rapport
 document.getElementById('toggle-delivery-report').onclick = () => {
     deliveryReportVisible = !deliveryReportVisible;
     const container = document.getElementById('delivery-report-container');
     container.style.display = deliveryReportVisible ? 'block' : 'none';
     if (deliveryReportVisible) { 
         initializeDateTime(); 
-        // Éviter le chevauchement avec l'envoi de facture
         const inv = document.getElementById('invoice-send-container');
         if (inv) inv.style.display = 'none';
     }
 };
 
-// Gestion des options de livraison
 document.getElementById('delivered-radio').onchange = function() {
     if (this.checked) {
         document.getElementById('reason-container').style.display = 'none';
@@ -1205,7 +1838,6 @@ document.getElementById('not-delivered-radio').onchange = function() {
     }
 };
 
-// Messages
 function showMessage(type, message) {
     const successMsg = document.getElementById('success-message');
     const errorMsg = document.getElementById('error-message');
@@ -1222,7 +1854,6 @@ function showMessage(type, message) {
     }
 }
 
-// Validation
 function validateForm() {
     const deliveryStatus = document.querySelector('input[name="delivery-status"]:checked');
     const agentName = document.getElementById('agent-name').value.trim();
@@ -1242,7 +1873,6 @@ function validateForm() {
     return true;
 }
 
-// Réinitialiser
 function resetForm() {
     document.querySelectorAll('input[name="delivery-status"]').forEach(radio => radio.checked = false);
     document.getElementById('reason-container').style.display = 'none';
@@ -1254,7 +1884,6 @@ function resetForm() {
     document.getElementById('error-message').style.display = 'none';
 }
 
-// Soumettre le rapport (enregistre aussi dans localStorage)
 document.getElementById('submit-report').onclick = () => {
     if (!validateForm()) { return; }
     const deliveryStatus = document.querySelector('input[name="delivery-status"]:checked').value;
@@ -1264,10 +1893,9 @@ document.getElementById('submit-report').onclick = () => {
     const deliveryTime = document.getElementById('delivery-time').value;
     const reasonText = document.getElementById('reason-text').value.trim();
     
-    // Créer l'objet rapport — date & heure auto inclues (timestamp)
     const report = {
         id: Date.now(),
-        timestamp: new Date().toISOString(), // auto
+        timestamp: new Date().toISOString(),
         status: deliveryStatus,
         reason: deliveryStatus === 'not-delivered' ? reasonText : '',
         agentName: agentName,
@@ -1281,30 +1909,19 @@ document.getElementById('submit-report').onclick = () => {
         } : null
     };
     
-    // Stockage
     deliveryReports.push(report);
     saveReportsToLS(deliveryReports);
     console.log('Rapport de livraison:', report);
     
     const statusText = deliveryStatus === 'delivered' ? 'livrée' : 'non livrée';
     showMessage('success', `Rapport de facture ${statusText} envoyé avec succès !`);
-    // voix supprimée
 
     setTimeout(() => { resetForm(); }, 2000);
 };
 
-// Initialiser le système au chargement
 initializeDateTime();
 
-// Bouton instructions
-document.getElementById('toggleInstructions').onclick=()=>{ 
-    var container=document.getElementById('instructions-container');
-    container.classList.toggle('show');
-    var l=document.getElementById('instructionsList');
-    l.style.display=(l.style.display==="none")?"block":"none";
-};
-
-// ====================== ENVOI DE FACTURE (PHP direct) ======================
+// Envoi de facture
 let invoicePanelVisible = false;
 document.getElementById('toggle-invoice-send').onclick = () => {
   invoicePanelVisible = !invoicePanelVisible;
@@ -1347,9 +1964,9 @@ document.getElementById('send-invoice').onclick = async (e) => {
 
   try {
     const response = await fetch("http://127.0.0.1:5000/sendmail", {
-  method: "POST",
-  body: formData
-});
+      method: "POST",
+      body: formData
+    });
 
     const result = await response.text();
     if (result.includes("SUCCESS")) {
@@ -1368,18 +1985,33 @@ document.getElementById('send-invoice').onclick = async (e) => {
     sendBtn.textContent = '🚀 Envoyer la facture';
   }
 };
+
+document.getElementById('toggleInstructions').onclick=()=>{ 
+    var container=document.getElementById('instructions-container');
+    container.classList.toggle('show');
+    var l=document.getElementById('instructionsList');
+    l.style.display=(l.style.display==="none")?"block":"none";
+};
+
+document.getElementById('delivered-radio').addEventListener('change', function(){
+  document.getElementById('structure-name').style.display = 'block';
+  document.querySelector('label[for="structure-name"]').style.display = 'block';
+});
+document.getElementById('not-delivered-radio').addEventListener('change', function(){
+  document.getElementById('structure-name').style.display = 'none';
+  document.querySelector('label[for="structure-name"]').style.display = 'none';
+});
+
 setupTopActionsForRole();
-} // fin initializeApp
+}
 
 // ====================== INTERFACE ADMIN ======================
 let adminMap = null;
 let adminMarkersLayer = null;
 
 function initializeAdmin() {
-    // Boutons haut
     setupTopActionsForRole();
 
-    // Map
     if (!adminMap) {
         adminMap = L.map('admin-map').setView([9.3077,2.3158],7);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:25, maxNativeZoom: 19}).addTo(adminMap);
@@ -1389,12 +2021,10 @@ function initializeAdmin() {
         adminMap.invalidateSize();
     }
 
-    // Charger rapports
     const reports = loadReportsFromLS();
     renderAdminTable(reports);
     plotAdminMarkers(reports);
 
-    // Recherche / filtre
     const searchInput = document.getElementById('admin-search');
     searchInput.oninput = () => {
         const q = (searchInput.value || '').toLowerCase();
@@ -1414,7 +2044,6 @@ function initializeAdmin() {
         plotAdminMarkers(filtered);
     };
 
-    // Export CSV
     document.getElementById('export-csv').onclick = () => exportReportsCSV(loadReportsFromLS());
 }
 
@@ -1443,17 +2072,16 @@ function renderAdminTable(reports) {
             <td>${escapeHtml(r.agentContact||'')}</td>
             <td>${escapeHtml(r.deliveryDate||'')}</td>
             <td>${escapeHtml(r.deliveryTime||'')}</td>
-            <td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(r.reason||'')}">${escapeHtml(r.reason||'')}</td>
-            <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(r.structure||'')}">${escapeHtml(r.structure||'')}</td>
+            <td style="max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(r.reason||'')}">${escapeHtml(r.reason||'')}</td>
+            <td style="max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(r.structure||'')}">${escapeHtml(r.structure||'')}</td>
             <td>${posTxt}</td>
-            <td>${created}</td>
+            <td style="font-size:0.7em;">${created}</td>
             <td class="row-actions">
                 <button class="focus">Voir</button>
-                <button class="edit">Modifier</button>
-                <button class="delete">Suppr.</button>
+                <button class="edit">Modif</button>
+                <button class="delete">Suppr</button>
             </td>
         `;
-        // Actions
         const focusBtn = tr.querySelector('.focus');
         const editBtn = tr.querySelector('.edit');
         const delBtn = tr.querySelector('.delete');
@@ -1497,7 +2125,6 @@ function focusOnReport(report) {
     if (!report || !report.location) return;
     const {lat,lng} = report.location;
     adminMap.setView([lat,lng], 18, {animate:true});
-    // Ouvrir popup du marker correspondant si présent
     adminMarkersLayer.eachLayer(l=>{
         if (l.getLatLng && Math.abs(l.getLatLng().lat - lat) < 1e-6 && Math.abs(l.getLatLng().lng - lng) < 1e-6) {
             l.openPopup();
@@ -1509,12 +2136,12 @@ function deleteReport(id) {
     if (!confirm("Supprimer ce rapport ?")) return;
     const reports = loadReportsFromLS().filter(r=>r.id !== id);
     saveReportsToLS(reports);
-    initializeAdmin(); // refresh
+    initializeAdmin();
 }
 
 function exportReportsCSV(reports) {
     const rows = [
-        ['id','timestamp','status','reason','agentName','agentContact','deliveryDate','deliveryTime','lat','lng']
+        ['id','timestamp','status','reason','agentName','agentContact','structure','deliveryDate','deliveryTime','lat','lng']
     ];
     (reports||[]).forEach(r=>{
         rows.push([
@@ -1524,6 +2151,7 @@ function exportReportsCSV(reports) {
             (r.reason||'').replace(/\n/g,' '),
             r.agentName||'',
             r.agentContact||'',
+            r.structure||'',
             r.deliveryDate||'',
             r.deliveryTime||'',
             r.location && r.location.lat != null ? r.location.lat : '',
@@ -1547,14 +2175,6 @@ function escapeHtml(str){
     return String(str || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
-// Déclencheur si un autre onglet modifie le stockage
-window.addEventListener('storage', (e)=>{
-    if (e.key === LS_KEY && document.getElementById('admin-container').style.display === 'block') {
-        initializeAdmin();
-    }
-});
-
-// --- Modal d'édition admin ---
 function openEditModal(report) {
   document.getElementById('edit-id').value = report.id;
   document.getElementById('edit-status').value = report.status || 'delivered';
@@ -1588,75 +2208,12 @@ function saveEdit() {
   initializeAdmin();
 }
 
-// Modify exportReportsCSV to include 'structure' if present
-(function(){
-  const orig = exportReportsCSV;
-  exportReportsCSV = function(reports) {
-      const rows = [
-          ['id','timestamp','status','reason','agentName','agentContact','structure','deliveryDate','deliveryTime','lat','lng']
-      ];
-      (reports||[]).forEach(r=>{
-          rows.push([
-              r.id||'',
-              r.timestamp||'',
-              r.status||'',
-              (r.reason||'').replace(/\n/g,' '),
-              r.agentName||'',
-              r.agentContact||'',
-              r.structure||'',
-              r.deliveryDate||'',
-              r.deliveryTime||'',
-              r.location && r.location.lat != null ? r.location.lat : '',
-              r.location && r.location.lng != null ? r.location.lng : ''
-          ]);
-      });
-      const csv = rows.map(row=>row.map(cell => {
-          const s = String(cell).replace(/"/g,'""');
-          return `"\${s}"`;
-      }).join(',')).join('\n');
-      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'rapports_impots.csv';
-      document.body.appendChild(a); a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-  };
-})();
-
-// --- Toggle champ Structure selon statut ---
-document.getElementById('delivered-radio').addEventListener('change', function(){
-  document.getElementById('structure-name').style.display = 'block';
-  document.querySelector('label[for="structure-name"]').style.display = 'block';
-});
-document.getElementById('not-delivered-radio').addEventListener('change', function(){
-  document.getElementById('structure-name').style.display = 'none';
-  document.querySelector('label[for="structure-name"]').style.display = 'none';
+window.addEventListener('storage', (e)=>{
+    if (e.key === LS_KEY && document.getElementById('admin-container').style.display === 'block') {
+        initializeAdmin();
+    }
 });
 </script>
-
-<!-- Modal édition administrateur -->
-<div id="edit-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:12000;">
-  <div style="background:#fff; padding:16px; border-radius:8px; width:420px; box-shadow:0 6px 18px rgba(0,0,0,0.2);">
-    <h3 style="margin-top:0;">✏️ Modifier le rapport</h3>
-    <div style="display:flex;flex-direction:column;gap:8px;">
-      <input id="edit-id" type="hidden" />
-      <label>Statut:
-        <select id="edit-status"><option value="delivered">Livrée</option><option value="not-delivered">Non livrée</option></select>
-      </label>
-      <label>Agent: <input id="edit-agentName" type="text" /></label>
-      <label>Contact: <input id="edit-agentContact" type="text" /></label>
-      <label>Structure: <input id="edit-structure" type="text" /></label>
-      <label>Date: <input id="edit-deliveryDate" type="date" /></label>
-      <label>Heure: <input id="edit-deliveryTime" type="time" /></label>
-      <label>Raison: <textarea id="edit-reason" style="min-height:60px;"></textarea></label>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;">
-        <button onclick="closeEditModal()" style="background:#6c757d;color:#fff;padding:8px;border-radius:6px;border:none;">Annuler</button>
-        <button onclick="saveEdit()" style="background:#007bff;color:#fff;padding:8px;border-radius:6px;border:none;">Enregistrer</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 </body>
 </html>
