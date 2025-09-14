@@ -1,0 +1,1662 @@
+<!DOCTYPE html> 
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Système de Distribution des Factures Impôts</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-minimap/dist/Control.MiniMap.min.css" />
+<style>
+/* Styles pour la page de connexion */
+#login-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#login-container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    width: 350px;
+    text-align: center;
+}
+
+#login-container h2 {
+    margin-top: 0;
+    color: #007bff;
+    margin-bottom: 25px;
+    font-size: 1.8em;
+}
+
+.login-input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1em;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+.login-input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+#login-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(145deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+    margin-top: 10px;
+}
+
+#login-btn:hover {
+    background: linear-gradient(145deg, #0056b3, #003f7f);
+    transform: translateY(-2px);
+}
+
+#login-error {
+    color: #dc3545;
+    margin-top: 15px;
+    display: none;
+    font-weight: 500;
+}
+
+/* Styles pour l'application principale (masquée initialement) */
+#app-container {
+    display: none;
+}
+
+body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f5f5f5; }
+#header { display:flex; justify-content:center; align-items:center; background:#007bff; color:white; padding:15px; box-shadow:0 2px 6px rgba(0,0,0,0.3); position:relative; z-index:1001; }
+#header img { width:50px; margin-right:15px; }
+#header h1 { margin:0; font-size:1.8em; text-shadow:1px 1px 2px #000; }
+#map { height: calc(100vh - 80px); }
+#sidebar { position:absolute; top:80px; left:0; bottom:0; width:280px; z-index:1000; background:rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding:15px; overflow-y:auto; display:flex; flex-direction:column; border-radius:0 12px 12px 0; box-shadow:2px 4px 12px rgba(0,0,0,0.15); }
+#sidebar h3 { margin-top:0; text-align:center; color:#007bff; }
+#sidebar input, #sidebar select { width: calc(100% - 16px); padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #ccc; font-size:0.95em; transition:0.2s all; }
+#sidebar input:focus, #sidebar select:focus { border-color:#007bff; box-shadow:0 0 6px rgba(0,123,255,0.4); outline:none; }
+#sidebar button { width:100%; padding:10px; margin-bottom:8px; border:none; border-radius:8px; color:white; cursor:pointer; font-weight:600; transition:0.25s all; background: linear-gradient(145deg,#007bff,#0056b3); box-shadow:0 2px 4px rgba(0,0,0,0.2); }
+#sidebar button:hover { background: linear-gradient(145deg,#0056b3,#003f7f); transform: translateY(-2px); }
+#companyList { display:none; list-style:none; padding:0; margin:0; max-height:200px; overflow-y:auto; border:1px solid #ddd; border-radius:5px; }
+#companyList li { padding:8px 10px; cursor:pointer; border-bottom:1px solid #eee; transition:0.2s; border-radius:3px; }
+#companyList li:hover, #companyList li.active { background:#007bff; color:white; }
+#routeControls { margin-top:auto; border-top:1px solid #eee; padding-top:15px; }
+#routeControls h3 { color:#28a745; }
+#pauseRoute { background:#ffc107; color:black; }
+#resumeRoute { background:#17a2b8; }
+#stopRoute { background:#dc3545; }
+#locateBtn { background:#28a745; }
+#layer-container { position:absolute; top:90px; right:10px; z-index:1000; background:rgba(255,255,255,0.95); backdrop-filter: blur(8px); padding:10px; border-radius:12px; display:flex; flex-direction:column; box-shadow:0 4px 12px rgba(0,0,0,0.25); }
+.layer-preview { width:50px; height:50px; margin:5px; cursor:pointer; border:2px solid #ccc; background-size:cover; background-position:center; border-radius:8px; transition:0.3s all; }
+.layer-preview.active, .layer-preview:hover { transform: scale(1.1); border-color:#007bff; box-shadow:0 2px 8px rgba(0,123,255,0.4); }
+#instructions-container { position:absolute; bottom:10px; right:10px; z-index:1001; max-width:300px; background:rgba(255,255,255,0.9); backdrop-filter: blur(10px); border-radius:10px; box-shadow:0 4px 14px rgba(0,0,0,0.25); padding:15px; font-size:0.9em; transition: transform 0.3s ease, opacity 0.3s ease; transform: translateY(20px); opacity: 0.95; }
+#instructions-container.show { transform: translateY(0); opacity: 1; }
+#toggleInstructions { background:#007bff; border:none; color:white; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:0.85em; margin-bottom:5px; }
+#instructionsList { max-height:200px; overflow-y:auto; padding-left:10px; }
+#instructionsList li { padding:6px 8px; margin-bottom:4px; border-radius:6px; transition:0.2s; }
+#instructionsList li.current { background:#007bff; color:white; font-weight:bold; box-shadow:0 2px 6px rgba(0,123,255,0.4); }
+/* Curseur style Google Maps */
+.leaflet-container { cursor: url('https://maps.gstatic.com/mapfiles/openhand_8_8.cur'), move; }
+#toggleLayersBtn { position:absolute; top:50px; right:10px; z-index:1002; padding:8px 12px; border:none; background:#007bff; color:white; border-radius:8px; cursor:pointer; }
+/* Supprimer les cadres des tuiles (si présents) */
+.leaflet-tile-container img { border: none !important; outline: none !important; }
+/* Supprimer les grilles */
+
+
+/* Styles pour le système de rapport de livraison */
+#delivery-report-container {
+    position: absolute;
+    top: 90px;
+    left: 300px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    width: 350px;
+    display: none;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#delivery-report-container h3 {
+    margin-top: 0;
+    color: #007bff;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.3em;
+}
+
+.delivery-option {
+    margin-bottom: 15px;
+}
+
+.delivery-option input[type="radio"] {
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+.delivery-option label {
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.delivery-option label.delivered {
+    color: #28a745;
+}
+
+.delivery-option label.not-delivered {
+    color: #dc3545;
+}
+
+#reason-container {
+    display: none;
+    margin-top: 10px;
+}
+
+#reason-text {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+    font-size: 0.9em;
+}
+
+#reason-text:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.9em;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
+}
+
+.datetime-group {
+    display: flex;
+    gap: 10px;
+}
+
+.datetime-group .form-group {
+    flex: 1;
+}
+
+#submit-report {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(145deg, #28a745, #1e7e34);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+}
+
+#submit-report:hover {
+    background: linear-gradient(145deg, #1e7e34, #155724);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#submit-report:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+#toggle-delivery-report {
+    background: linear-gradient(145deg, #28a745, #1e7e34);
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 8px;
+    border: none;
+}
+
+#toggle-delivery-report:hover {
+    background: linear-gradient(145deg, #1e7e34, #155724);
+    transform: translateY(-2px);
+}
+
+.success-message {
+    background: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #c3e6cb;
+    display: none;
+}
+
+.error-message {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #f5c6cb;
+    display: none;
+}
+
+/* ====================== AJOUT : Interface Admin ====================== */
+#admin-container { display:none; }
+#admin-header {
+    display:flex; align-items:center; justify-content:space-between;
+    background:#343a40; color:#fff; padding:12px 16px;
+}
+#admin-header .title { display:flex; align-items:center; gap:12px; }
+#admin-header img { width:36px; }
+#admin-actions { display:flex; gap:8px; }
+.admin-btn {
+    padding:8px 12px; border:none; border-radius:8px; cursor:pointer; color:#fff;
+    background: #007bff; font-weight:600;
+}
+.admin-btn.secondary { background:#6c757d; }
+.admin-btn.danger { background:#dc3545; }
+#admin-main { display:grid; grid-template-columns: 420px 1fr; gap:12px; padding:12px; }
+#admin-panel {
+    background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); padding:12px;
+}
+#admin-panel h2 { margin:0 0 10px; color:#007bff; font-size:1.3em; }
+#admin-search { width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:8px; }
+#reports-table { width:100%; border-collapse:collapse; font-size:0.92em; }
+#reports-table th, #reports-table td { border-bottom:1px solid #eee; padding:8px 6px; text-align:left; }
+#reports-table th { position:sticky; top:0; background:#f7f9fc; z-index:1; }
+.status-badge { padding:2px 8px; border-radius:999px; font-weight:700; font-size:0.8em; }
+.status-ok { background:#d4edda; color:#155724; }
+.status-ko { background:#f8d7da; color:#721c24; }
+.row-actions button { border:none; border-radius:6px; padding:4px 8px; margin-right:4px; cursor:pointer; }
+.row-actions .focus { background:#17a2b8; color:#fff; }
+.row-actions .delete { background:#ffc107; color:#000; }
+#admin-map { height: calc(100vh - 120px); border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+#empty-state { font-size:0.95em; color:#555; padding:8px 0 0; }
+
+/* Boutons d'entête (basculer/déconnexion) visuels */
+#top-actions {
+    position:absolute; right:12px; top:12px; display:flex; gap:8px; z-index:1100;
+}
+.top-btn {
+    padding:8px 12px; border:none; border-radius:999px; cursor:pointer; font-weight:700;
+    background:#ffffff; color:#007bff; box-shadow:0 2px 6px rgba(0,0,0,0.2);
+}
+.top-btn.danger { color:#fff; background:#dc3545; }
+.top-btn.dark { color:#fff; background:#343a40; }
+/* ==================================================================== */
+
+/* ====================== ENVOI FACTURE ====================== */
+#invoice-send-container {
+    position: absolute;
+    top: 90px;
+    left: 300px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    width: 350px;
+    display: none;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+#invoice-send-container h3 {
+    margin-top: 0;
+    color: #007bff;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.3em;
+}
+#toggle-invoice-send {
+    background: linear-gradient(145deg, #0069d9, #004a9f);
+    color: #fff; border-radius: 8px; cursor:pointer; font-weight:600;
+    transition: all .3s; box-shadow:0 2px 6px rgba(0,0,0,.2);
+    width:100%; padding:10px; margin-bottom:8px; border:none;
+}
+#toggle-invoice-send:hover {
+    background: linear-gradient(145deg, #004a9f, #003a80);
+    transform: translateY(-2px);
+}
+#send-invoice {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(145deg, #0069d9, #004a9f);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 8px;
+}
+#send-invoice:hover { background: linear-gradient(145deg, #004a9f, #003a80); transform: translateY(-2px); }
+#send-invoice:disabled { background:#6c757d; cursor:not-allowed; transform:none; }
+#invoice-success-msg, #invoice-error-msg {
+    padding:10px; border-radius:8px; margin-bottom:12px; display:none; border:1px solid transparent;
+}
+#invoice-success-msg { background:#d4edda; color:#155724; border-color:#c3e6cb; }
+#invoice-error-msg   { background:#f8d7da; color:#721c24; border-color:#f5c6cb; }
+.small-muted { font-size:.85em; color:#666; }
+.accepted-types { font-size:.85em; color:#007bff; }
+/* ========================================================== */
+
+/* Suppression totale des cadres ou lignes entre tuiles */
+.leaflet-tile {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+.leaflet-tile-container img {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+
+/* Suppression forcée de tout quadrillage / bordures des fonds Leaflet */
+.leaflet-tile, 
+.leaflet-tile-container img,
+.leaflet-layer,
+.leaflet-tile-pane,
+.leaflet-map-pane,
+.leaflet-pane {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    background: none !important;
+}
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js">
+// --- Fonctions Admin supplémentaires ---
+function modifierEnregistrement() {
+  alert("Fonction de modification à implémenter (admin pourra corriger un enregistrement).");
+}
+
+function exporterCSV() {
+  let rows = [];
+  document.querySelectorAll("#companyList li").forEach(li => {
+    rows.push([li.textContent, li.title]);
+  });
+  let csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+  let link = document.createElement("a");
+  link.setAttribute("href", csvContent);
+  link.setAttribute("download", "entreprises_export.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function rafraichirDonnees() {
+  location.reload();
+}
+
+</script>
+</head>
+<body>
+<!-- Page de connexion -->
+<div id="login-overlay">
+    <div id="login-container">
+        <h2>Connexion au Système</h2>
+        <input type="text" id="username" class="login-input" placeholder="Nom d'utilisateur" autocomplete="off">
+        <input type="password" id="password" class="login-input" placeholder="Mot de passe" autocomplete="off">
+        <button id="login-btn">Se connecter</button>
+        <div id="login-error">Identifiants incorrects. Veuillez réessayer.</div>
+        <!-- Astuce d'identifiants (optionnel à retirer en prod) -->
+        <div style="margin-top:10px;color:#ffffffcc;font-size:0.9em">
+            <div><strong>Agent :</strong> IMPOTS / IMPOTS 229</div>
+            <div><strong>Admin :</strong> ADMIN / ADMIN229</div>
+        </div>
+    </div>
+</div>
+
+<!-- Application principale (Agent) -->
+<div id="app-container">
+    <div id="header">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin">
+        <h1>Système de Distribution des Factures impôts</h1>
+        <!-- AJOUT : actions globales (affiché selon rôle) -->
+        <div id="top-actions" style="display:none;">
+            <button id="switch-to-admin" class="top-btn dark">Interface Admin</button>
+            <button id="logout-btn" class="top-btn danger">Déconnexion</button>
+        </div>
+    </div>
+    <div id="sidebar">
+        <div id="coordContainer">
+            <h3>Recherche par coordonnées</h3>
+            <input id="latInput" placeholder="Latitude / Est" type="text">
+            <input id="lngInput" placeholder="Longitude / Nord" type="text">
+            <select id="coordType">
+                <option value="geo">Géographique (Lat/Lng)</option>
+                <option value="utm">UTM / Métrique</option>
+            </select>
+            <button id="coordBtnSidebar">📍 Aller</button>
+        </div>
+        <div id="searchControls">
+            <h3>Rechercher une Structure</h3>
+            <input type="text" id="searchStructureInput" placeholder="Nom de la structure">
+            <button id="searchStructureBtn">🔍 Rechercher</button>
+            <button id="locateBtn">📍 Me localiser</button>
+            <button id="toggleVoice">🔊 Voix ON/OFF</button>
+        </div>
+        <div id="companySection">
+            <button id="toggleCompanies">📂 Afficher/Cacher entreprises</button>
+            <ul id="companyList"></ul>
+        </div>
+        <div id="routeControls">
+            <h3>Navigation</h3>
+            <button id="pauseRoute">⏸ Pause</button>
+            <button id="resumeRoute">▶️ Reprendre</button>
+            <button id="stopRoute">🛑 Arrêter</button>
+            <!-- Bouton pour afficher/masquer le rapport de livraison placé après Arrêter -->
+            <button id="toggle-delivery-report">📋 Rapport Livraison</button>
+            <!-- AJOUT : Bouton Envoi Facture sous Rapport Livraison -->
+            <button id="toggle-invoice-send">✉️ Envoi Facture</button>
+        </div>
+    </div>
+    
+    <!-- Container pour le rapport de livraison -->
+    <div id="delivery-report-container">
+        <h3>📋 Rapport de Livraison</h3>
+        
+        <div id="success-message" class="success-message"></div>
+        <div id="error-message" class="error-message"></div>
+        
+        <div class="delivery-option">
+            <label class="delivered">
+                <input type="radio" name="delivery-status" value="delivered" id="delivered-radio">
+                ✅ Facture Livrée
+            </label>
+        </div>
+        
+        <div class="delivery-option">
+            <label class="not-delivered">
+                <input type="radio" name="delivery-status" value="not-delivered" id="not-delivered-radio">
+                ❌ Facture Non Livrée
+            </label>
+        </div>
+        
+        <div id="reason-container">
+            <label for="reason-text">Raison de la non-livraison :</label>
+            <textarea id="reason-text" placeholder="Veuillez préciser la raison..."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="agent-name">Nom et Prénoms de l'Agent :</label>
+            <input type="text" id="agent-name" placeholder="Nom complet de l'agent">
+        </div>
+        
+        <div class="form-group">
+            <label for="agent-contact">Contact :</label>
+            <input type="tel" id="agent-contact" placeholder="Numéro de téléphone">
+        </div>
+        
+        <div class="datetime-group">
+            <div class="form-group">
+                <label for="delivery-date">Date de livraison :</label>
+                <input type="date" id="delivery-date">
+            </div>
+            
+            <div class="form-group">
+                <label for="delivery-time">Heure de livraison :</label>
+                <input type="time" id="delivery-time">
+            </div>
+        </div>
+        
+        
+        <div class="form-group">
+            <label for="structure-name" style="display:none;">Structure ayant reçu la facture :</label>
+            <input type="text" id="structure-name" placeholder="Nom de la structure" style="display:none;">
+        </div>
+<button id="submit-report">📤 Envoyer le Rapport</button>
+    </div>
+
+    <!-- Container pour l'envoi de facture -->
+    <div id="invoice-send-container">
+      <h3>✉️ Envoi de Facture</h3>
+
+      <div id="invoice-success-msg"></div>
+      <div id="invoice-error-msg"></div>
+
+      <form id="invoice-form" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="invoice-file">Fichier facture (PDF/JPG/PNG) :</label>
+          <input type="file" id="invoice-file" name="attachment" accept=".pdf,.jpg,.jpeg,.png" required>
+          <div class="small-muted">Taille max recommandée: 7 Mo</div>
+        </div>
+
+        <div class="form-group">
+          <label for="invoice-to">Adresse e‑mail destinataire :</label>
+          <input type="email" id="invoice-to" name="to_email" placeholder="ex: facturation@structure.bj" required>
+        </div>
+
+        <div class="form-group">
+          <label for="invoice-ref">Référence (n° de mail ou n° de facture) :</label>
+          <input type="text" id="invoice-ref" name="invoice_ref" placeholder="Ex: FAC-2025-001 (optionnel)">
+        </div>
+
+        <div class="form-group">
+          <label for="invoice-message">Message (optionnel) :</label>
+          <textarea id="invoice-message" name="message" placeholder="Message d'accompagnement..."></textarea>
+        </div>
+
+        <!-- Champs cachés pour le modèle d'email -->
+        <input type="hidden" name="from_name" id="invoice-from-name" value="">
+        <input type="hidden" name="agent_contact" id="invoice-from-contact" value="">
+        <input type="hidden" name="subject" id="invoice-subject" value="">
+        <input type="hidden" name="company_name" id="invoice-company-name" value="">
+      </form>
+
+      <button id="send-invoice">🚀 Envoyer la facture</button>
+      <div class="small-muted accepted-types">Formats acceptés: .pdf, .jpg, .jpeg, .png</div>
+      <div class="small-muted">Astuce: le nom et le contact de l'agent (du Rapport de Livraison) sont repris comme expéditeur.</div>
+    </div>
+    
+    <div id="layer-container"></div>
+    <div id="map"></div>
+    <div id="toggleLayersBtn">Masquer/Afficher fonds</div>
+    <div id="instructions-container">
+        <button id="toggleInstructions">Afficher/Cacher instructions</button>
+        <ul id="instructionsList" style="display:none;"></ul>
+    </div>
+</div>
+
+<!-- ====================== AJOUT : Interface Administrateur ====================== -->
+<div id="admin-container">
+    <div id="admin-header">
+        <div class="title">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="BJ">
+            <strong>Interface Administrateur — Suivi des Rapports</strong>
+        </div>
+        <div id="admin-actions">
+            <button id="switch-to-agent" class="admin-btn secondary">Mode Agent</button>
+            <button id="export-csv" class="admin-btn">Exporter CSV</button>
+            <button id="logout-btn-admin" class="admin-btn danger">Déconnexion</button>
+        </div>
+    </div>
+    <div id="admin-main">
+        <div id="admin-panel">
+            <h2>📑 Rapports reçus</h2>
+            <input id="admin-search" placeholder="Rechercher (agent, statut, raison, contact, date, heure)...">
+            <div style="max-height: calc(100vh - 210px); overflow:auto; border:1px solid #eee; border-radius:8px;">
+                <table id="reports-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Statut</th>
+                            <th>Agent</th>
+                            <th>Contact</th>
+                            <th>Date</th>
+                            <th>Heure</th>
+                            <th>Raison</th>
+                            <th>Structure</th>
+                            <th>Position</th>
+                            <th>Créé le</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reports-tbody">
+                        <!-- Lignes injectées JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="empty-state" style="display:none;">Aucun rapport pour le moment.</div>
+        </div>
+        <div id="admin-map"></div>
+    </div>
+</div>
+<!-- ============================================================================ -->
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+<script src="https://unpkg.com/leaflet-minimap/dist/Control.MiniMap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.8.0/proj4.js"></script>
+<script>
+// ====================== AUTH / MODE ======================
+let currentUserRole = null; // 'agent' | 'admin'
+const LS_KEY = 'deliveryReports_v1';
+
+function saveReportsToLS(reports) {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(reports || [])); } catch(e){ console.warn(e); }
+}
+function loadReportsFromLS() {
+    try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch(e){ return []; }
+}
+
+// --- GESTION DE LA CONNEXION ---
+document.addEventListener('DOMContentLoaded', function() {
+    const loginOverlay = document.getElementById('login-overlay');
+    const appContainer = document.getElementById('app-container');
+    const adminContainer = document.getElementById('admin-container');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const loginBtn = document.getElementById('login-btn');
+    const loginError = document.getElementById('login-error');
+    
+    // Fonction de vérification des identifiants (AJOUT : renvoie le rôle)
+    function checkCredentials(username, password) {
+        const u = (username || '').trim().toUpperCase();
+        const p = (password || '').trim();
+        if (u === 'IMPOTS' && p === 'IMPOTS 229') return 'agent';
+        if (u === 'ADMIN'  && p === 'ADMIN229')   return 'admin';
+        return null;
+    }
+    
+    // Événement de connexion
+    loginBtn.addEventListener('click', function() {
+        const username = usernameInput.value;
+        const password = passwordInput.value;
+        const role = checkCredentials(username, password);
+        
+        if (role) {
+            currentUserRole = role;
+            loginOverlay.style.display = 'none';
+
+            if (role === 'admin') {
+                // Afficher directement l'interface admin
+                adminContainer.style.display = 'block';
+                appContainer.style.display = 'none';
+                initializeAdmin(); // init admin
+            } else {
+                // Mode agent
+                appContainer.style.display = 'block';
+                adminContainer.style.display = 'none';
+                // Afficher boutons entête si c'est un admin (ici non)
+                document.getElementById('top-actions').style.display = 'none';
+                initializeApp();
+            }
+        } else {
+            // Échec de connexion
+            loginError.style.display = 'block';
+            usernameInput.value = '';
+            passwordInput.value = '';
+            setTimeout(() => {
+                loginError.style.display = 'none';
+            }, 3000);
+        }
+    });
+    
+    // Permettre la connexion avec la touche Entrée
+    passwordInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            loginBtn.click();
+        }
+    });
+});
+
+// Boutons de bascule / déconnexion (affichage selon rôle)
+function setupTopActionsForRole() {
+    const topActions = document.getElementById('top-actions');
+    const switchToAdminBtn = document.getElementById('switch-to-admin');
+    const logoutBtn = document.getElementById('logout-btn');
+    const appContainer = document.getElementById('app-container');
+    const adminContainer = document.getElementById('admin-container');
+
+    // Visible uniquement si admin
+    if (currentUserRole === 'admin') {
+        topActions.style.display = 'flex';
+        switchToAdminBtn.onclick = () => {
+            appContainer.style.display = 'none';
+            adminContainer.style.display = 'block';
+            initializeAdmin();
+        };
+    } else {
+        topActions.style.display = 'none';
+    }
+
+    logoutBtn.onclick = globalLogout;
+    const logoutBtnAdmin = document.getElementById('logout-btn-admin');
+    if (logoutBtnAdmin) logoutBtnAdmin.onclick = globalLogout;
+
+    const switchToAgent = document.getElementById('switch-to-agent');
+    if (switchToAgent) {
+        switchToAgent.onclick = () => {
+            adminContainer.style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+            initializeApp(); // (ré)initialiser si besoin
+            setupTopActionsForRole();
+        };
+    }
+}
+
+function globalLogout() {
+    currentUserRole = null;
+    document.getElementById('app-container').style.display = 'none';
+    document.getElementById('admin-container').style.display = 'none';
+    document.getElementById('login-overlay').style.display = 'flex';
+}
+
+// ====================== CODE D'ORIGINE (APPLICATION AGENT) ======================
+// --- INITIALISATION DE L'APPLICATION (après connexion) ---
+function initializeApp() {
+// --- VARIABLES GLOBALES (à ajouter ou modifier) ---
+var speech = window.speechSynthesis;
+var voiceEnabled = true;
+var lastSpokenInstructionTimestamp = 0; // Timestamp de la dernière fois qu'une instruction a été prononcée
+const MIN_SPEAK_INTERVAL = 5000; // Minimum 5 secondes entre deux instructions vocales (en ms)
+
+// --- VARIABLES ---
+var map = L.map('map').setView([9.3077,2.3158],7);
+var allCompanies = [];
+var selectedCompany = null; // AJOUT: structure sélectionnée (pour pré-remplir l'email)
+var routingControl=null, movingMarkerStart=null, movingMarkerEnd=null, movingCursor=null, routeLine=null;
+var routeCoords=[], routeInstructions=[], currentStep=0, routeInterval=null, isPaused=false;
+var userMarker=null;
+var gpsWatchId = null; // Pour stocker l'ID du watchPosition
+var currentInstructionIndex = 0; // Index de l'instruction courante à lire
+var lastSpokenInstruction = -1; // Index de la dernière instruction prononcée
+var voiceGuidanceInterval = null; // Intervalle pour le guidage vocal
+
+// --- INFRASTRUCTURES FIXES ---
+var infrastructures = [
+  { nom: "École Primaire Z", lat: 9.3100, lng: 2.3200, alerteFait: false },
+  { nom: "Pont principal", lat: 9.3150, lng: 2.3250, alerteFait: false },
+  { nom: "Rond-point central", lat: 9.3125, lng: 2.3180, alerteFait: false },
+  { nom: "Hôpital Général", lat: 9.3170, lng: 2.3100, alerteFait: false }
+];
+var infraAlertDistance = 25; // distance en mètres pour alerte
+
+// --- ICONS ---
+var greenIcon = new L.Icon({ iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/green-dot.png', iconSize:[32,32], iconAnchor:[16,32] });
+var redIcon = new L.Icon({ iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png', iconSize:[32,32], iconAnchor:[16,32] });
+var googleCursorIcon = new L.Icon({ iconUrl:'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png', iconSize:[32,32], iconAnchor:[16,32] });
+
+// --- BASE MAPS ---
+var baseLayers = {
+"OSM": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:25, maxNativeZoom: 19, attribution:'', errorTileUrl:''}).addTo(map),
+"Google Satellite": L.tileLayer('https://mt.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{maxZoom:25, maxNativeZoom: 19, attribution:'', errorTileUrl:''}),
+"Google Earth": L.tileLayer('https://mt.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:25, maxNativeZoom: 19, attribution:'', errorTileUrl:''}),
+"Google Terrain": L.tileLayer('https://mt.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{maxZoom:25, maxNativeZoom: 19, attribution:'', errorTileUrl:''})
+};
+
+// --- MINIATURES ---
+var layerThumbs = {
+"OSM":"https://tile.openstreetmap.org/5/15/10.png",
+"Google Satellite":"https://mt.google.com/vt/lyrs=s&x=10&y=10&z=5",
+"Google Earth":"https://mt.google.com/vt/lyrs=y&x=10&y=10&z=5",
+"Google Terrain":"https://mt.google.com/vt/lyrs=p&x=10&y=10&z=5"
+};
+var layerContainer=document.getElementById('layer-container');
+layerContainer.innerHTML = ''; // reset si on réinit
+Object.keys(baseLayers).forEach((key,idx)=>{
+    var div=document.createElement('div');
+    div.className="layer-preview"+(idx===0?" active":"");
+    div.style.backgroundImage=`url('${layerThumbs[key]}')`;
+    div.title=key;
+    div.onclick=()=>{
+        map.eachLayer(l=>{ if(l instanceof L.TileLayer) map.removeLayer(l); });
+        baseLayers[key].addTo(map);
+        document.querySelectorAll('.layer-preview').forEach(p=>p.classList.remove('active'));
+        div.classList.add('active');
+    };
+    layerContainer.appendChild(div);
+});
+
+// --- BOUTON MASQUER / AFFICHER FONDS ---
+var layerContainerVisible = true;
+document.getElementById('toggleLayersBtn').onclick = () => {
+    layerContainerVisible = !layerContainerVisible;
+    layerContainer.style.display = layerContainerVisible ? 'flex' : 'none';
+};
+
+// --- VOICE ---
+function speak(text){
+    if(!voiceEnabled) return;
+    if (speech.speaking) { return; }
+    const now = Date.now();
+    if (now - lastSpokenInstructionTimestamp < MIN_SPEAK_INTERVAL) { return; }
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = 'fr-FR';
+    u.onend = () => { lastSpokenInstructionTimestamp = now; };
+    u.onerror = (event) => { console.error('SpeechSynthesisUtterance.onerror', event); };
+    speech.speak(u);
+}
+document.getElementById('toggleVoice').onclick=()=>{ voiceEnabled=!voiceEnabled; alert('Voix '+(voiceEnabled?'activée':'désactivée')); };
+
+// --- LOCALISATION ---
+document.getElementById('locateBtn').onclick=()=>{ map.locate({setView:true,maxZoom:25}); };
+map.on('locationfound', e => {
+    if(userMarker) map.removeLayer(userMarker);
+    userMarker = L.marker(e.latlng,{icon:redIcon}).addTo(map);
+    map.setView(e.latlng,25,{animate:true});
+});
+map.on('locationerror',()=>{ alert("Impossible de vous localiser."); });
+
+// --- ENTREPRISES ---
+fetch('/api/entreprises')
+  .then(r => r.json())
+  .then(data => {
+    allCompanies = data;
+    var list = document.getElementById('companyList');
+    list.innerHTML = ''; 
+    data.forEach(e => {
+      if (e.Latitude && e.Longitude) {
+        var li = document.createElement('li');
+        li.textContent = e.Nom_Entreprise;
+        li.title = e.Adresse_Complete;
+        li.onclick = () => { 
+            selectedCompany = e; 
+            startRoute(parseFloat(e.Latitude), parseFloat(e.Longitude), e.Nom_Entreprise); 
+        };
+        list.appendChild(li);
+      }
+    });
+  });
+document.getElementById('toggleCompanies').onclick = () => {
+    var list = document.getElementById('companyList');
+    list.style.display = (window.getComputedStyle(list).display === "none") ? "block" : "none";
+};
+
+// --- RECHERCHE STRUCTURE ---
+document.getElementById('searchStructureBtn').onclick = () => {
+    const query = document.getElementById('searchStructureInput').value.trim().toLowerCase();
+    if (!query) { alert("Veuillez saisir le nom d'une structure."); return; }
+    const match = allCompanies.find(e => e.Nom_Entreprise.toLowerCase().includes(query));
+    if (!match || !match.Latitude || !match.Longitude) { alert("Structure introuvable ou coordonnées manquantes."); return; }
+    selectedCompany = match;
+    startRoute(parseFloat(match.Latitude), parseFloat(match.Longitude), match.Nom_Entreprise);
+};
+
+
+// --- RECHERCHE PAR COORDONNÉES AVEC ITINÉRAIRE (CORRIGÉE POUR UTM) ---
+document.getElementById('coordBtnSidebar').onclick = () => {
+    const lat = parseFloat(document.getElementById('latInput').value);
+    const lng = parseFloat(document.getElementById('lngInput').value);
+    const coordType = document.getElementById('coordType').value;
+    if (isNaN(lat) || isNaN(lng)) {
+        alert("Veuillez entrer des coordonnées valides !");
+        return;
+    }
+    let destLat = lat, destLng = lng;
+    if (coordType === "utm") {
+        try {
+            // Exemple: fuseau 31N pour le Bénin (à ajuster si besoin)
+            const utmProj = "+proj=utm +zone=31 +datum=WGS84 +units=m +no_defs";
+            const geoProj = "+proj=longlat +datum=WGS84 +no_defs";
+            const res = proj4(utmProj, geoProj, [lng, lat]); // [Est, Nord]
+            destLng = res[0];
+            destLat = res[1];
+        } catch(e){ alert("Erreur de conversion UTM: " + e); return; }
+    }
+    selectedCompany = null;
+    startRouteWithoutVoice(destLat, destLng, `Destination (${destLat.toFixed(5)}, ${destLng.toFixed(5)})`);
+};
+
+
+// --- ROUTE ET ANIMATIONS ---
+function clearRoute(){
+    clearInterval(routeInterval);
+    if (voiceGuidanceInterval) clearInterval(voiceGuidanceInterval);
+    if (gpsWatchId) {
+        navigator.geolocation.clearWatch(gpsWatchId);
+        gpsWatchId = null;
+    }
+    speech.cancel();
+
+    routeInterval=null;
+    voiceGuidanceInterval = null;
+    isPaused=false;
+
+    if(movingMarkerStart) map.removeLayer(movingMarkerStart);
+    if(movingMarkerEnd) map.removeLayer(movingMarkerEnd);
+    if(movingCursor) map.removeLayer(movingCursor);
+    if(routeLine) map.removeLayer(routeLine);
+    if(routingControl) map.removeControl(routingControl);
+
+    routeCoords=[];
+    routeInstructions=[];
+    currentStep=0;
+    currentInstructionIndex = 0;
+    lastSpokenInstruction = -1;
+    lastSpokenInstructionTimestamp = 0;
+
+    document.getElementById('instructionsList').innerHTML='';
+}
+
+function distance(latlng1,latlng2){
+    const R=6371000; // m
+    const toRad=d=>d*Math.PI/180;
+    const dLat=toRad(latlng2[0]-latlng1[0]);
+    const dLon=toRad(latlng2[1]-latlng1[1]);
+    const lat1=toRad(latlng1[0]); const lat2=toRad(latlng2[0]);
+    const a=Math.sin(dLat/2)**2 + Math.sin(dLon/2)**2 * Math.cos(lat1)*Math.cos(lat2);
+    return 2*R*Math.atan2(Math.sqrt(a),Math.atan2(Math.sqrt(1-a),1)); // stable
+}
+
+function resumeRouteAnimation(){
+    if(!routeCoords || routeCoords.length===0) return;
+    routeInterval=setInterval(()=>{
+        if(!isPaused) {
+            if(currentStep<routeCoords.length-1){
+                currentStep++;
+                movingCursor.setLatLng(routeCoords[currentStep]);
+                map.panTo(routeCoords[currentStep], {animate:true, duration:0.5, easeLinearity:0.5});
+            }else{
+                if(voiceEnabled) speak("Vous êtes arrivé à destination.");
+                clearInterval(routeInterval);
+            }
+        }
+    },200);
+}
+
+// --- VOICE GUIDANCE + INFRA ---
+function startVoiceGuidance(){
+    if(!routeInstructions || routeInstructions.length===0) return;
+    if (gpsWatchId) navigator.geolocation.clearWatch(gpsWatchId);
+    
+    gpsWatchId = navigator.geolocation.watchPosition(pos => {
+        const userPos = [pos.coords.latitude, pos.coords.longitude];
+        
+        if (movingCursor) {
+            movingCursor.setLatLng(userPos);
+            map.panTo(userPos, {animate:true, duration:0.5, easeLinearity:0.5});
+        }
+        
+        if (currentInstructionIndex < routeInstructions.length) {
+            const instruction = routeInstructions[currentInstructionIndex];
+            const instructionLatLng = routeCoords[instruction.index]; 
+            const distToInstruction = distance(userPos, [instructionLatLng.lat, instructionLatLng.lng]);
+
+            if (distToInstruction < 30 && currentInstructionIndex !== lastSpokenInstruction) {
+                if (voiceEnabled) speak(instruction.text);
+                lastSpokenInstruction = currentInstructionIndex;
+                var instrList=document.getElementById('instructionsList');
+                instrList.querySelectorAll('li').forEach(li=>li.classList.remove('current'));
+                if(instrList.children[currentInstructionIndex]) instrList.children[currentInstructionIndex].classList.add('current');
+                instrList.children[currentInstructionIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            if (distToInstruction > 50 && currentInstructionIndex === lastSpokenInstruction) { 
+                 currentInstructionIndex++; 
+                 lastSpokenInstruction = -1;
+            }
+        }
+
+        infrastructures.forEach(infra => {
+            const distInfra = distance(userPos, [infra.lat, infra.lng]);
+            if(distInfra < infraAlertDistance && !infra.alerteFait) {
+                if (voiceEnabled) speak(`Attention, ${infra.nom} à proximité.`); 
+                infra.alerteFait = true;
+            } else if (distInfra > infraAlertDistance * 2 && infra.alerteFait) {
+                infra.alerteFait = false;
+            }
+        });
+
+    }, (error) => {
+        console.error("Erreur de géolocalisation pour le guidage vocal :", error);
+    }, {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 5000
+    });
+}
+
+// --- DÉMARRER ROUTE (avec voix) ---
+function startRoute(lat,lng,name){
+    clearRoute();
+    if(voiceEnabled) speak(`Itinéraire vers ${name} en cours`);
+    infrastructures.forEach(i => i.alerteFait = false);
+
+    navigator.geolocation.getCurrentPosition(pos=>{
+        var start=[pos.coords.latitude,pos.coords.longitude];
+        var end=[lat,lng];
+        routingControl=L.Routing.control({
+            waypoints:[L.latLng(start),L.latLng(end)],
+            language:'fr',
+            createMarker:()=>null,
+            addWaypoints:false,
+            routeWhileDragging:false,
+            show:false,
+            lineOptions:{styles:[{color:'blue',weight:5}]}
+        }).addTo(map);
+
+        routingControl.on('routesfound',e=>{
+            var route=e.routes[0];
+            routeCoords=route.coordinates;
+            routeInstructions=route.instructions; 
+            
+            routeLine=L.polyline(routeCoords,{color:'blue',weight:5}).addTo(map);
+            movingMarkerStart=L.marker(routeCoords[0],{icon:greenIcon}).addTo(map);
+            movingMarkerEnd=L.marker(routeCoords[routeCoords.length-1],{icon:redIcon}).addTo(map);
+            movingCursor=L.marker(routeCoords[0],{icon:googleCursorIcon}).addTo(map);
+            map.fitBounds(routeLine.getBounds(),{padding:[50,50]});
+
+            var instrList=document.getElementById('instructionsList');
+            instrList.innerHTML = ''; 
+            routeInstructions.forEach((instr,idx)=>{
+                var li=document.createElement('li');
+                li.innerHTML=`<strong>${idx+1}.</strong> ${instr.text}`;
+                instrList.appendChild(li);
+            });
+
+            currentStep=0;
+            currentInstructionIndex = 0;
+            lastSpokenInstruction = -1;
+            lastSpokenInstructionTimestamp = 0;
+            resumeRouteAnimation();
+            startVoiceGuidance();
+        });
+    },()=>{ alert("Position introuvable"); });
+}
+
+// --- DÉMARRER ROUTE SANS VOIX ---
+function startRouteWithoutVoice(lat,lng,name){
+    clearRoute();
+    infrastructures.forEach(i => i.alerteFait = false);
+
+    navigator.geolocation.getCurrentPosition(pos=>{
+        var start=[pos.coords.latitude,pos.coords.longitude];
+        var end=[lat,lng];
+        routingControl=L.Routing.control({
+            waypoints:[L.latLng(start),L.latLng(end)],
+            language:'fr',
+            createMarker:()=>null,
+            addWaypoints:false,
+            routeWhileDragging:false,
+            show:false,
+            lineOptions:{styles:[{color:'blue',weight:5}]}
+        }).addTo(map);
+
+        routingControl.on('routesfound',e=>{
+            var route=e.routes[0];
+            routeCoords=route.coordinates;
+            routeInstructions=route.instructions; 
+            
+            routeLine=L.polyline(routeCoords,{color:'blue',weight:5}).addTo(map);
+            movingMarkerStart=L.marker(routeCoords[0],{icon:greenIcon}).addTo(map);
+            movingMarkerEnd=L.marker(routeCoords[routeCoords.length-1],{icon:redIcon}).addTo(map);
+            movingCursor=L.marker(routeCoords[0],{icon:googleCursorIcon}).addTo(map);
+            map.fitBounds(routeLine.getBounds(),{padding:[50,50]});
+
+            var instrList=document.getElementById('instructionsList');
+            instrList.innerHTML = ''; 
+            routeInstructions.forEach((instr,idx)=>{
+                var li=document.createElement('li');
+                li.innerHTML=`<strong>${idx+1}.</strong> ${instr.text}`;
+                instrList.appendChild(li);
+            });
+
+            currentStep=0;
+            currentInstructionIndex = 0;
+            lastSpokenInstruction = -1;
+            lastSpokenInstructionTimestamp = 0;
+            resumeRouteAnimation();
+        });
+    },()=>{ alert("Position introuvable"); });
+}
+
+// --- BOUTONS ---
+document.getElementById("pauseRoute").onclick=()=>{
+    if(routeInterval && !isPaused){
+        clearInterval(routeInterval);
+        if (gpsWatchId) navigator.geolocation.clearWatch(gpsWatchId);
+        isPaused=true;
+        speech.cancel();
+        if(voiceEnabled) speak("Navigation en pause");
+    }
+};
+document.getElementById("resumeRoute").onclick=()=>{
+    if(isPaused){
+        isPaused=false;
+        if(voiceEnabled) speak("Reprise navigation");
+        resumeRouteAnimation();
+        startVoiceGuidance(); 
+    }
+};
+document.getElementById("stopRoute").onclick=()=>{ 
+    if(voiceEnabled) speak("Itinéraire arrêté"); 
+    clearRoute(); 
+};
+
+// --- SYSTÈME DE RAPPORT DE LIVRAISON ---
+var deliveryReportVisible = false;
+// IMPORTANT : on charge l'existant depuis localStorage
+var deliveryReports = loadReportsFromLS();
+
+// Initialiser les dates et heures par défaut
+function initializeDateTime() {
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    const currentTime = now.toTimeString().slice(0, 5);
+    document.getElementById('delivery-date').value = today;
+    document.getElementById('delivery-time').value = currentTime;
+}
+
+// Afficher/masquer le container de rapport
+document.getElementById('toggle-delivery-report').onclick = () => {
+    deliveryReportVisible = !deliveryReportVisible;
+    const container = document.getElementById('delivery-report-container');
+    container.style.display = deliveryReportVisible ? 'block' : 'none';
+    if (deliveryReportVisible) { 
+        initializeDateTime(); 
+        // Éviter le chevauchement avec l'envoi de facture
+        const inv = document.getElementById('invoice-send-container');
+        if (inv) inv.style.display = 'none';
+    }
+};
+
+// Gestion des options de livraison
+document.getElementById('delivered-radio').onchange = function() {
+    if (this.checked) {
+        document.getElementById('reason-container').style.display = 'none';
+        document.getElementById('reason-text').value = '';
+    }
+};
+document.getElementById('not-delivered-radio').onchange = function() {
+    if (this.checked) {
+        document.getElementById('reason-container').style.display = 'block';
+    }
+};
+
+// Messages
+function showMessage(type, message) {
+    const successMsg = document.getElementById('success-message');
+    const errorMsg = document.getElementById('error-message');
+    successMsg.style.display = 'none';
+    errorMsg.style.display = 'none';
+    if (type === 'success') {
+        successMsg.textContent = message;
+        successMsg.style.display = 'block';
+        setTimeout(() => { successMsg.style.display = 'none'; }, 5000);
+    } else if (type === 'error') {
+        errorMsg.textContent = message;
+        errorMsg.style.display = 'block';
+        setTimeout(() => { errorMsg.style.display = 'none'; }, 5000);
+    }
+}
+
+// Validation
+function validateForm() {
+    const deliveryStatus = document.querySelector('input[name="delivery-status"]:checked');
+    const agentName = document.getElementById('agent-name').value.trim();
+    const agentContact = document.getElementById('agent-contact').value.trim();
+    const deliveryDate = document.getElementById('delivery-date').value;
+    const deliveryTime = document.getElementById('delivery-time').value;
+    const reasonText = document.getElementById('reason-text').value.trim();
+    
+    if (!deliveryStatus) { showMessage('error', 'Veuillez sélectionner le statut de livraison.'); return false; }
+    if (!agentName)     { showMessage('error', 'Veuillez saisir le nom et prénoms de l\'agent.'); return false; }
+    if (!agentContact)  { showMessage('error', 'Veuillez saisir le contact de l\'agent.'); return false; }
+    if (!deliveryDate)  { showMessage('error', 'Veuillez saisir la date de livraison.'); return false; }
+    if (!deliveryTime)  { showMessage('error', 'Veuillez saisir l\'heure de livraison.'); return false; }
+    if (deliveryStatus.value === 'not-delivered' && !reasonText) {
+        showMessage('error', 'Veuillez préciser la raison de la non-livraison.'); return false;
+    }
+    return true;
+}
+
+// Réinitialiser
+function resetForm() {
+    document.querySelectorAll('input[name="delivery-status"]').forEach(radio => radio.checked = false);
+    document.getElementById('reason-container').style.display = 'none';
+    document.getElementById('reason-text').value = '';
+    document.getElementById('agent-name').value = '';
+    document.getElementById('agent-contact').value = '';
+    initializeDateTime();
+    document.getElementById('success-message').style.display = 'none';
+    document.getElementById('error-message').style.display = 'none';
+}
+
+// Soumettre le rapport (enregistre aussi dans localStorage)
+document.getElementById('submit-report').onclick = () => {
+    if (!validateForm()) { return; }
+    const deliveryStatus = document.querySelector('input[name="delivery-status"]:checked').value;
+    const agentName = document.getElementById('agent-name').value.trim();
+    const agentContact = document.getElementById('agent-contact').value.trim();
+    const deliveryDate = document.getElementById('delivery-date').value;
+    const deliveryTime = document.getElementById('delivery-time').value;
+    const reasonText = document.getElementById('reason-text').value.trim();
+    
+    // Créer l'objet rapport — date & heure auto inclues (timestamp)
+    const report = {
+        id: Date.now(),
+        timestamp: new Date().toISOString(), // auto
+        status: deliveryStatus,
+        reason: deliveryStatus === 'not-delivered' ? reasonText : '',
+        agentName: agentName,
+        agentContact: agentContact,
+        deliveryDate: deliveryDate,
+        deliveryTime: deliveryTime,
+        structure: document.getElementById('structure-name') ? document.getElementById('structure-name').value.trim() : '',
+        location: userMarker ? {
+            lat: userMarker.getLatLng().lat,
+            lng: userMarker.getLatLng().lng
+        } : null
+    };
+    
+    // Stockage
+    deliveryReports.push(report);
+    saveReportsToLS(deliveryReports);
+    console.log('Rapport de livraison:', report);
+    
+    const statusText = deliveryStatus === 'delivered' ? 'livrée' : 'non livrée';
+    showMessage('success', `Rapport de facture ${statusText} envoyé avec succès !`);
+    // voix supprimée
+
+    setTimeout(() => { resetForm(); }, 2000);
+};
+
+// Initialiser le système au chargement
+initializeDateTime();
+
+// Bouton instructions
+document.getElementById('toggleInstructions').onclick=()=>{ 
+    var container=document.getElementById('instructions-container');
+    container.classList.toggle('show');
+    var l=document.getElementById('instructionsList');
+    l.style.display=(l.style.display==="none")?"block":"none";
+};
+
+// ====================== ENVOI DE FACTURE (PHP direct) ======================
+let invoicePanelVisible = false;
+document.getElementById('toggle-invoice-send').onclick = () => {
+  invoicePanelVisible = !invoicePanelVisible;
+  const invCtn = document.getElementById('invoice-send-container');
+  invCtn.style.display = invoicePanelVisible ? 'block' : 'none';
+  if (invoicePanelVisible) {
+    const repCtn = document.getElementById('delivery-report-container');
+    if (repCtn) repCtn.style.display = 'none';
+  }
+};
+
+document.getElementById('send-invoice').onclick = async (e) => {
+  e.preventDefault();
+  const form = document.getElementById('invoice-form');
+  const sendBtn = document.getElementById('send-invoice');
+  const successMsg = document.getElementById('invoice-success-msg');
+  const errorMsg = document.getElementById('invoice-error-msg');
+
+  successMsg.style.display = "none";
+  errorMsg.style.display = "none";
+
+  const fileInput = document.getElementById('invoice-file');
+  const toInput   = document.getElementById('invoice-to');
+
+  if (!fileInput.files.length) {
+    errorMsg.textContent = "❌ Veuillez choisir un fichier facture.";
+    errorMsg.style.display = "block";
+    return;
+  }
+  if (!toInput.value) {
+    errorMsg.textContent = "❌ Adresse e-mail destinataire requise.";
+    errorMsg.style.display = "block";
+    return;
+  }
+
+  const formData = new FormData(form);
+
+  sendBtn.disabled = true;
+  sendBtn.textContent = '⏳ Envoi...';
+
+  try {
+    const response = await fetch("http://127.0.0.1:5000/sendmail", {
+  method: "POST",
+  body: formData
+});
+
+    const result = await response.text();
+    if (result.includes("SUCCESS")) {
+      successMsg.textContent = "✅ Facture envoyée avec succès !";
+      successMsg.style.display = "block";
+      form.reset();
+    } else {
+      errorMsg.textContent = "❌ Erreur lors de l'envoi (" + result + ")";
+      errorMsg.style.display = "block";
+    }
+  } catch (err) {
+    errorMsg.textContent = "❌ Erreur réseau : " + err;
+    errorMsg.style.display = "block";
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.textContent = '🚀 Envoyer la facture';
+  }
+};
+setupTopActionsForRole();
+} // fin initializeApp
+
+// ====================== INTERFACE ADMIN ======================
+let adminMap = null;
+let adminMarkersLayer = null;
+
+function initializeAdmin() {
+    // Boutons haut
+    setupTopActionsForRole();
+
+    // Map
+    if (!adminMap) {
+        adminMap = L.map('admin-map').setView([9.3077,2.3158],7);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:25, maxNativeZoom: 19}).addTo(adminMap);
+        adminMarkersLayer = L.layerGroup().addTo(adminMap);
+    } else {
+        adminMarkersLayer.clearLayers();
+        adminMap.invalidateSize();
+    }
+
+    // Charger rapports
+    const reports = loadReportsFromLS();
+    renderAdminTable(reports);
+    plotAdminMarkers(reports);
+
+    // Recherche / filtre
+    const searchInput = document.getElementById('admin-search');
+    searchInput.oninput = () => {
+        const q = (searchInput.value || '').toLowerCase();
+        const filtered = reports.filter(r => {
+            const fields = [
+                r.status,
+                r.agentName,
+                r.agentContact,
+                r.reason,
+                r.deliveryDate,
+                r.deliveryTime,
+                r.timestamp
+            ].map(x => (x || '').toString().toLowerCase()).join(' ');
+            return fields.includes(q);
+        });
+        renderAdminTable(filtered);
+        plotAdminMarkers(filtered);
+    };
+
+    // Export CSV
+    document.getElementById('export-csv').onclick = () => exportReportsCSV(loadReportsFromLS());
+}
+
+function renderAdminTable(reports) {
+    const tbody = document.getElementById('reports-tbody');
+    const empty = document.getElementById('empty-state');
+    tbody.innerHTML = '';
+    if (!reports || reports.length === 0) {
+        empty.style.display = 'block';
+        return;
+    }
+    empty.style.display = 'none';
+
+    reports
+      .sort((a,b)=> (b.id||0)-(a.id||0))
+      .forEach((r,idx)=>{
+        const tr = document.createElement('tr');
+        const badge = r.status === 'delivered' ? '<span class="status-badge status-ok">Livrée</span>' : '<span class="status-badge status-ko">Non livrée</span>';
+        const posTxt = r.location ? `${r.location.lat.toFixed(5)}, ${r.location.lng.toFixed(5)}` : '—';
+        const created = new Date(r.timestamp).toLocaleString();
+
+        tr.innerHTML = `
+            <td>${idx+1}</td>
+            <td>${badge}</td>
+            <td>${escapeHtml(r.agentName||'')}</td>
+            <td>${escapeHtml(r.agentContact||'')}</td>
+            <td>${escapeHtml(r.deliveryDate||'')}</td>
+            <td>${escapeHtml(r.deliveryTime||'')}</td>
+            <td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(r.reason||'')}">${escapeHtml(r.reason||'')}</td>
+            <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(r.structure||'')}">${escapeHtml(r.structure||'')}</td>
+            <td>${posTxt}</td>
+            <td>${created}</td>
+            <td class="row-actions">
+                <button class="focus">Voir</button>
+                <button class="edit">Modifier</button>
+                <button class="delete">Suppr.</button>
+            </td>
+        `;
+        // Actions
+        const focusBtn = tr.querySelector('.focus');
+        const editBtn = tr.querySelector('.edit');
+        const delBtn = tr.querySelector('.delete');
+        focusBtn.onclick = () => focusOnReport(r);
+        if (editBtn) editBtn.onclick = () => openEditModal(r);
+        delBtn.onclick = () => deleteReport(r.id);
+
+        tbody.appendChild(tr);
+      });
+}
+
+function plotAdminMarkers(reports) {
+    adminMarkersLayer.clearLayers();
+    const markers = [];
+    (reports||[]).forEach(r=>{
+        if (r.location && typeof r.location.lat === 'number' && typeof r.location.lng === 'number') {
+            const icon = new L.Icon({
+                iconUrl: r.status === 'delivered'
+                  ? 'https://maps.gstatic.com/mapfiles/ms2/micons/green-dot.png'
+                  : 'https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png',
+                iconSize:[32,32], iconAnchor:[16,32]
+            });
+            const m = L.marker([r.location.lat, r.location.lng], {icon})
+                .bindPopup(`<strong>${escapeHtml(r.agentName||'')}</strong><br/>
+                            Statut: ${r.status==='delivered'?'Livrée':'Non livrée'}<br/>
+                            Date: ${escapeHtml(r.deliveryDate||'')} ${escapeHtml(r.deliveryTime||'')}<br/>
+                            Raison: ${escapeHtml(r.reason||'-')}<br/>
+                            Structure: ${escapeHtml(r.structure||'-')}<br/>
+                            Créé le: ${new Date(r.timestamp).toLocaleString()}`);
+            adminMarkersLayer.addLayer(m);
+            markers.push(m);
+        }
+    });
+    if (markers.length) {
+        const group = L.featureGroup(markers);
+        adminMap.fitBounds(group.getBounds().pad(0.2));
+    }
+}
+
+function focusOnReport(report) {
+    if (!report || !report.location) return;
+    const {lat,lng} = report.location;
+    adminMap.setView([lat,lng], 18, {animate:true});
+    // Ouvrir popup du marker correspondant si présent
+    adminMarkersLayer.eachLayer(l=>{
+        if (l.getLatLng && Math.abs(l.getLatLng().lat - lat) < 1e-6 && Math.abs(l.getLatLng().lng - lng) < 1e-6) {
+            l.openPopup();
+        }
+    });
+}
+
+function deleteReport(id) {
+    if (!confirm("Supprimer ce rapport ?")) return;
+    const reports = loadReportsFromLS().filter(r=>r.id !== id);
+    saveReportsToLS(reports);
+    initializeAdmin(); // refresh
+}
+
+function exportReportsCSV(reports) {
+    const rows = [
+        ['id','timestamp','status','reason','agentName','agentContact','deliveryDate','deliveryTime','lat','lng']
+    ];
+    (reports||[]).forEach(r=>{
+        rows.push([
+            r.id||'',
+            r.timestamp||'',
+            r.status||'',
+            (r.reason||'').replace(/\n/g,' '),
+            r.agentName||'',
+            r.agentContact||'',
+            r.deliveryDate||'',
+            r.deliveryTime||'',
+            r.location && r.location.lat != null ? r.location.lat : '',
+            r.location && r.location.lng != null ? r.location.lng : ''
+        ]);
+    });
+    const csv = rows.map(row=>row.map(cell => {
+        const s = String(cell).replace(/"/g,'""');
+        return `"${s}"`;
+    }).join(',')).join('\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'rapports_impots.csv';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function escapeHtml(str){
+    return String(str || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+// Déclencheur si un autre onglet modifie le stockage
+window.addEventListener('storage', (e)=>{
+    if (e.key === LS_KEY && document.getElementById('admin-container').style.display === 'block') {
+        initializeAdmin();
+    }
+});
+
+// --- Modal d'édition admin ---
+function openEditModal(report) {
+  document.getElementById('edit-id').value = report.id;
+  document.getElementById('edit-status').value = report.status || 'delivered';
+  document.getElementById('edit-agentName').value = report.agentName || '';
+  document.getElementById('edit-agentContact').value = report.agentContact || '';
+  document.getElementById('edit-structure').value = report.structure || '';
+  document.getElementById('edit-deliveryDate').value = report.deliveryDate || '';
+  document.getElementById('edit-deliveryTime').value = report.deliveryTime || '';
+  document.getElementById('edit-reason').value = report.reason || '';
+  document.getElementById('edit-modal').style.display = 'flex';
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').style.display = 'none';
+}
+
+function saveEdit() {
+  const id = Number(document.getElementById('edit-id').value);
+  let reports = loadReportsFromLS();
+  let idx = reports.findIndex(r => r.id === id);
+  if (idx === -1) { alert('Rapport introuvable'); closeEditModal(); return; }
+  reports[idx].status = document.getElementById('edit-status').value;
+  reports[idx].agentName = document.getElementById('edit-agentName').value.trim();
+  reports[idx].agentContact = document.getElementById('edit-agentContact').value.trim();
+  reports[idx].structure = document.getElementById('edit-structure').value.trim();
+  reports[idx].deliveryDate = document.getElementById('edit-deliveryDate').value;
+  reports[idx].deliveryTime = document.getElementById('edit-deliveryTime').value;
+  reports[idx].reason = document.getElementById('edit-reason').value.trim();
+  saveReportsToLS(reports);
+  closeEditModal();
+  initializeAdmin();
+}
+
+// Modify exportReportsCSV to include 'structure' if present
+(function(){
+  const orig = exportReportsCSV;
+  exportReportsCSV = function(reports) {
+      const rows = [
+          ['id','timestamp','status','reason','agentName','agentContact','structure','deliveryDate','deliveryTime','lat','lng']
+      ];
+      (reports||[]).forEach(r=>{
+          rows.push([
+              r.id||'',
+              r.timestamp||'',
+              r.status||'',
+              (r.reason||'').replace(/\n/g,' '),
+              r.agentName||'',
+              r.agentContact||'',
+              r.structure||'',
+              r.deliveryDate||'',
+              r.deliveryTime||'',
+              r.location && r.location.lat != null ? r.location.lat : '',
+              r.location && r.location.lng != null ? r.location.lng : ''
+          ]);
+      });
+      const csv = rows.map(row=>row.map(cell => {
+          const s = String(cell).replace(/"/g,'""');
+          return `"\${s}"`;
+      }).join(',')).join('\n');
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'rapports_impots.csv';
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+  };
+})();
+
+// --- Toggle champ Structure selon statut ---
+document.getElementById('delivered-radio').addEventListener('change', function(){
+  document.getElementById('structure-name').style.display = 'block';
+  document.querySelector('label[for="structure-name"]').style.display = 'block';
+});
+document.getElementById('not-delivered-radio').addEventListener('change', function(){
+  document.getElementById('structure-name').style.display = 'none';
+  document.querySelector('label[for="structure-name"]').style.display = 'none';
+});
+</script>
+
+<!-- Modal édition administrateur -->
+<div id="edit-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:12000;">
+  <div style="background:#fff; padding:16px; border-radius:8px; width:420px; box-shadow:0 6px 18px rgba(0,0,0,0.2);">
+    <h3 style="margin-top:0;">✏️ Modifier le rapport</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <input id="edit-id" type="hidden" />
+      <label>Statut:
+        <select id="edit-status"><option value="delivered">Livrée</option><option value="not-delivered">Non livrée</option></select>
+      </label>
+      <label>Agent: <input id="edit-agentName" type="text" /></label>
+      <label>Contact: <input id="edit-agentContact" type="text" /></label>
+      <label>Structure: <input id="edit-structure" type="text" /></label>
+      <label>Date: <input id="edit-deliveryDate" type="date" /></label>
+      <label>Heure: <input id="edit-deliveryTime" type="time" /></label>
+      <label>Raison: <textarea id="edit-reason" style="min-height:60px;"></textarea></label>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;">
+        <button onclick="closeEditModal()" style="background:#6c757d;color:#fff;padding:8px;border-radius:6px;border:none;">Annuler</button>
+        <button onclick="saveEdit()" style="background:#007bff;color:#fff;padding:8px;border-radius:6px;border:none;">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
