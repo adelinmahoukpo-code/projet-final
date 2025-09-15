@@ -7,12 +7,15 @@ from email.mime.application import MIMEApplication
 from email.mime.text import MIMEText
 
 app = Flask(__name__)
-CORS(app)  # Autoriser ton frontend à appeler l’API
+CORS(app)
+
+# 📌 Chemin absolu vers le dossier où se trouve ce fichier
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # 📌 Route principale : sert index.html
 @app.route("/")
 def home():
-    return send_from_directory(os.path.dirname(__file__), "index.html")
+    return send_from_directory(BASE_DIR, "index.html")
 
 # 📌 Route pour envoyer une facture par mail
 @app.route("/sendmail", methods=["POST"])
