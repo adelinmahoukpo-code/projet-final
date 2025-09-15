@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, send_from_directory, jsonify
+from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -9,13 +9,13 @@ from email.mime.text import MIMEText
 app = Flask(__name__)
 CORS(app)
 
-# 📌 Chemin absolu vers le dossier où se trouve ce fichier
+# 📌 Chemin absolu vers le dossier du projet
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # 📌 Route principale : sert index.html
 @app.route("/")
 def home():
-    return send_from_directory(BASE_DIR, "index.html")
+    return send_file(os.path.join(BASE_DIR, "index.html"))
 
 # 📌 Route pour envoyer une facture par mail
 @app.route("/sendmail", methods=["POST"])
