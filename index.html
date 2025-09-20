@@ -1634,25 +1634,54 @@ map.on('locationfound', e => {
 });
 map.on('locationerror',()=>{ alert("Impossible de vous localiser."); });
 
-fetch('/api/entreprises')
-  .then(r => r.json())
-  .then(data => {
-    allCompanies = data;
-    var list = document.getElementById('companyList');
-    list.innerHTML = ''; 
-    data.forEach(e => {
-      if (e.Latitude && e.Longitude) {
-        var li = document.createElement('li');
-        li.textContent = e.Nom_Entreprise;
-        li.title = e.Adresse_Complete;
-        li.onclick = () => { 
-            selectedCompany = e; 
-            startRoute(parseFloat(e.Latitude), parseFloat(e.Longitude), e.Nom_Entreprise); 
-        };
-        list.appendChild(li);
-      }
-    });
-  });
+// ====================== CHARGEMENT DES ENTREPRISES DEPUIS LE CSV ======================
+Papa.parse("public/entreprises_geocodes.csv", {
+    download: true,
+    header: true,
+    complete: function(results) {
+        console.log("Données CSV chargées:", results.data);
+        allCompanies = results.data.filter(e => e.Nom_Entreprise && e.Latitude && e.Longitude);
+        var list = document.getElementById('companyList');
+        list.innerHTML = ''; 
+        allCompanies.forEach(e => {
+            var li = document.createElement('li');
+            li.textContent = e.Nom_Entreprise;
+            li.title = `ID: ${e.ID || ''} - Coordonnées: ${e.Latitude}, ${e.Longitude}`;
+            li.onclick = () => { 
+                selectedCompany = e; 
+                startRoute(parseFloat(e.Latitude), parseFloat(e.Longitude), e.Nom_Entreprise); 
+            };
+            list.appendChild(li);
+        });
+        console.log(`${allCompanies.length} entreprises chargées`);
+    },
+    error: function(error) {
+        console.error("Erreur lors du chargement du CSV:", error);
+        // Fallback avec les données intégrées si le CSV ne se charge pas
+        allCompanies = [
+            {ID: "1", Nom_Entreprise: "EREVAN", Latitude: "6.348958", Longitude: "2.386909"},
+            {ID: "2", Nom_Entreprise: "Le Plasma Bar", Latitude: "6.381497", Longitude: "2.334261"},
+            {ID: "3", Nom_Entreprise: "Poulet Piquet", Latitude: "6.382206", Longitude: "2.336388"},
+            {ID: "4", Nom_Entreprise: "Sofitel Hôtel", Latitude: "6.350114", Longitude: "2.393706"},
+            {ID: "5", Nom_Entreprise: "Séminaire St Jean Eudes", Latitude: "6.38906", Longitude: "2.321026"},
+            {ID: "6", Nom_Entreprise: "Eglise de Jésus-Christ des Saints des derniers Jours", Latitude: "6.392349", Longitude: "2.317976"}
+        ];
+        var list = document.getElementById('companyList');
+        list.innerHTML = ''; 
+        allCompanies.forEach(e => {
+            var li = document.createElement('li');
+            li.textContent = e.Nom_Entreprise;
+            li.title = `ID: ${e.ID} - Coordonnées: ${e.Latitude}, ${e.Longitude}`;
+            li.onclick = () => { 
+                selectedCompany = e; 
+                startRoute(parseFloat(e.Latitude), parseFloat(e.Longitude), e.Nom_Entreprise); 
+            };
+            list.appendChild(li);
+        });
+        console.log("Utilisation des données de fallback");
+    }
+});
+
 document.getElementById('toggleCompanies').onclick = () => {
     var list = document.getElementById('companyList');
     list.style.display = (window.getComputedStyle(list).display === "none") ? "block" : "none";
@@ -2088,7 +2117,7 @@ document.getElementById('submit-report').onclick = () => {
 
 initializeDateTime();
 
-// Envoi de facture
+// ====================== ENVOI DE FACTURE ======================
 let invoicePanelVisible = false;
 document.getElementById('toggle-invoice-send').onclick = () => {
   invoicePanelVisible = !invoicePanelVisible;
@@ -2097,6 +2126,18 @@ document.getElementById('toggle-invoice-send').onclick = () => {
   if (invoicePanelVisible) {
     const repCtn = document.getElementById('delivery-report-container');
     if (repCtn) repCtn.style.display = 'none';
+    
+    // Préremplir les champs avec les données du rapport de livraison
+    const agentName = document.getElementById('agent-name').value || '';
+    const agentContact = document.getElementById('agent-contact').value || '';
+    document.getElementById('invoice-from-name').value = agentName;
+    document.getElementById('invoice-from-contact').value = agentContact;
+    document.getElementById('invoice-subject').value = 'Facture Direction Générale des Impôts';
+    
+    // Ajouter le nom de l'entreprise si une est sélectionnée
+    if (selectedCompany && selectedCompany.Nom_Entreprise) {
+      document.getElementById('invoice-company-name').value = selectedCompany.Nom_Entreprise;
+    }
   }
 };
 
@@ -2135,17 +2176,22 @@ document.getElementById('send-invoice').onclick = async (e) => {
       body: formData
     });
 
-    const result = await response.text();
-    if (result.includes("SUCCESS")) {
-      successMsg.textContent = "✅ Facture envoyée avec succès !";
+    const result = await response.json();
+    if (result.status === "success") {
+      successMsg.textContent = "✅ " + result.message;
       successMsg.style.display = "block";
       form.reset();
+      // Réinitialiser les champs cachés
+      document.getElementById('invoice-from-name').value = '';
+      document.getElementById('invoice-from-contact').value = '';
+      document.getElementById('invoice-subject').value = '';
+      document.getElementById('invoice-company-name').value = '';
     } else {
-      errorMsg.textContent = "❌ Erreur lors de l'envoi (" + result + ")";
+      errorMsg.textContent = "❌ " + result.message;
       errorMsg.style.display = "block";
     }
   } catch (err) {
-    errorMsg.textContent = "❌ Erreur réseau : " + err;
+    errorMsg.textContent = "❌ Erreur réseau : " + err.message;
     errorMsg.style.display = "block";
   } finally {
     sendBtn.disabled = false;
@@ -2380,6 +2426,29 @@ window.addEventListener('storage', (e)=>{
         initializeAdmin();
     }
 });
+</script>
+
+
+<script>
+// Charger la liste des entreprises depuis Flask
+fetch("/entreprises")
+  .then(response => response.json())
+  .then(data => {
+    let container = document.getElementById("liste-entreprises");
+    if (!container) {
+      container = document.createElement("div");
+      container.id = "liste-entreprises";
+      document.body.appendChild(container);
+    }
+    container.innerHTML = "";
+    data.forEach(ent => {
+      let item = document.createElement("div");
+      item.className = "entreprise-item";
+      item.innerHTML = `<b>${ent.nom}</b> - ${ent.adresse}`;
+      container.appendChild(item);
+    });
+  })
+  .catch(err => console.error("Erreur chargement entreprises :", err));
 </script>
 
 </body>
