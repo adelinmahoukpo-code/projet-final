@@ -1112,6 +1112,18 @@ body {
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- Leaflet Routing Machine -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"/>
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+<!-- Signature Pad -->
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+
 </head>
 <body>
 <!-- Overlay sidebar pour mobile -->
@@ -2449,6 +2461,88 @@ fetch("/entreprises")
     });
   })
   .catch(err => console.error("Erreur chargement entreprises :", err));
+</script>
+
+
+<!-- Modal Signature -->
+<div id="signatureModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+  <div style="background:#fff; margin:5% auto; padding:20px; width:80%; max-width:600px; border-radius:8px;">
+    <h3>Accusé de réception</h3>
+    <p>Veuillez signer ci-dessous ou importer votre empreinte :</p>
+    <canvas id="signaturePad" style="border:1px solid #000; width:100%; height:200px;"></canvas><br>
+    <button onclick="clearSignature()">Effacer</button>
+    <button onclick="saveSignature()">Valider Signature</button><br><br>
+    <label>Ou importer votre empreinte :</label>
+    <input type="file" id="fingerprintUpload" accept="image/*" onchange="uploadFingerprint(event)"><br><br>
+    <button onclick="closeSignatureModal()">Fermer</button>
+  </div>
+</div>
+
+<script>
+let map;
+let routingControl;
+let signaturePad;
+
+function initMap(lat, lng) {
+    if (!map) {
+        map = L.map('map').setView([lat, lng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+    }
+}
+
+// Afficher routes multiples
+function showRoutes(startLat, startLng, endLat, endLng) {
+    initMap(startLat, startLng);
+    if (routingControl) {
+        map.removeControl(routingControl);
+    }
+    routingControl = L.Routing.control({
+        waypoints: [
+            L.latLng(startLat, startLng),
+            L.latLng(endLat, endLng)
+        ],
+        router: new L.Routing.OSRMv1({
+            serviceUrl: 'https://router.project-osrm.org/route/v1'
+        }),
+        routeWhileDragging: true,
+        showAlternatives: true
+    }).addTo(map);
+}
+
+// Gestion du modal signature
+function openSignatureModal() {
+    document.getElementById('signatureModal').style.display = 'block';
+    let canvas = document.getElementById('signaturePad');
+    signaturePad = new SignaturePad(canvas);
+}
+
+function closeSignatureModal() {
+    document.getElementById('signatureModal').style.display = 'none';
+}
+
+function clearSignature() {
+    if (signaturePad) signaturePad.clear();
+}
+
+function saveSignature() {
+    if (signaturePad && !signaturePad.isEmpty()) {
+        let dataURL = signaturePad.toDataURL();
+        alert("Signature sauvegardée ! (Envoyer au serveur ici)");
+        console.log("Signature:", dataURL);
+    } else {
+        alert("Veuillez signer avant de valider.");
+    }
+}
+
+function uploadFingerprint(event) {
+    let file = event.target.files[0];
+    if (file) {
+        alert("Empreinte importée ! (Envoyer au serveur ici)");
+        console.log("Empreinte:", file);
+    }
+}
 </script>
 
 </body>
