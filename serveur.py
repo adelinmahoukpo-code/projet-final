@@ -68,11 +68,19 @@ def get_entreprises():
     entreprises = []
     csv_path = os.path.join(os.path.dirname(__file__), "entreprises_geocodes.csv")
     
-    with open(csv_path, newline="", encoding="utf-8") as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            entreprises.append(row)
-    
+    # Vérifie si le fichier existe
+    if not os.path.exists(csv_path):
+        return jsonify({"error": "Fichier CSV non trouvé"}), 404
+
+    try:
+        # Lire le CSV avec encodage latin-1 pour éviter UnicodeDecodeError
+        with open(csv_path, newline="", encoding="latin-1") as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                entreprises.append(row)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
     return jsonify(entreprises)
 
 if __name__ == "__main__":
