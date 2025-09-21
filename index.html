@@ -389,113 +389,6 @@ body {
     transform: scale(1.1);
 }
 
-/* Sélection d'itinéraire */
-#route-selector {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    width: 400px;
-    max-width: 90vw;
-    max-height: 80vh;
-    overflow-y: auto;
-    z-index: 2000;
-    display: none;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-#route-selector h3 {
-    margin-top: 0;
-    color: #007bff;
-    text-align: center;
-    font-size: 1.3em;
-}
-
-.route-option {
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: all 0.3s;
-    background: #fff;
-}
-
-.route-option:hover {
-    border-color: #007bff;
-    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
-}
-
-.route-option.selected {
-    border-color: #007bff;
-    background: #e7f3ff;
-}
-
-.route-title {
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 5px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.route-details {
-    font-size: 0.9em;
-    color: #666;
-}
-
-.route-distance {
-    font-weight: bold;
-    color: #007bff;
-}
-
-.route-time {
-    color: #28a745;
-}
-
-#start-selected-route {
-    width: 100%;
-    padding: 12px;
-    background: linear-gradient(145deg, #28a745, #1e7e34);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1em;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 15px;
-    transition: all 0.3s;
-}
-
-#start-selected-route:hover {
-    background: linear-gradient(145deg, #1e7e34, #155724);
-    transform: translateY(-2px);
-}
-
-#start-selected-route:disabled {
-    background: #6c757d;
-    cursor: not-allowed;
-    transform: none;
-}
-
-#cancel-route-selection {
-    width: 100%;
-    padding: 10px;
-    background: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
 /* Rapport de livraison */
 #delivery-report-container {
     position: fixed;
@@ -507,7 +400,7 @@ body {
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    width: 400px;
+    width: 350px;
     max-width: calc(100vw - 40px);
     display: none;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -604,148 +497,6 @@ body {
 
 .datetime-group .form-group {
     flex: 1;
-}
-
-/* Signature et empreinte */
-#signature-section {
-    display: none;
-    border-top: 2px solid #007bff;
-    padding-top: 15px;
-    margin-top: 15px;
-}
-
-#signature-section h4 {
-    color: #007bff;
-    margin-bottom: 15px;
-    text-align: center;
-}
-
-.signature-option {
-    margin-bottom: 15px;
-}
-
-.signature-option input[type="radio"] {
-    margin-right: 10px;
-    transform: scale(1.2);
-}
-
-.signature-option label {
-    font-weight: 500;
-    color: #333;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-}
-
-#signature-canvas-container, #fingerprint-container {
-    display: none;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    padding: 15px;
-    margin-top: 10px;
-    background: #f8f9fa;
-}
-
-#signature-canvas {
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: white;
-    cursor: crosshair;
-    display: block;
-    margin: 0 auto;
-}
-
-.canvas-controls {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.canvas-btn {
-    padding: 8px 15px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9em;
-    font-weight: 600;
-    transition: all 0.2s;
-}
-
-.clear-btn {
-    background: #dc3545;
-    color: white;
-}
-
-.clear-btn:hover {
-    background: #c82333;
-}
-
-.save-btn {
-    background: #28a745;
-    color: white;
-}
-
-.save-btn:hover {
-    background: #218838;
-}
-
-#fingerprint-instructions {
-    text-align: center;
-    color: #666;
-    font-style: italic;
-    margin-bottom: 15px;
-}
-
-#fingerprint-capture {
-    width: 100%;
-    padding: 15px;
-    background: linear-gradient(145deg, #17a2b8, #138496);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1em;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-#fingerprint-capture:hover {
-    background: linear-gradient(145deg, #138496, #0f6674);
-}
-
-#fingerprint-capture:disabled {
-    background: #6c757d;
-    cursor: not-allowed;
-}
-
-#fingerprint-status {
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 6px;
-    text-align: center;
-    display: none;
-}
-
-#fingerprint-status.success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-#fingerprint-status.error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.signature-preview {
-    max-width: 100%;
-    max-height: 150px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-top: 10px;
-    display: none;
 }
 
 #submit-report {
@@ -914,20 +665,6 @@ body {
 .row-actions .focus { background: #17a2b8; color: #fff; }
 .row-actions .edit { background: #28a745; color: #fff; }
 .row-actions .delete { background: #ffc107; color: #000; }
-
-.signature-cell {
-    max-width: 100px;
-    text-align: center;
-}
-
-.signature-preview-small {
-    max-width: 80px;
-    max-height: 40px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
 #admin-map { 
     height: 400px; 
     border-radius: 12px; 
@@ -1050,46 +787,6 @@ body {
     color: #007bff; 
 }
 
-/* Modal de visualisation de signature */
-#signature-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 3000;
-}
-
-#signature-modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    max-width: 90%;
-    max-height: 90%;
-    text-align: center;
-}
-
-#signature-modal img {
-    max-width: 100%;
-    max-height: 500px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
-
-#close-signature-modal {
-    margin-top: 15px;
-    padding: 10px 20px;
-    background: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
 /* Suppression des bordures des tuiles */
 .leaflet-tile,
 .leaflet-tile-container img,
@@ -1125,10 +822,6 @@ body {
         max-width: 250px;
         bottom: 5px;
         right: 5px;
-    }
-
-    #route-selector {
-        width: 350px;
     }
 }
 
@@ -1218,11 +911,6 @@ body {
         max-width: 350px;
         max-height: 80vh;
         z-index: 1200;
-    }
-
-    #route-selector {
-        width: 90%;
-        max-width: 350px;
     }
     
     /* Layer container adapté */
@@ -1340,12 +1028,6 @@ body {
     #login-container h2 {
         font-size: 1.5em;
     }
-
-    /* Signature canvas responsive */
-    #signature-canvas {
-        max-width: 100%;
-        height: auto;
-    }
 }
 
 /* Très petits écrans */
@@ -1409,11 +1091,6 @@ body {
         height: 30px;
         font-size: 0.9em;
     }
-
-    #route-selector {
-        width: 95%;
-        padding: 15px;
-    }
 }
 
 /* Paysage mobile */
@@ -1432,15 +1109,21 @@ body {
     #instructionsList {
         max-height: 100px;
     }
-
-    #route-selector {
-        max-height: 90vh;
-        top: 5%;
-        transform: translate(-50%, 0);
-    }
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- Leaflet Routing Machine -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"/>
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+<!-- Signature Pad -->
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+
 </head>
 <body>
 <!-- Overlay sidebar pour mobile -->
@@ -1508,16 +1191,6 @@ body {
         </div>
     </div>
     
-    <!-- Sélecteur d'itinéraire -->
-    <div id="route-selector">
-        <h3>🛣️ Choisir un itinéraire</h3>
-        <div id="route-options-container">
-            <!-- Les options d'itinéraires seront ajoutées ici dynamiquement -->
-        </div>
-        <button id="start-selected-route" disabled>🚀 Démarrer l'itinéraire sélectionné</button>
-        <button id="cancel-route-selection">❌ Annuler</button>
-    </div>
-    
     <!-- Container pour le rapport de livraison -->
     <div id="delivery-report-container">
         <h3>📋 Rapport de Livraison</h3>
@@ -1569,48 +1242,6 @@ body {
         <div class="form-group">
             <label for="structure-name" style="display:none;">Structure ayant reçu la facture :</label>
             <input type="text" id="structure-name" placeholder="Nom de la structure" style="display:none;">
-        </div>
-
-        <!-- Section signature et empreinte -->
-        <div id="signature-section">
-            <h4>📝 Accusé de Réception</h4>
-            
-            <div class="signature-option">
-                <label>
-                    <input type="radio" name="receipt-type" value="signature" id="signature-radio">
-                    ✍️ Signature Numérique
-                </label>
-            </div>
-            
-            <div class="signature-option">
-                <label>
-                    <input type="radio" name="receipt-type" value="fingerprint" id="fingerprint-radio">
-                    👆 Empreinte Digitale
-                </label>
-            </div>
-
-            <!-- Container pour signature -->
-            <div id="signature-canvas-container">
-                <p style="text-align: center; color: #666; margin-bottom: 15px;">
-                    Signez dans la zone ci-dessous :
-                </p>
-                <canvas id="signature-canvas" width="320" height="160"></canvas>
-                <div class="canvas-controls">
-                    <button id="clear-signature" class="canvas-btn clear-btn">🗑️ Effacer</button>
-                    <button id="save-signature" class="canvas-btn save-btn">💾 Valider</button>
-                </div>
-                <img id="signature-preview" class="signature-preview" />
-            </div>
-
-            <!-- Container pour empreinte -->
-            <div id="fingerprint-container">
-                <div id="fingerprint-instructions">
-                    Placez votre doigt sur le capteur de votre appareil ou cliquez sur le bouton ci-dessous
-                </div>
-                <button id="fingerprint-capture">👆 Capturer l'empreinte digitale</button>
-                <div id="fingerprint-status"></div>
-                <img id="fingerprint-preview" class="signature-preview" />
-            </div>
         </div>
         
         <button id="submit-report">📤 Envoyer le Rapport</button>
@@ -1703,7 +1334,6 @@ body {
                             <th>Heure</th>
                             <th>Raison</th>
                             <th>Structure</th>
-                            <th>Signature</th>
                             <th>Position</th>
                             <th>Créé le</th>
                             <th>Actions</th>
@@ -1740,15 +1370,6 @@ body {
       </div>
     </div>
   </div>
-</div>
-
-<!-- Modal de visualisation de signature -->
-<div id="signature-modal">
-    <div id="signature-modal-content">
-        <h3>Signature / Empreinte</h3>
-        <img id="signature-modal-image" src="" alt="Signature ou empreinte">
-        <button id="close-signature-modal">Fermer</button>
-    </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -1911,10 +1532,6 @@ var currentInstructionIndex = 0;
 var lastSpokenInstruction = -1;
 var voiceGuidanceInterval = null;
 
-// Variables pour le choix d'itinéraire
-var availableRoutes = [];
-var selectedRoute = null;
-
 // Variables pour le suivi GPS réel
 var isNavigating = false;
 var followUserPosition = true;
@@ -2044,7 +1661,7 @@ Papa.parse("public/entreprises_geocodes.csv", {
             li.title = `ID: ${e.ID || ''} - Coordonnées: ${e.Latitude}, ${e.Longitude}`;
             li.onclick = () => { 
                 selectedCompany = e; 
-                showRouteOptions(parseFloat(e.Latitude), parseFloat(e.Longitude), e.Nom_Entreprise); 
+                startRoute(parseFloat(e.Latitude), parseFloat(e.Longitude), e.Nom_Entreprise); 
             };
             list.appendChild(li);
         });
@@ -2069,7 +1686,7 @@ Papa.parse("public/entreprises_geocodes.csv", {
             li.title = `ID: ${e.ID} - Coordonnées: ${e.Latitude}, ${e.Longitude}`;
             li.onclick = () => { 
                 selectedCompany = e; 
-                showRouteOptions(parseFloat(e.Latitude), parseFloat(e.Longitude), e.Nom_Entreprise); 
+                startRoute(parseFloat(e.Latitude), parseFloat(e.Longitude), e.Nom_Entreprise); 
             };
             list.appendChild(li);
         });
@@ -2088,7 +1705,7 @@ document.getElementById('searchStructureBtn').onclick = () => {
     const match = allCompanies.find(e => e.Nom_Entreprise.toLowerCase().includes(query));
     if (!match || !match.Latitude || !match.Longitude) { alert("Structure introuvable ou coordonnées manquantes."); return; }
     selectedCompany = match;
-    showRouteOptions(parseFloat(match.Latitude), parseFloat(match.Longitude), match.Nom_Entreprise);
+    startRoute(parseFloat(match.Latitude), parseFloat(match.Longitude), match.Nom_Entreprise);
 };
 
 document.getElementById('coordBtnSidebar').onclick = () => {
@@ -2110,207 +1727,8 @@ document.getElementById('coordBtnSidebar').onclick = () => {
         } catch(e){ alert("Erreur de conversion UTM: " + e); return; }
     }
     selectedCompany = null;
-    showRouteOptions(destLat, destLng, `Destination (${destLat.toFixed(5)}, ${destLng.toFixed(5)})`);
+    startRouteWithoutVoice(destLat, destLng, `Destination (${destLat.toFixed(5)}, ${destLng.toFixed(5)})`);
 };
-
-// ====================== SÉLECTION D'ITINÉRAIRE ======================
-function showRouteOptions(destLat, destLng, destName) {
-    navigator.geolocation.getCurrentPosition(pos => {
-        const start = [pos.coords.latitude, pos.coords.longitude];
-        const end = [destLat, destLng];
-        currentUserPosition = start;
-
-        // Calculer différents itinéraires avec différents profils
-        calculateMultipleRoutes(start, end, destName);
-    }, () => { 
-        alert("Impossible d'obtenir votre position pour calculer les itinéraires"); 
-    });
-}
-
-function calculateMultipleRoutes(start, end, destName) {
-    const routeProfiles = [
-        { profile: 'driving-car', name: '🚗 Itinéraire Rapide', description: 'Le plus court en temps' },
-        { profile: 'driving-car', name: '🛣️ Itinéraire Autoroutes', description: 'Privilégie les grandes routes' },
-        { profile: 'driving-car', name: '🌆 Itinéraire Ville', description: 'Évite les autoroutes' },
-        { profile: 'driving-car', name: '🚙 Itinéraire Économique', description: 'Consomme moins de carburant' }
-    ];
-
-    availableRoutes = [];
-    let routesCalculated = 0;
-    const totalRoutes = routeProfiles.length;
-
-    routeProfiles.forEach((profile, index) => {
-        // Pour simuler différents itinéraires, on utilise des waypoints légèrement différents
-        const routingOptions = {
-            waypoints: [L.latLng(start), L.latLng(end)],
-            language: 'fr',
-            createMarker: () => null,
-            addWaypoints: false,
-            routeWhileDragging: false,
-            show: false,
-            lineOptions: { styles: [{ color: getRouteColor(index), weight: 3, opacity: 0.7 }] }
-        };
-
-        // Ajouter des variations pour simuler différents itinéraires
-        if (index === 1) { // Autoroutes
-            routingOptions.avoidanceParameters = { avoidTolls: false };
-        } else if (index === 2) { // Ville
-            routingOptions.avoidanceParameters = { avoidHighways: true };
-        } else if (index === 3) { // Économique
-            routingOptions.avoidanceParameters = { avoidTolls: true };
-        }
-
-        const tempControl = L.Routing.control(routingOptions);
-        
-        tempControl.on('routesfound', e => {
-            const route = e.routes[0];
-            const routeData = {
-                profile: profile,
-                route: route,
-                distance: route.summary.totalDistance,
-                time: route.summary.totalTime,
-                coordinates: route.coordinates,
-                instructions: route.instructions,
-                color: getRouteColor(index),
-                polyline: null
-            };
-
-            // Ajouter une variation artificielle pour différencier les routes
-            if (index === 1) {
-                routeData.distance *= 1.1; // +10% distance pour autoroutes
-                routeData.time *= 0.9; // -10% temps pour autoroutes
-            } else if (index === 2) {
-                routeData.distance *= 0.95; // -5% distance pour ville
-                routeData.time *= 1.15; // +15% temps pour ville
-            } else if (index === 3) {
-                routeData.distance *= 1.05; // +5% distance pour économique
-                routeData.time *= 1.05; // +5% temps pour économique
-            }
-
-            availableRoutes.push(routeData);
-            
-            // Dessiner la route sur la carte
-            routeData.polyline = L.polyline(route.coordinates, {
-                color: routeData.color,
-                weight: 3,
-                opacity: 0.7
-            }).addTo(map);
-
-            routesCalculated++;
-            if (routesCalculated === totalRoutes) {
-                // Trier les routes par temps (plus rapide en premier)
-                availableRoutes.sort((a, b) => a.time - b.time);
-                displayRouteSelector(destName);
-            }
-        });
-
-        tempControl.on('routingerror', e => {
-            console.error('Erreur calcul itinéraire:', e);
-            routesCalculated++;
-            if (routesCalculated === totalRoutes) {
-                if (availableRoutes.length > 0) {
-                    availableRoutes.sort((a, b) => a.time - b.time);
-                    displayRouteSelector(destName);
-                } else {
-                    alert('Impossible de calculer les itinéraires');
-                }
-            }
-        });
-
-        // Déclencher le calcul
-        map.addControl(tempControl);
-        setTimeout(() => map.removeControl(tempControl), 1000);
-    });
-}
-
-function getRouteColor(index) {
-    const colors = ['#007bff', '#28a745', '#ffc107', '#dc3545'];
-    return colors[index % colors.length];
-}
-
-function displayRouteSelector(destName) {
-    const selector = document.getElementById('route-selector');
-    const container = document.getElementById('route-options-container');
-    
-    container.innerHTML = '';
-    selector.style.display = 'block';
-
-    // Mettre à jour le titre
-    selector.querySelector('h3').textContent = `🛣️ Itinéraires vers ${destName}`;
-
-    availableRoutes.forEach((routeData, index) => {
-        const option = document.createElement('div');
-        option.className = 'route-option';
-        option.dataset.index = index;
-
-        const distance = (routeData.distance / 1000).toFixed(1);
-        const time = Math.round(routeData.time / 60);
-        
-        option.innerHTML = `
-            <div class="route-title">
-                ${routeData.profile.name}
-                <span style="color: ${routeData.color};">●</span>
-            </div>
-            <div class="route-details">
-                ${routeData.profile.description}<br>
-                <span class="route-distance">${distance} km</span> • 
-                <span class="route-time">${time} min</span>
-            </div>
-        `;
-
-        option.onclick = () => selectRouteOption(index);
-        container.appendChild(option);
-    });
-
-    // Pré-sélectionner le plus rapide
-    if (availableRoutes.length > 0) {
-        selectRouteOption(0);
-    }
-}
-
-function selectRouteOption(index) {
-    selectedRoute = availableRoutes[index];
-    
-    // Mettre à jour l'interface
-    document.querySelectorAll('.route-option').forEach((option, i) => {
-        option.classList.toggle('selected', i === index);
-    });
-
-    // Mettre en évidence la route sélectionnée
-    availableRoutes.forEach((routeData, i) => {
-        if (routeData.polyline) {
-            routeData.polyline.setStyle({
-                weight: i === index ? 5 : 3,
-                opacity: i === index ? 1 : 0.4
-            });
-        }
-    });
-
-    document.getElementById('start-selected-route').disabled = false;
-}
-
-// Gestionnaires d'événements pour le sélecteur d'itinéraire
-document.getElementById('start-selected-route').onclick = () => {
-    if (selectedRoute) {
-        document.getElementById('route-selector').style.display = 'none';
-        startRouteWithSelectedRoute(selectedRoute);
-    }
-};
-
-document.getElementById('cancel-route-selection').onclick = () => {
-    document.getElementById('route-selector').style.display = 'none';
-    clearRouteOptions();
-};
-
-function clearRouteOptions() {
-    availableRoutes.forEach(routeData => {
-        if (routeData.polyline) {
-            map.removeLayer(routeData.polyline);
-        }
-    });
-    availableRoutes = [];
-    selectedRoute = null;
-}
 
 function clearRoute(){
     clearInterval(routeInterval);
@@ -2342,7 +1760,6 @@ function clearRoute(){
 
     document.getElementById('instructionsList').innerHTML='';
     hideZoomControls();
-    clearRouteOptions();
 }
 
 function distance(latlng1,latlng2){
@@ -2464,50 +1881,6 @@ function resumeRouteAnimation(){
             }
         }
     },1000); // Plus lent que le GPS réel
-}
-
-function startRouteWithSelectedRoute(routeData) {
-    clearRoute();
-    if(voiceEnabled) speak(`Démarrage de l'itinéraire ${routeData.profile.name}`);
-    infrastructures.forEach(i => i.alerteFait = false);
-
-    routeCoords = routeData.coordinates;
-    routeInstructions = routeData.instructions;
-    
-    const start = routeCoords[0];
-    const end = routeCoords[routeCoords.length - 1];
-    
-    // Nettoyer les anciennes polylines
-    clearRouteOptions();
-    
-    routeLine = L.polyline(routeCoords, {color: routeData.color, weight: 5}).addTo(map);
-    movingMarkerStart = L.marker([start.lat, start.lng], {icon: greenIcon}).addTo(map);
-    movingMarkerEnd = L.marker([end.lat, end.lng], {icon: redIcon}).addTo(map);
-    
-    if (currentUserPosition) {
-        movingCursor = L.marker(currentUserPosition, {icon: googleCursorIcon}).addTo(map);
-    } else {
-        movingCursor = L.marker([start.lat, start.lng], {icon: googleCursorIcon}).addTo(map);
-    }
-    
-    // Ajuster la vue initiale
-    map.fitBounds(routeLine.getBounds(), {padding: [50, 50]});
-
-    var instrList = document.getElementById('instructionsList');
-    instrList.innerHTML = ''; 
-    routeInstructions.forEach((instr, idx) => {
-        var li = document.createElement('li');
-        li.innerHTML = `<strong>${idx+1}.</strong> ${instr.text}`;
-        instrList.appendChild(li);
-    });
-
-    currentStep = 0;
-    currentInstructionIndex = 0;
-    lastSpokenInstruction = -1;
-    lastSpokenInstructionTimestamp = 0;
-    
-    // Démarrer le suivi GPS réel
-    startRealTimeGPSTracking();
 }
 
 function startRoute(lat,lng,name){
@@ -2635,246 +2008,6 @@ document.getElementById("stopRoute").onclick=()=>{
     clearRoute(); 
 };
 
-// ====================== SIGNATURE ET EMPREINTE ======================
-let signatureCanvas = null;
-let signatureContext = null;
-let isDrawing = false;
-let currentSignatureData = null;
-let currentFingerprintData = null;
-
-function initializeSignature() {
-    signatureCanvas = document.getElementById('signature-canvas');
-    signatureContext = signatureCanvas.getContext('2d');
-
-    // Configuration du canvas
-    signatureContext.strokeStyle = '#000000';
-    signatureContext.lineWidth = 2;
-    signatureContext.lineCap = 'round';
-    signatureContext.lineJoin = 'round';
-
-    // Événements de souris
-    signatureCanvas.addEventListener('mousedown', startDrawing);
-    signatureCanvas.addEventListener('mousemove', draw);
-    signatureCanvas.addEventListener('mouseup', stopDrawing);
-    signatureCanvas.addEventListener('mouseout', stopDrawing);
-
-    // Événements tactiles
-    signatureCanvas.addEventListener('touchstart', handleTouchStart, { passive: false });
-    signatureCanvas.addEventListener('touchmove', handleTouchMove, { passive: false });
-    signatureCanvas.addEventListener('touchend', stopDrawing, { passive: false });
-
-    // Boutons de contrôle
-    document.getElementById('clear-signature').onclick = clearSignature;
-    document.getElementById('save-signature').onclick = saveSignature;
-}
-
-function startDrawing(e) {
-    isDrawing = true;
-    const rect = signatureCanvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    signatureContext.beginPath();
-    signatureContext.moveTo(x, y);
-}
-
-function draw(e) {
-    if (!isDrawing) return;
-    const rect = signatureCanvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    signatureContext.lineTo(x, y);
-    signatureContext.stroke();
-}
-
-function stopDrawing() {
-    isDrawing = false;
-    signatureContext.beginPath();
-}
-
-function handleTouchStart(e) {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const mouseEvent = new MouseEvent('mousedown', {
-        clientX: touch.clientX,
-        clientY: touch.clientY
-    });
-    signatureCanvas.dispatchEvent(mouseEvent);
-}
-
-function handleTouchMove(e) {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const mouseEvent = new MouseEvent('mousemove', {
-        clientX: touch.clientX,
-        clientY: touch.clientY
-    });
-    signatureCanvas.dispatchEvent(mouseEvent);
-}
-
-function clearSignature() {
-    signatureContext.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
-    document.getElementById('signature-preview').style.display = 'none';
-    currentSignatureData = null;
-}
-
-function saveSignature() {
-    // Vérifier si le canvas contient quelque chose
-    const imageData = signatureContext.getImageData(0, 0, signatureCanvas.width, signatureCanvas.height);
-    const data = imageData.data;
-    let isEmpty = true;
-    
-    for (let i = 0; i < data.length; i += 4) {
-        if (data[i + 3] !== 0) { // Vérifier le canal alpha
-            isEmpty = false;
-            break;
-        }
-    }
-    
-    if (isEmpty) {
-        alert('Veuillez d\'abord signer dans la zone prévue.');
-        return;
-    }
-
-    // Convertir en image
-    currentSignatureData = signatureCanvas.toDataURL('image/png');
-    const preview = document.getElementById('signature-preview');
-    preview.src = currentSignatureData;
-    preview.style.display = 'block';
-    
-    alert('Signature sauvegardée avec succès !');
-}
-
-// Gestion de l'empreinte digitale
-function initializeFingerprint() {
-    document.getElementById('fingerprint-capture').onclick = captureFingerprint;
-}
-
-function captureFingerprint() {
-    const button = document.getElementById('fingerprint-capture');
-    const status = document.getElementById('fingerprint-status');
-    
-    button.disabled = true;
-    button.textContent = '⏳ Capture en cours...';
-    
-    // Simuler la capture d'empreinte
-    if ('navigator' in window && 'credentials' in navigator && 'create' in navigator.credentials) {
-        // Tentative d'utilisation de l'API WebAuthn pour l'authentification biométrique
-        const publicKeyCredentialCreationOptions = {
-            challenge: new Uint8Array(32),
-            rp: {
-                name: "Système de Distribution des Factures",
-                id: window.location.hostname,
-            },
-            user: {
-                id: new Uint8Array(16),
-                name: "agent@impots.bj",
-                displayName: "Agent des Impôts",
-            },
-            pubKeyCredParams: [{alg: -7, type: "public-key"}],
-            authenticatorSelection: {
-                authenticatorAttachment: "platform",
-                userVerification: "required"
-            },
-            timeout: 30000,
-            attestation: "direct"
-        };
-
-        navigator.credentials.create({
-            publicKey: publicKeyCredentialCreationOptions
-        }).then(credential => {
-            // Générer une image simulée d'empreinte
-            generateFingerprintImage();
-            
-            status.className = 'success';
-            status.textContent = '✅ Empreinte capturée avec succès !';
-            status.style.display = 'block';
-            
-        }).catch(err => {
-            console.warn('WebAuthn non disponible, utilisation de la simulation:', err);
-            // Fallback vers simulation
-            simulateFingerprint();
-        }).finally(() => {
-            button.disabled = false;
-            button.textContent = '👆 Capturer l\'empreinte digitale';
-        });
-    } else {
-        // Simulation pour les navigateurs non compatibles
-        simulateFingerprint();
-    }
-}
-
-function simulateFingerprint() {
-    const status = document.getElementById('fingerprint-status');
-    const button = document.getElementById('fingerprint-capture');
-    
-    setTimeout(() => {
-        generateFingerprintImage();
-        
-        status.className = 'success';
-        status.textContent = '✅ Empreinte capturée avec succès !';
-        status.style.display = 'block';
-        
-        button.disabled = false;
-        button.textContent = '👆 Capturer l\'empreinte digitale';
-    }, 2000);
-}
-
-function generateFingerprintImage() {
-    // Créer un canvas temporaire pour générer une image d'empreinte simulée
-    const canvas = document.createElement('canvas');
-    canvas.width = 200;
-    canvas.height = 250;
-    const ctx = canvas.getContext('2d');
-    
-    // Arrière-plan
-    ctx.fillStyle = '#f8f9fa';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Dessiner des lignes simulant une empreinte
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = 1;
-    
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    
-    // Dessiner des cercles concentriques avec du bruit
-    for (let r = 20; r < 100; r += 8) {
-        ctx.beginPath();
-        for (let angle = 0; angle < Math.PI * 2; angle += 0.1) {
-            const x = centerX + Math.cos(angle) * r + Math.random() * 3 - 1.5;
-            const y = centerY + Math.sin(angle) * r * 1.2 + Math.random() * 3 - 1.5;
-            if (angle === 0) {
-                ctx.moveTo(x, y);
-            } else {
-                ctx.lineTo(x, y);
-            }
-        }
-        ctx.stroke();
-    }
-    
-    // Ajouter quelques lignes supplémentaires pour plus de réalisme
-    for (let i = 0; i < 15; i++) {
-        ctx.beginPath();
-        const startX = centerX + (Math.random() - 0.5) * 120;
-        const startY = centerY + (Math.random() - 0.5) * 150;
-        const endX = startX + (Math.random() - 0.5) * 40;
-        const endY = startY + (Math.random() - 0.5) * 40;
-        ctx.moveTo(startX, startY);
-        ctx.lineTo(endX, endY);
-        ctx.stroke();
-    }
-    
-    // Ajouter un timestamp
-    ctx.fillStyle = '#666';
-    ctx.font = '10px Arial';
-    ctx.fillText(new Date().toLocaleString(), 10, canvas.height - 10);
-    
-    currentFingerprintData = canvas.toDataURL('image/png');
-    const preview = document.getElementById('fingerprint-preview');
-    preview.src = currentFingerprintData;
-    preview.style.display = 'block';
-}
-
 // Rapport de livraison
 var deliveryReportVisible = false;
 var deliveryReports = loadReportsFromLS();
@@ -2895,31 +2028,6 @@ document.getElementById('toggle-delivery-report').onclick = () => {
         initializeDateTime(); 
         const inv = document.getElementById('invoice-send-container');
         if (inv) inv.style.display = 'none';
-        
-        // Initialiser les fonctionnalités de signature
-        if (!signatureCanvas) {
-            initializeSignature();
-            initializeFingerprint();
-        }
-    }
-};
-
-// Gestion des options de signature/empreinte
-document.getElementById('signature-radio').onchange = function() {
-    if (this.checked) {
-        document.getElementById('signature-canvas-container').style.display = 'block';
-        document.getElementById('fingerprint-container').style.display = 'none';
-        currentFingerprintData = null;
-        document.getElementById('fingerprint-preview').style.display = 'none';
-    }
-};
-
-document.getElementById('fingerprint-radio').onchange = function() {
-    if (this.checked) {
-        document.getElementById('fingerprint-container').style.display = 'block';
-        document.getElementById('signature-canvas-container').style.display = 'none';
-        currentSignatureData = null;
-        if (signatureCanvas) clearSignature();
     }
 };
 
@@ -2927,18 +2035,11 @@ document.getElementById('delivered-radio').onchange = function() {
     if (this.checked) {
         document.getElementById('reason-container').style.display = 'none';
         document.getElementById('reason-text').value = '';
-        document.getElementById('structure-name').style.display = 'block';
-        document.querySelector('label[for="structure-name"]').style.display = 'block';
-        document.getElementById('signature-section').style.display = 'block';
     }
 };
-
 document.getElementById('not-delivered-radio').onchange = function() {
     if (this.checked) {
         document.getElementById('reason-container').style.display = 'block';
-        document.getElementById('structure-name').style.display = 'none';
-        document.querySelector('label[for="structure-name"]').style.display = 'none';
-        document.getElementById('signature-section').style.display = 'none';
     }
 };
 
@@ -2974,50 +2075,15 @@ function validateForm() {
     if (deliveryStatus.value === 'not-delivered' && !reasonText) {
         showMessage('error', 'Veuillez préciser la raison de la non-livraison.'); return false;
     }
-    
-    // Validation pour facture livrée
-    if (deliveryStatus.value === 'delivered') {
-        const structureName = document.getElementById('structure-name').value.trim();
-        if (!structureName) {
-            showMessage('error', 'Veuillez saisir le nom de la structure ayant reçu la facture.'); 
-            return false;
-        }
-        
-        const receiptType = document.querySelector('input[name="receipt-type"]:checked');
-        if (!receiptType) {
-            showMessage('error', 'Veuillez choisir le type d\'accusé de réception (signature ou empreinte).'); 
-            return false;
-        }
-        
-        if (receiptType.value === 'signature' && !currentSignatureData) {
-            showMessage('error', 'Veuillez signer dans la zone prévue puis cliquer sur "Valider".'); 
-            return false;
-        }
-        
-        if (receiptType.value === 'fingerprint' && !currentFingerprintData) {
-            showMessage('error', 'Veuillez capturer votre empreinte digitale.'); 
-            return false;
-        }
-    }
-    
     return true;
 }
 
 function resetForm() {
     document.querySelectorAll('input[name="delivery-status"]').forEach(radio => radio.checked = false);
-    document.querySelectorAll('input[name="receipt-type"]').forEach(radio => radio.checked = false);
     document.getElementById('reason-container').style.display = 'none';
-    document.getElementById('signature-section').style.display = 'none';
-    document.getElementById('signature-canvas-container').style.display = 'none';
-    document.getElementById('fingerprint-container').style.display = 'none';
     document.getElementById('reason-text').value = '';
     document.getElementById('agent-name').value = '';
     document.getElementById('agent-contact').value = '';
-    document.getElementById('structure-name').value = '';
-    if (signatureCanvas) clearSignature();
-    currentFingerprintData = null;
-    document.getElementById('fingerprint-preview').style.display = 'none';
-    document.getElementById('fingerprint-status').style.display = 'none';
     initializeDateTime();
     document.getElementById('success-message').style.display = 'none';
     document.getElementById('error-message').style.display = 'none';
@@ -3025,24 +2091,12 @@ function resetForm() {
 
 document.getElementById('submit-report').onclick = () => {
     if (!validateForm()) { return; }
-    
     const deliveryStatus = document.querySelector('input[name="delivery-status"]:checked').value;
     const agentName = document.getElementById('agent-name').value.trim();
     const agentContact = document.getElementById('agent-contact').value.trim();
     const deliveryDate = document.getElementById('delivery-date').value;
     const deliveryTime = document.getElementById('delivery-time').value;
     const reasonText = document.getElementById('reason-text').value.trim();
-    const structureName = document.getElementById('structure-name').value.trim();
-    
-    let receiptData = null;
-    if (deliveryStatus === 'delivered') {
-        const receiptType = document.querySelector('input[name="receipt-type"]:checked').value;
-        receiptData = {
-            type: receiptType,
-            data: receiptType === 'signature' ? currentSignatureData : currentFingerprintData,
-            timestamp: new Date().toISOString()
-        };
-    }
     
     const report = {
         id: Date.now(),
@@ -3053,8 +2107,7 @@ document.getElementById('submit-report').onclick = () => {
         agentContact: agentContact,
         deliveryDate: deliveryDate,
         deliveryTime: deliveryTime,
-        structure: structureName,
-        receiptProof: receiptData,
+        structure: document.getElementById('structure-name') ? document.getElementById('structure-name').value.trim() : '',
         location: currentUserPosition ? {
             lat: currentUserPosition[0],
             lng: currentUserPosition[1]
@@ -3165,6 +2218,15 @@ document.getElementById('toggleInstructions').onclick=()=>{
     l.style.display=(l.style.display==="none")?"block":"none";
 };
 
+document.getElementById('delivered-radio').addEventListener('change', function(){
+  document.getElementById('structure-name').style.display = 'block';
+  document.querySelector('label[for="structure-name"]').style.display = 'block';
+});
+document.getElementById('not-delivered-radio').addEventListener('change', function(){
+  document.getElementById('structure-name').style.display = 'none';
+  document.querySelector('label[for="structure-name"]').style.display = 'none';
+});
+
 setupTopActionsForRole();
 }
 
@@ -3199,7 +2261,6 @@ function initializeAdmin() {
                 r.reason,
                 r.deliveryDate,
                 r.deliveryTime,
-                r.structure,
                 r.timestamp
             ].map(x => (x || '').toString().toLowerCase()).join(' ');
             return fields.includes(q);
@@ -3209,36 +2270,6 @@ function initializeAdmin() {
     };
 
     document.getElementById('export-csv').onclick = () => exportReportsCSV(loadReportsFromLS());
-
-    // Initialiser la modal de signature
-    initializeSignatureModal();
-}
-
-function initializeSignatureModal() {
-    const modal = document.getElementById('signature-modal');
-    const closeBtn = document.getElementById('close-signature-modal');
-    
-    closeBtn.onclick = () => {
-        modal.style.display = 'none';
-    };
-    
-    modal.onclick = (e) => {
-        if (e.target === modal) {
-            modal.style.display = 'none';
-        }
-    };
-}
-
-function showSignatureModal(receiptData) {
-    const modal = document.getElementById('signature-modal');
-    const image = document.getElementById('signature-modal-image');
-    const title = modal.querySelector('h3');
-    
-    if (receiptData && receiptData.data) {
-        title.textContent = receiptData.type === 'signature' ? 'Signature Numérique' : 'Empreinte Digitale';
-        image.src = receiptData.data;
-        modal.style.display = 'flex';
-    }
 }
 
 function renderAdminTable(reports) {
@@ -3258,18 +2289,6 @@ function renderAdminTable(reports) {
         const badge = r.status === 'delivered' ? '<span class="status-badge status-ok">Livrée</span>' : '<span class="status-badge status-ko">Non livrée</span>';
         const posTxt = r.location ? `${r.location.lat.toFixed(5)}, ${r.location.lng.toFixed(5)}` : '—';
         const created = new Date(r.timestamp).toLocaleString();
-        
-        // Gestion de l'affichage de la signature/empreinte
-        let signatureCell = '—';
-        if (r.receiptProof && r.receiptProof.data) {
-            const proofType = r.receiptProof.type === 'signature' ? '✍️' : '👆';
-            signatureCell = `<div class="signature-cell">
-                <img src="${r.receiptProof.data}" class="signature-preview-small" 
-                     onclick="showSignatureModal(${JSON.stringify(r.receiptProof).replace(/"/g, '&quot;')})" 
-                     title="Cliquer pour agrandir" />
-                <div style="font-size: 0.7em;">${proofType} ${r.receiptProof.type === 'signature' ? 'Sign.' : 'Empr.'}</div>
-            </div>`;
-        }
 
         tr.innerHTML = `
             <td>${idx+1}</td>
@@ -3280,7 +2299,6 @@ function renderAdminTable(reports) {
             <td>${escapeHtml(r.deliveryTime||'')}</td>
             <td style="max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(r.reason||'')}">${escapeHtml(r.reason||'')}</td>
             <td style="max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(r.structure||'')}">${escapeHtml(r.structure||'')}</td>
-            <td>${signatureCell}</td>
             <td>${posTxt}</td>
             <td style="font-size:0.7em;">${created}</td>
             <td class="row-actions">
@@ -3311,19 +2329,12 @@ function plotAdminMarkers(reports) {
                   : 'https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png',
                 iconSize:[32,32], iconAnchor:[16,32]
             });
-            
-            let receiptInfo = '';
-            if (r.receiptProof && r.receiptProof.data) {
-                const proofType = r.receiptProof.type === 'signature' ? 'Signature' : 'Empreinte';
-                receiptInfo = `<br/>Accusé: ${proofType} ${r.receiptProof.type === 'signature' ? '✍️' : '👆'}`;
-            }
-            
             const m = L.marker([r.location.lat, r.location.lng], {icon})
                 .bindPopup(`<strong>${escapeHtml(r.agentName||'')}</strong><br/>
                             Statut: ${r.status==='delivered'?'Livrée':'Non livrée'}<br/>
                             Date: ${escapeHtml(r.deliveryDate||'')} ${escapeHtml(r.deliveryTime||'')}<br/>
                             Raison: ${escapeHtml(r.reason||'-')}<br/>
-                            Structure: ${escapeHtml(r.structure||'-')}${receiptInfo}<br/>
+                            Structure: ${escapeHtml(r.structure||'-')}<br/>
                             Créé le: ${new Date(r.timestamp).toLocaleString()}`);
             adminMarkersLayer.addLayer(m);
             markers.push(m);
@@ -3355,7 +2366,7 @@ function deleteReport(id) {
 
 function exportReportsCSV(reports) {
     const rows = [
-        ['id','timestamp','status','reason','agentName','agentContact','structure','deliveryDate','deliveryTime','receiptType','lat','lng']
+        ['id','timestamp','status','reason','agentName','agentContact','structure','deliveryDate','deliveryTime','lat','lng']
     ];
     (reports||[]).forEach(r=>{
         rows.push([
@@ -3368,7 +2379,6 @@ function exportReportsCSV(reports) {
             r.structure||'',
             r.deliveryDate||'',
             r.deliveryTime||'',
-            r.receiptProof ? r.receiptProof.type : '',
             r.location && r.location.lat != null ? r.location.lat : '',
             r.location && r.location.lng != null ? r.location.lng : ''
         ]);
@@ -3451,6 +2461,88 @@ fetch("/entreprises")
     });
   })
   .catch(err => console.error("Erreur chargement entreprises :", err));
+</script>
+
+
+<!-- Modal Signature -->
+<div id="signatureModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+  <div style="background:#fff; margin:5% auto; padding:20px; width:80%; max-width:600px; border-radius:8px;">
+    <h3>Accusé de réception</h3>
+    <p>Veuillez signer ci-dessous ou importer votre empreinte :</p>
+    <canvas id="signaturePad" style="border:1px solid #000; width:100%; height:200px;"></canvas><br>
+    <button onclick="clearSignature()">Effacer</button>
+    <button onclick="saveSignature()">Valider Signature</button><br><br>
+    <label>Ou importer votre empreinte :</label>
+    <input type="file" id="fingerprintUpload" accept="image/*" onchange="uploadFingerprint(event)"><br><br>
+    <button onclick="closeSignatureModal()">Fermer</button>
+  </div>
+</div>
+
+<script>
+let map;
+let routingControl;
+let signaturePad;
+
+function initMap(lat, lng) {
+    if (!map) {
+        map = L.map('map').setView([lat, lng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+    }
+}
+
+// Afficher routes multiples
+function showRoutes(startLat, startLng, endLat, endLng) {
+    initMap(startLat, startLng);
+    if (routingControl) {
+        map.removeControl(routingControl);
+    }
+    routingControl = L.Routing.control({
+        waypoints: [
+            L.latLng(startLat, startLng),
+            L.latLng(endLat, endLng)
+        ],
+        router: new L.Routing.OSRMv1({
+            serviceUrl: 'https://router.project-osrm.org/route/v1'
+        }),
+        routeWhileDragging: true,
+        showAlternatives: true
+    }).addTo(map);
+}
+
+// Gestion du modal signature
+function openSignatureModal() {
+    document.getElementById('signatureModal').style.display = 'block';
+    let canvas = document.getElementById('signaturePad');
+    signaturePad = new SignaturePad(canvas);
+}
+
+function closeSignatureModal() {
+    document.getElementById('signatureModal').style.display = 'none';
+}
+
+function clearSignature() {
+    if (signaturePad) signaturePad.clear();
+}
+
+function saveSignature() {
+    if (signaturePad && !signaturePad.isEmpty()) {
+        let dataURL = signaturePad.toDataURL();
+        alert("Signature sauvegardée ! (Envoyer au serveur ici)");
+        console.log("Signature:", dataURL);
+    } else {
+        alert("Veuillez signer avant de valider.");
+    }
+}
+
+function uploadFingerprint(event) {
+    let file = event.target.files[0];
+    if (file) {
+        alert("Empreinte importée ! (Envoyer au serveur ici)");
+        console.log("Empreinte:", file);
+    }
+}
 </script>
 
 </body>
