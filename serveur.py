@@ -1,21 +1,22 @@
 from flask import Flask, request, send_from_directory, jsonify
+from flask_cors import CORS
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
-import mimetypes
 import os
 import csv
 from dotenv import load_dotenv
 
-# Charger les variables d'environnement depuis .env
+# Charger les variables d'environnement depuis .env (local)
 load_dotenv()
 
 EMAIL = os.getenv("GMAIL_USERNAME")
 PASSWORD = os.getenv("GMAIL_PASSWORD")
 
 app = Flask(__name__)
+CORS(app)  # Autoriser toutes les origines (évite Failed to fetch)
 
 # 📌 Route principale : sert index.html
 @app.route("/")
@@ -25,12 +26,18 @@ def home():
 # 📌 Route pour envoyer un mail
 @app.route("/sendmail", methods=["POST"])
 def sendmail():
-    destinataire = request.form.get("to_email")
-    messagePerso = request.form.get("message", "")
-    refFacture   = request.form.get("invoice_ref", "")
-    fromName     = request.form.get("from_name", "Mon Service Facture")
-    fromContact  = request.form.get("agent_contact", "")
-    sujet        = request.form.get("subject", "Nouvelle Facture")
+    # Support JSON ou form-data
+    if request.is_json:
+        data = request.get_json()
+    else:
+        data = request.form
+
+    destinataire = data.get("to_email")
+    messagePerso = data.get("message", "")
+    refFacture   = data.get("invoice_ref", "")
+    fromName     = data.get("from_name", "Mon Service Facture")
+    fromContact  = data.get("agent_contact", "")
+    sujet        = data.get("subject", "Nouvelle Facture")
 
     msg = MIMEMultipart()
     msg["From"] = EMAIL
@@ -55,7 +62,7 @@ def sendmail():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
 
-# 📌 Nouvelle route : renvoyer la liste des entreprises
+# 📌 Route pour renvoyer la liste des entreprises
 @app.route("/entreprises")
 def get_entreprises():
     entreprises = []
@@ -69,4 +76,6 @@ def get_entreprises():
     return jsonify(entreprises)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Récupérer le port fourni par Render ou utiliser 5000 par défaut
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
