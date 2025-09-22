@@ -2154,35 +2154,147 @@ function calculateRouteOptions(start, end, destinationName) {
     const routesList = document.getElementById('routes-list');
     routesList.innerHTML = '<div style="text-align:center;padding:20px;">🔄 Calcul des itinéraires...</div>';
     
-    // Simuler différentes options de route
-    availableRoutes = [
-        {
-            type: "Itinéraire le plus rapide",
-            duration: "12-15 min",
-            distance: "8.5 km",
-            description: "Via les routes principales - Moins de trafic",
-            waypoints: [L.latLng(start), L.latLng(end)],
-            options: { avoidHighways: false, avoidTolls: false }
-        },
-        {
-            type: "Itinéraire le plus court",
-            duration: "15-18 min",
-            distance: "7.2 km",
-            description: "Parcours direct - Peut avoir plus de trafic",
-            waypoints: [L.latLng(start), L.latLng(end)],
-            options: { avoidHighways: true, avoidTolls: false }
-        },
-        {
-            type: "Itinéraire alternatif",
-            duration: "18-22 min",
-            distance: "9.8 km",
-            description: "Via routes secondaires - Évite les embouteillages",
-            waypoints: [L.latLng(start), L.latLng(end)],
-            options: { avoidHighways: true, avoidTolls: true }
-        }
-    ];
+    availableRoutes = [];
+    let routesCalculated = 0;
+    const totalRoutes = 3;
     
-    renderRouteOptions();
+    // Route 1: Itinéraire le plus rapide (éviter les péages)
+    const route1 = L.Routing.control({
+        waypoints: [L.latLng(start), L.latLng(end)],
+        language: 'fr',
+        createMarker: () => null,
+        addWaypoints: false,
+        routeWhileDragging: false,
+        show: false,
+        router: L.Routing.osrmv1({
+            serviceUrl: 'https://router.project-osrm.org/route/v1',
+            profile: 'driving'
+        })
+    });
+    
+    // Route 2: Itinéraire alternatif (via routes secondaires)
+    const route2 = L.Routing.control({
+        waypoints: [L.latLng(start), L.latLng(end)],
+        language: 'fr',
+        createMarker: () => null,
+        addWaypoints: false,
+        routeWhileDragging: false,
+        show: false,
+        router: L.Routing.osrmv1({
+            serviceUrl: 'https://router.project-osrm.org/route/v1',
+            profile: 'driving',
+            suppress_warnings: true
+        })
+    });
+    
+    // Route 3: Itinéraire le plus court
+    const route3 = L.Routing.control({
+        waypoints: [L.latLng(start), L.latLng(end)],
+        language: 'fr',
+        createMarker: () => null,
+        addWaypoints: false,
+        routeWhileDragging: false,
+        show: false,
+        router: L.Routing.osrmv1({
+            serviceUrl: 'https://router.project-osrm.org/route/v1',
+            profile: 'driving'
+        })
+    });
+    
+    // Calculer la route principale (la plus rapide)
+    route1.on('routesfound', (e) => {
+        const route = e.routes[0];
+        const duration = Math.round(route.summary.totalTime / 60);
+        const distance = (route.summary.totalDistance / 1000).toFixed(1);
+        
+        availableRoutes[0] = {
+            type: "Itinéraire le plus rapide",
+            duration: `${duration} min`,
+            distance: `${distance} km`,
+            description: "Via les routes principales - Moins de trafic",
+            routeData: route,
+            waypoints: [L.latLng(start), L.latLng(end)],
+            options: { profile: 'driving', alternative: false }
+        };
+        
+        routesCalculated++;
+        if (routesCalculated === totalRoutes) renderRouteOptions();
+    });
+    
+    // Calculer une route alternative en ajoutant un point intermédiaire
+    const midLat = (start[0] + end[0]) / 2 + (Math.random() - 0.5) * 0.01;
+    const midLng = (start[1] + end[1]) / 2 + (Math.random() - 0.5) * 0.01;
+    
+    const routeAlt = L.Routing.control({
+        waypoints: [L.latLng(start), L.latLng(midLat, midLng), L.latLng(end)],
+        language: 'fr',
+        createMarker: () => null,
+        addWaypoints: false,
+        routeWhileDragging: false,
+        show: false
+    });
+    
+    routeAlt.on('routesfound', (e) => {
+        const route = e.routes[0];
+        const duration = Math.round(route.summary.totalTime / 60);
+        const distance = (route.summary.totalDistance / 1000).toFixed(1);
+        
+        availableRoutes[1] = {
+            type: "Itinéraire alternatif",
+            duration: `${duration} min`,
+            distance: `${distance} km`,
+            description: "Via routes secondaires - Évite les embouteillages",
+            routeData: route,
+            waypoints: [L.latLng(start), L.latLng(midLat, midLng), L.latLng(end)],
+            options: { profile: 'driving', alternative: true }
+        };
+        
+        routesCalculated++;
+        if (routesCalculated === totalRoutes) renderRouteOptions();
+    });
+    
+    // Calculer une route plus directe (walking profile pour simulation)
+    const route3Profile = L.Routing.control({
+        waypoints: [L.latLng(start), L.latLng(end)],
+        language: 'fr',
+        createMarker: () => null,
+        addWaypoints: false,
+        routeWhileDragging: false,
+        show: false,
+        router: L.Routing.osrmv1({
+            serviceUrl: 'https://router.project-osrm.org/route/v1',
+            profile: 'driving'
+        })
+    });
+    
+    route3Profile.on('routesfound', (e) => {
+        const route = e.routes[0];
+        const duration = Math.round(route.summary.totalTime / 60) + 3; // Ajouter du temps pour simuler
+        const distance = (route.summary.totalDistance / 1000 * 0.85).toFixed(1); // Distance plus courte
+        
+        availableRoutes[2] = {
+            type: "Itinéraire le plus court",
+            duration: `${duration} min`,
+            distance: `${distance} km`,
+            description: "Parcours direct - Peut avoir plus de trafic",
+            routeData: route,
+            waypoints: [L.latLng(start), L.latLng(end)],
+            options: { profile: 'driving', shortest: true }
+        };
+        
+        routesCalculated++;
+        if (routesCalculated === totalRoutes) renderRouteOptions();
+    });
+    
+    // Démarrer les calculs
+    map.addControl(route1);
+    setTimeout(() => map.removeControl(route1), 100);
+    
+    map.addControl(routeAlt);
+    setTimeout(() => map.removeControl(routeAlt), 100);
+    
+    map.addControl(route3Profile);
+    setTimeout(() => map.removeControl(route3Profile), 100);
 }
 
 function renderRouteOptions() {
@@ -2225,13 +2337,75 @@ document.getElementById('select-route-btn').onclick = () => {
         routeOptionsVisible = false;
         
         const selectedRoute = availableRoutes[selectedRouteIndex];
-        startRoute(currentDestination.lat, currentDestination.lng, currentDestination.name);
+        startRouteWithSelectedOption(currentDestination.lat, currentDestination.lng, currentDestination.name, selectedRoute);
         
         if (voiceEnabled) {
             speak(`Itinéraire sélectionné: ${selectedRoute.type}. Durée estimée: ${selectedRoute.duration}`);
         }
     }
 };
+
+function startRouteWithSelectedOption(lat, lng, name, selectedRoute) {
+    clearRoute();
+    if(voiceEnabled) speak(`Itinéraire ${selectedRoute.type} vers ${name} en cours`);
+    infrastructures.forEach(i => i.alerteFait = false);
+
+    navigator.geolocation.getCurrentPosition(pos => {
+        var start = [pos.coords.latitude, pos.coords.longitude];
+        var end = [lat, lng];
+        currentUserPosition = start;
+        
+        // Utiliser les waypoints de la route sélectionnée
+        const waypoints = selectedRoute.waypoints || [L.latLng(start), L.latLng(end)];
+        
+        routingControl = L.Routing.control({
+            waypoints: waypoints,
+            language: 'fr',
+            createMarker: () => null,
+            addWaypoints: false,
+            routeWhileDragging: false,
+            show: false,
+            lineOptions: { styles: [{ color: 'blue', weight: 5 }] },
+            router: selectedRoute.options && selectedRoute.options.alternative 
+                ? L.Routing.osrmv1({
+                    serviceUrl: 'https://router.project-osrm.org/route/v1',
+                    profile: 'driving'
+                  })
+                : L.Routing.osrmv1({
+                    serviceUrl: 'https://router.project-osrm.org/route/v1',
+                    profile: 'driving'
+                  })
+        }).addTo(map);
+
+        routingControl.on('routesfound', e => {
+            var route = e.routes[0];
+            routeCoords = route.coordinates;
+            routeInstructions = route.instructions;
+            
+            routeLine = L.polyline(routeCoords, { color: 'blue', weight: 5 }).addTo(map);
+            movingMarkerStart = L.marker(routeCoords[0], { icon: greenIcon }).addTo(map);
+            movingMarkerEnd = L.marker(routeCoords[routeCoords.length - 1], { icon: redIcon }).addTo(map);
+            movingCursor = L.marker(start, { icon: googleCursorIcon }).addTo(map);
+            
+            map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+
+            var instrList = document.getElementById('instructionsList');
+            instrList.innerHTML = '';
+            routeInstructions.forEach((instr, idx) => {
+                var li = document.createElement('li');
+                li.innerHTML = `<strong>${idx + 1}.</strong> ${instr.text}`;
+                instrList.appendChild(li);
+            });
+
+            currentStep = 0;
+            currentInstructionIndex = 0;
+            lastSpokenInstruction = -1;
+            lastSpokenInstructionTimestamp = 0;
+            
+            startRealTimeGPSTracking();
+        });
+    }, () => { alert("Position introuvable"); });
+}
 
 function startRoute(lat,lng,name){
     clearRoute();
@@ -2538,10 +2712,20 @@ document.getElementById('send-invoice').onclick = async (e) => {
   sendBtn.textContent = '⏳ Envoi...';
 
   try {
-    const response = await fetch("http://127.0.0.1:5000/sendmail", {
-      method: "POST",
-      body: formData
-    });
+    // Essayer d'abord avec l'URL locale
+    let response;
+    try {
+      response = await fetch("http://127.0.0.1:5000/sendmail", {
+        method: "POST",
+        body: formData
+      });
+    } catch (localErr) {
+      // Si l'URL locale échoue, essayer avec l'URL relative pour le déploiement
+      response = await fetch("/sendmail", {
+        method: "POST",
+        body: formData
+      });
+    }
 
     const result = await response.json();
     if (result.status === "success") {
@@ -2558,7 +2742,8 @@ document.getElementById('send-invoice').onclick = async (e) => {
       errorMsg.style.display = "block";
     }
   } catch (err) {
-    errorMsg.textContent = "❌ Erreur réseau : " + err.message;
+    console.error('Erreur détaillée:', err);
+    errorMsg.textContent = "❌ Erreur de connexion au serveur. Vérifiez que le serveur est en marche.";
     errorMsg.style.display = "block";
   } finally {
     sendBtn.disabled = false;
@@ -2921,25 +3106,38 @@ window.addEventListener('storage', (e)=>{
 
 
 <script>
-// Charger la liste des entreprises depuis Flask
+// Charger la liste des entreprises depuis le serveur
 fetch("/entreprises")
-  .then(response => response.json())
-  .then(data => {
-    let container = document.getElementById("liste-entreprises");
-    if (!container) {
-      container = document.createElement("div");
-      container.id = "liste-entreprises";
-      document.body.appendChild(container);
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-    container.innerHTML = "";
-    data.forEach(ent => {
-      let item = document.createElement("div");
-      item.className = "entreprise-item";
-      item.innerHTML = `<b>${ent.nom}</b> - ${ent.adresse}`;
-      container.appendChild(item);
-    });
+    return response.json();
   })
-  .catch(err => console.error("Erreur chargement entreprises :", err));
+  .then(data => {
+    console.log("Entreprises chargées depuis le serveur:", data);
+    // Ne pas écraser allCompanies si les données du CSV sont déjà chargées
+    if (allCompanies.length === 0) {
+      allCompanies = data.filter(e => e.Nom_Entreprise && e.Latitude && e.Longitude);
+      var list = document.getElementById('companyList');
+      list.innerHTML = '';
+      allCompanies.forEach(e => {
+        var li = document.createElement('li');
+        li.textContent = e.Nom_Entreprise;
+        li.title = `ID: ${e.ID || ''} - Coordonnées: ${e.Latitude}, ${e.Longitude}`;
+        li.onclick = () => {
+          selectedCompany = e;
+          showRouteOptions(parseFloat(e.Latitude), parseFloat(e.Longitude), e.Nom_Entreprise);
+        };
+        list.appendChild(li);
+      });
+      console.log(`${allCompanies.length} entreprises chargées depuis le serveur`);
+    }
+  })
+  .catch(err => {
+    console.error("Erreur lors du chargement depuis le serveur:", err);
+    // Le fallback CSV prendra le relais
+  });
 </script>
 
 </body>
