@@ -1582,7 +1582,6 @@ body {
     </div>
 </div>
 
-<!-- Modal édition administrateur -->
 <div id="edit-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:12000; padding:20px;">
   <div style="background:#fff; padding:16px; border-radius:8px; width:100%; max-width:420px; box-shadow:0 6px 18px rgba(0,0,0,0.2); max-height:90vh; overflow-y:auto;">
     <h3 style="margin-top:0;">✏️ Modifier le rapport</h3>
@@ -1601,6 +1600,20 @@ body {
         <button onclick="closeEditModal()" style="background:#6c757d;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;">Annuler</button>
         <button onclick="saveEdit()" style="background:#007bff;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;">Enregistrer</button>
       </div>
+    </div>
+  </div>
+</div>
+        
+<!-- Signature viewing modal -->
+<div id="signature-view-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:15000;padding:20px;">
+  <div style="background:#fff;padding:20px;border-radius:8px;width:100%;max-width:500px;box-shadow:0 6px 18px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto;">
+    <h3 style="margin-top:0;color:#007bff;text-align:center;">📷 Signature de réception</h3>
+    <div style="text-align:center;margin:20px 0;">
+      <img id="signature-view-image" style="max-width:100%;max-height:300px;border:1px solid #ddd;border-radius:8px;" />
+    </div>
+    <div style="text-align:center;">
+      <button onclick="closeSignatureViewModal()" style="background:#6c757d;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;">Fermer</button>
+      <button id="download-signature" style="background:#28a745;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;margin-left:10px;">💾 Télécharger</button>
     </div>
   </div>
 </div>
@@ -1790,9 +1803,27 @@ var infrastructures = [
 ];
 var infraAlertDistance = 25;
 
-var greenIcon = new L.Icon({ iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/green-dot.png', iconSize:[32,32], iconAnchor:[16,32] });
-var redIcon = new L.Icon({ iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png', iconSize:[32,32], iconAnchor:[16,32] });
-var googleCursorIcon = new L.Icon({ iconUrl:'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png', iconSize:[32,32], iconAnchor:[16,32] });
+// Variables pour la gestion dynamique du trait
+var progressLine = null;
+var totalRouteDistance = 0;
+var currentRouteProgress = 0;
+
+// Icônes personnalisés pour départ, arrivée et position
+var departIcon = new L.Icon({ 
+    iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/green-dot.png', 
+    iconSize: [32,32], 
+    iconAnchor: [16,32]
+});
+var arriveeIcon = new L.Icon({ 
+    iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png', 
+    iconSize: [32,32], 
+    iconAnchor: [16,32]
+});
+var positionIcon = new L.Icon({ 
+    iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png', 
+    iconSize: [32,32], 
+    iconAnchor: [16,32]
+});
 
 var baseLayers = {
 "OSM": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:25, maxNativeZoom: 19, attribution:'', errorTileUrl:''}).addTo(map),
@@ -1885,7 +1916,7 @@ document.getElementById('toggleVoice').onclick=()=>{ voiceEnabled=!voiceEnabled;
 document.getElementById('locateBtn').onclick=()=>{ map.locate({setView:true,maxZoom:25}); };
 map.on('locationfound', e => {
     if(userMarker) map.removeLayer(userMarker);
-    userMarker = L.marker(e.latlng,{icon:redIcon}).addTo(map);
+    userMarker = L.marker(e.latlng,{icon:arriveeIcon}).addTo(map);
     map.setView(e.latlng,25,{animate:true});
     currentUserPosition = [e.latlng.lat, e.latlng.lng];
 });
@@ -1972,7 +2003,7 @@ document.getElementById('coordBtnSidebar').onclick = () => {
         } catch(e){ alert("Erreur de conversion UTM: " + e); return; }
     }
     selectedCompany = null;
-    startRouteWithoutVoice(destLat, destLng, `Destination (${destLat.toFixed(5)}, ${destLng.toFixed(5)})`);
+    showRouteOptions(destLat, destLng, `Destination (${destLat.toFixed(5)}, ${destLng.toFixed(5)})`);
 };
 
 function clearRoute(){
@@ -1994,6 +2025,7 @@ function clearRoute(){
     if(movingMarkerEnd) map.removeLayer(movingMarkerEnd);
     if(movingCursor) map.removeLayer(movingCursor);
     if(routeLine) map.removeLayer(routeLine);
+    if(progressLine) map.removeLayer(progressLine);
     if(routingControl) map.removeControl(routingControl);
 
     routeCoords=[];
@@ -2033,6 +2065,43 @@ function startRealTimeGPSTracking(){
         if (movingCursor) {
             movingCursor.setLatLng(userPos);
         }
+        
+        // Mettre à jour la ligne progressive
+        updateProgressiveLine(userPos);
+        
+function updateProgressiveLine(userPos) {
+    if (!routeCoords || routeCoords.length === 0) return;
+    
+    // Trouver le point le plus proche sur la route
+    let closestIndex = 0;
+    let minDistance = Infinity;
+    
+    routeCoords.forEach((coord, index) => {
+        const dist = distance(userPos, [coord.lat, coord.lng]);
+        if (dist < minDistance) {
+            minDistance = dist;
+            closestIndex = index;
+        }
+    });
+    
+    // Mettre à jour la ligne de progression
+    if (progressLine) {
+        map.removeLayer(progressLine);
+    }
+    
+    // Créer une ligne depuis la position actuelle jusqu'à la destination
+    const remainingCoords = routeCoords.slice(closestIndex);
+    if (remainingCoords.length > 1) {
+        progressLine = L.polyline(remainingCoords, { 
+            color: '#007bff', 
+            weight: 5, 
+            opacity: 0.8
+        }).addTo(map);
+    }
+    
+    // Calculer le progrès
+    currentRouteProgress = (closestIndex / routeCoords.length) * 100;
+}
         
         // Suivre la position utilisateur si activé
         if (followUserPosition) {
@@ -2383,9 +2452,9 @@ function startRouteWithSelectedOption(lat, lng, name, selectedRoute) {
             routeInstructions = route.instructions;
             
             routeLine = L.polyline(routeCoords, { color: 'blue', weight: 5 }).addTo(map);
-            movingMarkerStart = L.marker(routeCoords[0], { icon: greenIcon }).addTo(map);
-            movingMarkerEnd = L.marker(routeCoords[routeCoords.length - 1], { icon: redIcon }).addTo(map);
-            movingCursor = L.marker(start, { icon: googleCursorIcon }).addTo(map);
+            movingMarkerStart = L.marker(routeCoords[0], { icon: departIcon }).addTo(map);
+            movingMarkerEnd = L.marker(routeCoords[routeCoords.length - 1], { icon: arriveeIcon }).addTo(map);
+            movingCursor = L.marker(start, { icon: positionIcon }).addTo(map);
             
             map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
 
@@ -2960,7 +3029,7 @@ function renderAdminTable(reports) {
             <td>${escapeHtml(r.deliveryTime||'')}</td>
             <td style="max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(r.reason||'')}">${escapeHtml(r.reason||'')}</td>
             <td style="max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(r.structure||'')}">${escapeHtml(r.structure||'')}</td>
-            <td>${r.signature ? '<span style="color:#28a745;font-weight:bold;">✅ Signée</span>' : '<span style="color:#6c757d;">⭕ Non signée</span>'}</td>
+            <td>${r.signature ? '<button class="view-signature" data-signature="' + r.signature + '" style="background:#007bff;color:white;border:none;border-radius:4px;padding:3px 6px;cursor:pointer;font-size:0.7em;">📷 Voir</button>' : '<span style="color:#6c757d;">⭕ Non signée</span>'}</td>
             <td>${posTxt}</td>
             <td style="font-size:0.7em;">${created}</td>
             <td class="row-actions">
@@ -3029,7 +3098,7 @@ function deleteReport(id) {
 
 function exportReportsCSV(reports) {
     const rows = [
-        ['id','timestamp','status','reason','agentName','agentContact','structure','deliveryDate','deliveryTime','signature','lat','lng']
+        ['id','timestamp','status','reason','agentName','agentContact','structure','deliveryDate','deliveryTime','signature_status','signature_data','lat','lng']
     ];
     (reports||[]).forEach(r=>{
         rows.push([
@@ -3043,6 +3112,7 @@ function exportReportsCSV(reports) {
             r.deliveryDate||'',
             r.deliveryTime||'',
             r.signature ? 'Signée' : 'Non signée',
+            r.signature || '',
             r.location && r.location.lat != null ? r.location.lat : '',
             r.location && r.location.lng != null ? r.location.lng : ''
         ]);
@@ -3102,6 +3172,34 @@ window.addEventListener('storage', (e)=>{
         initializeAdmin();
     }
 });
+
+// ====================== SIGNATURE VIEWING FUNCTIONS ======================
+function viewSignature(signatureData) {
+    document.getElementById('signature-view-image').src = signatureData;
+    document.getElementById('signature-view-modal').style.display = 'flex';
+    
+    // Set up download functionality
+    document.getElementById('download-signature').onclick = () => {
+        const link = document.createElement('a');
+        link.href = signatureData;
+        link.download = 'signature_' + Date.now() + '.png';
+        link.click();
+    };
+}
+
+function closeSignatureViewModal() {
+    document.getElementById('signature-view-modal').style.display = 'none';
+}
+
+// Add click event for signature view buttons
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('view-signature')) {
+        const signatureData = e.target.getAttribute('data-signature');
+        if (signatureData) {
+            viewSignature(signatureData);
+        }
+    }
+});
 </script>
 
 
@@ -3140,5 +3238,36 @@ fetch("/entreprises")
   });
 </script>
 
-</body>
-</html>
+```
+
+// Add signature modal for viewing
+<div id="signature-view-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:15000;padding:20px;">
+  <div style="background:#fff;padding:20px;border-radius:8px;width:100%;max-width:500px;box-shadow:0 6px 18px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto;">
+    <h3 style="margin-top:0;color:#007bff;text-align:center;">📷 Signature de réception</h3>
+    <div style="text-align:center;margin:20px 0;">
+      <img id="signature-view-image" style="max-width:100%;max-height:300px;border:1px solid #ddd;border-radius:8px;" />
+    </div>
+    <div style="text-align:center;">
+      <button onclick="closeSignatureViewModal()" style="background:#6c757d;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;">Fermer</button>
+      <button id="download-signature" style="background:#28a745;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;margin-left:10px;">💾 Télécharger</button>
+    </div>
+  </div>
+</div>
+
+// Add signature viewing functions
+function viewSignature(signatureData) {
+  document.getElementById('signature-view-image').src = signatureData;
+  document.getElementById('signature-view-modal').style.display = 'flex';
+  
+  // Set up download functionality
+  document.getElementById('download-signature').onclick = () => {
+    const link = document.createElement('a');
+    link.href = signatureData;
+    link.download = 'signature_' + Date.now() + '.png';
+    link.click();
+  };
+}
+
+function closeSignatureViewModal() {
+  document.getElementById('signature-view-modal').style.display = 'none';
+}
