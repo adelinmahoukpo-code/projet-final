@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <title>Système de Distribution des Factures Impôts</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
@@ -90,10 +97,44 @@
     display: none;
 }
 
+/* Modern Material Design Variables */
+:root {
+    --primary-color: #1976d2;
+    --primary-dark: #1565c0;
+    --primary-light: #bbdefb;
+    --accent-color: #ff5722;
+    --success-color: #4caf50;
+    --warning-color: #ff9800;
+    --error-color: #f44336;
+    --text-primary: #212121;
+    --text-secondary: #757575;
+    --divider-color: #e0e0e0;
+    --background-color: #fafafa;
+    --surface-color: #ffffff;
+    --shadow-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    --shadow-2: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    --shadow-3: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    --shadow-4: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+    --border-radius: 8px;
+    --border-radius-large: 16px;
+    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-medium: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Global Styles with Modern Typography */
+* {
+    box-sizing: border-box;
+}
+
 body { 
     margin: 0; 
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-    background: #f5f5f5;
+    font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--background-color);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
 }
 
@@ -101,12 +142,26 @@ body {
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
-    background: #007bff; 
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     color: white; 
-    padding: 15px; 
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3); 
+    padding: 16px 24px; 
+    box-shadow: var(--shadow-2);
     position: relative; 
     z-index: 1001;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+#header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    pointer-events: none;
 }
 
 #header .header-content {
@@ -150,18 +205,32 @@ body {
     top: 80px; 
     left: 0; 
     bottom: 0; 
-    width: 280px; 
+    width: 320px; 
     z-index: 1000; 
-    background: rgba(255,255,255,0.95); 
-    backdrop-filter: blur(10px); 
-    padding: 15px; 
+    background: var(--surface-color);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 24px; 
     overflow-y: auto; 
     display: flex; 
     flex-direction: column; 
-    border-radius: 0 12px 12px 0; 
-    box-shadow: 2px 4px 12px rgba(0,0,0,0.15);
+    border-radius: 0 var(--border-radius-large) var(--border-radius-large) 0; 
+    box-shadow: var(--shadow-3);
+    border-right: 1px solid var(--divider-color);
     transform: translateX(0);
-    transition: transform 0.3s ease;
+    transition: transform var(--transition-medium);
+}
+
+#sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(25,118,210,0.02) 0%, rgba(25,118,210,0.01) 100%);
+    pointer-events: none;
+    border-radius: 0 var(--border-radius-large) var(--border-radius-large) 0;
 }
 
 #sidebar.hidden {
@@ -176,40 +245,74 @@ body {
 }
 
 #sidebar input, #sidebar select { 
-    width: calc(100% - 16px); 
-    padding: 10px; 
-    margin-bottom: 10px; 
-    border-radius: 8px; 
-    border: 1px solid #ccc; 
+    width: calc(100% - 24px); 
+    padding: 14px 12px; 
+    margin-bottom: 16px; 
+    border-radius: var(--border-radius); 
+    border: 2px solid var(--divider-color); 
     font-size: 0.95em; 
-    transition: 0.2s all;
+    font-family: inherit;
+    background: var(--surface-color);
+    color: var(--text-primary);
+    transition: all var(--transition-fast);
     box-sizing: border-box;
+    position: relative;
 }
 
 #sidebar input:focus, #sidebar select:focus { 
-    border-color: #007bff; 
-    box-shadow: 0 0 6px rgba(0,123,255,0.4); 
-    outline: none; 
+    border-color: var(--primary-color); 
+    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1); 
+    outline: none;
+    transform: translateY(-1px);
+}
+
+#sidebar input::placeholder {
+    color: var(--text-secondary);
+    font-weight: 400;
 }
 
 #sidebar button { 
     width: 100%; 
-    padding: 10px; 
-    margin-bottom: 8px; 
+    padding: 14px 20px; 
+    margin-bottom: 12px; 
     border: none; 
-    border-radius: 8px; 
+    border-radius: var(--border-radius); 
     color: white; 
     cursor: pointer; 
     font-weight: 600; 
-    transition: 0.25s all; 
-    background: linear-gradient(145deg,#007bff,#0056b3); 
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    font-size: 0.9em;
+    font-size: 0.95em;
+    letter-spacing: 0.025em;
+    transition: all var(--transition-fast); 
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    box-shadow: var(--shadow-1);
+    position: relative;
+    overflow: hidden;
+}
+
+#sidebar button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left var(--transition-medium);
 }
 
 #sidebar button:hover { 
-    background: linear-gradient(145deg,#0056b3,#003f7f); 
+    background: linear-gradient(135deg, var(--primary-dark) 0%, #0d47a1 100%);
     transform: translateY(-2px); 
+    box-shadow: var(--shadow-2);
+}
+
+#sidebar button:hover::before {
+    left: 100%;
+}
+
+#sidebar button:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-1);
 }
 
 #companyList { 
@@ -1001,7 +1104,106 @@ body {
     background: none !important;
 }
 
-/* Styles pour les lignes de route */
+/* Loading States and Progress Indicators */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.progress-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--divider-color);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 8px 0;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    border-radius: 2px;
+    transition: width var(--transition-medium);
+    width: 0%;
+}
+
+/* Status Cards */
+.status-card {
+    background: var(--surface-color);
+    border-radius: var(--border-radius);
+    padding: 16px;
+    margin: 8px 0;
+    box-shadow: var(--shadow-1);
+    border-left: 4px solid var(--primary-color);
+    transition: all var(--transition-fast);
+}
+
+.status-card:hover {
+    box-shadow: var(--shadow-2);
+    transform: translateY(-2px);
+}
+
+.status-card.success {
+    border-left-color: var(--success-color);
+}
+
+.status-card.warning {
+    border-left-color: var(--warning-color);
+}
+
+.status-card.error {
+    border-left-color: var(--error-color);
+}
+
+/* Toast Notifications */
+.toast-container {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    z-index: 10000;
+    pointer-events: none;
+}
+
+.toast {
+    background: var(--surface-color);
+    color: var(--text-primary);
+    padding: 16px 20px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-3);
+    margin-bottom: 12px;
+    transform: translateX(400px);
+    transition: all var(--transition-medium);
+    pointer-events: auto;
+    border-left: 4px solid var(--primary-color);
+    max-width: 300px;
+}
+
+.toast.show {
+    transform: translateX(0);
+}
+
+.toast.success {
+    border-left-color: var(--success-color);
+}
+
+.toast.error {
+    border-left-color: var(--error-color);
+}
+
+.toast.warning {
+    border-left-color: var(--warning-color);
+}
 .main-route-line {
     border-radius: 3px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
@@ -1449,7 +1651,22 @@ body {
         </div>
         <div id="routeControls">
             <h3>Navigation</h3>
-            <button id="pauseRoute">⏸ Pause</button>
+            
+            <!-- Statistics Dashboard -->
+            <div class="status-card" id="stats-card" style="display: none;">
+                <h4 style="margin: 0 0 12px 0; color: var(--primary-color);">📊 Statistiques</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.85em;">
+                    <div>Distance: <strong id="total-distance">0 km</strong></div>
+                    <div>Temps: <strong id="estimated-time">0 min</strong></div>
+                    <div>Progrès: <strong id="route-progress">0%</strong></div>
+                    <div>Vitesse: <strong id="current-speed">0 km/h</strong></div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-bar-fill" id="navigation-progress"></div>
+                </div>
+            </div>
+            
+            <button id="pauseRoute">⏸️ Pause</button>
             <button id="resumeRoute">▶️ Reprendre</button>
             <button id="stopRoute">🛑 Arrêter</button>
             <button id="toggle-delivery-report">📋 Rapport Livraison</button>
@@ -1607,6 +1824,9 @@ body {
     </div>
 </div>
 
+<!-- Toast Notification Container -->
+<div class="toast-container" id="toast-container"></div>
+
 <!-- Interface Administrateur -->
 <div id="admin-container">
     <div id="admin-header">
@@ -1695,6 +1915,67 @@ body {
 <script src="https://unpkg.com/leaflet-minimap/dist/Control.MiniMap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.8.0/proj4.js"></script>
 <script>
+// ====================== PROFESSIONAL TOAST NOTIFICATIONS ======================
+function showToast(message, type = 'info', duration = 5000) {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    const icons = {
+        success: '✅',
+        error: '❌',
+        warning: '⚠️',
+        info: 'ℹ️'
+    };
+    
+    toast.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 1.2em;">${icons[type] || icons.info}</span>
+            <div>
+                <div style="font-weight: 600; margin-bottom: 4px;">${type.charAt(0).toUpperCase() + type.slice(1)}</div>
+                <div style="font-size: 0.9em; color: var(--text-secondary);">${message}</div>
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; font-size: 1.2em; cursor: pointer; color: var(--text-secondary); margin-left: auto;">×</button>
+        </div>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Trigger animation
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    // Auto remove
+    if (duration > 0) {
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
+    }
+}
+
+// ====================== LOADING STATES ======================
+function showLoading(element, text = 'Chargement...') {
+    const originalText = element.textContent;
+    element.dataset.originalText = originalText;
+    element.innerHTML = `<span class="loading-spinner"></span>${text}`;
+    element.disabled = true;
+}
+
+function hideLoading(element) {
+    const originalText = element.dataset.originalText || element.textContent;
+    element.innerHTML = originalText;
+    element.disabled = false;
+    delete element.dataset.originalText;
+}
+
+// ====================== PROGRESS BAR ======================
+function updateProgress(percentage) {
+    const progressBar = document.querySelector('.progress-bar-fill');
+    if (progressBar) {
+        progressBar.style.width = `${Math.min(100, Math.max(0, percentage))}%`;
+    }
+}
+
 // ====================== AUTH / MODE ======================
 let currentUserRole = null;
 const LS_KEY = 'deliveryReports_v1';
@@ -2186,6 +2467,9 @@ function clearRoute(){
     lastSpokenInstructionTimestamp = 0;
     currentRouteProgress = 0;
 
+    // Hide statistics dashboard
+    document.getElementById('stats-card').style.display = 'none';
+    
     document.getElementById('instructionsList').innerHTML='';
     hideZoomControls();
 }
@@ -2198,6 +2482,43 @@ function distance(latlng1,latlng2){
     const lat1=toRad(latlng1[0]); const lat2=toRad(latlng2[0]);
     const a=Math.sin(dLat/2)**2 + Math.sin(dLon/2)**2 * Math.cos(lat1)*Math.cos(lat2);
     return 2*R*Math.atan2(Math.sqrt(a),Math.atan2(Math.sqrt(1-a),1));
+}
+
+// ====================== STATISTICS AND PERFORMANCE TRACKING ======================
+function updateStatistics(route) {
+    if (!route) return;
+    
+    const totalDistance = (route.summary.totalDistance / 1000).toFixed(1);
+    const estimatedTime = Math.round(route.summary.totalTime / 60);
+    
+    document.getElementById('total-distance').textContent = `${totalDistance} km`;
+    document.getElementById('estimated-time').textContent = `${estimatedTime} min`;
+    document.getElementById('route-progress').textContent = `${Math.round(currentRouteProgress)}%`;
+    
+    // Update progress bar
+    const progressBar = document.getElementById('navigation-progress');
+    if (progressBar) {
+        progressBar.style.width = `${currentRouteProgress}%`;
+    }
+}
+
+function updateCurrentSpeed(position) {
+    if (position && position.coords && position.coords.speed !== null) {
+        const speedKmh = Math.round((position.coords.speed || 0) * 3.6);
+        const speedElement = document.getElementById('current-speed');
+        if (speedElement) {
+            speedElement.textContent = `${speedKmh} km/h`;
+        }
+    }
+}
+
+// Update statistics during navigation
+function updateNavigationStats() {
+    document.getElementById('route-progress').textContent = `${Math.round(currentRouteProgress)}%`;
+    const progressBar = document.getElementById('navigation-progress');
+    if (progressBar) {
+        progressBar.style.width = `${currentRouteProgress}%`;
+    }
 }
 
 // ====================== SUIVI GPS RÉEL AMÉLIORÉ ======================
@@ -2296,8 +2617,14 @@ function startRealTimeGPSTracking(){
         const userPos = [pos.coords.latitude, pos.coords.longitude];
         currentUserPosition = userPos;
         
+        // Update speed statistics
+        updateCurrentSpeed(pos);
+        
         // Mettre à jour la ligne progressive et la position du curseur
         updateProgressiveLine(userPos);
+        
+        // Update navigation statistics
+        updateNavigationStats();
         
         // Suivre la position utilisateur si activé avec transition fluide
         if (followUserPosition) {
@@ -2362,8 +2689,25 @@ function startRealTimeGPSTracking(){
 
     }, (error) => {
         console.error("Erreur de géolocalisation pour le guidage vocal :", error);
+        let errorMessage = "Erreur GPS: ";
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                errorMessage += "Accès à la localisation refusé";
+                showToast(errorMessage, 'error');
+                break;
+            case error.POSITION_UNAVAILABLE:
+                errorMessage += "Position indisponible";
+                showToast(errorMessage, 'warning');
+                break;
+            case error.TIMEOUT:
+                errorMessage += "Timeout de localisation";
+                showToast(errorMessage, 'warning');
+                break;
+        }
+        
         // En cas d'erreur GPS, continuer avec l'animation simulée
         if (!isPaused && isNavigating) {
+            showToast('Passage en mode simulation', 'info');
             resumeRouteAnimation();
         }
     }, {
@@ -2430,13 +2774,15 @@ function showRouteOptions(lat, lng, name) {
 
 function calculateRouteOptions(start, end, destinationName) {
     const routesList = document.getElementById('routes-list');
-    routesList.innerHTML = '<div style="text-align:center;padding:20px;">🔄 Calcul des itinéraires...</div>';
+    routesList.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-secondary);"><span class="loading-spinner"></span>Calcul des itinéraires...</div>';
+    
+    showToast('Calcul des itinéraires en cours...', 'info', 3000);
     
     availableRoutes = [];
     let routesCalculated = 0;
     const totalRoutes = 3;
     
-    // Route 1: Itinéraire le plus rapide (éviter les péages)
+    // Route 1: Itinéraire le plus rapide (avoid tolls)
     const route1 = L.Routing.control({
         waypoints: [L.latLng(start), L.latLng(end)],
         language: 'fr',
@@ -2479,7 +2825,7 @@ function calculateRouteOptions(start, end, destinationName) {
         })
     });
     
-    // Calculer la route principale (la plus rapide)
+    // Calculate main route (fastest)
     route1.on('routesfound', (e) => {
         const route = e.routes[0];
         const duration = Math.round(route.summary.totalTime / 60);
@@ -2492,14 +2838,20 @@ function calculateRouteOptions(start, end, destinationName) {
             description: "Via les routes principales - Moins de trafic",
             routeData: route,
             waypoints: [L.latLng(start), L.latLng(end)],
-            options: { profile: 'driving', alternative: false }
+            options: { profile: 'driving', alternative: false },
+            icon: '🚗',
+            color: '#4caf50'
         };
         
         routesCalculated++;
-        if (routesCalculated === totalRoutes) renderRouteOptions();
+        updateProgress((routesCalculated / totalRoutes) * 100);
+        if (routesCalculated === totalRoutes) {
+            renderRouteOptions();
+            showToast('Itinéraires calculés avec succès!', 'success');
+        }
     });
     
-    // Calculer une route alternative en ajoutant un point intermédiaire
+    // Calculate alternative route by adding intermediate point
     const midLat = (start[0] + end[0]) / 2 + (Math.random() - 0.5) * 0.01;
     const midLng = (start[1] + end[1]) / 2 + (Math.random() - 0.5) * 0.01;
     
@@ -2524,14 +2876,20 @@ function calculateRouteOptions(start, end, destinationName) {
             description: "Via routes secondaires - Évite les embouteillages",
             routeData: route,
             waypoints: [L.latLng(start), L.latLng(midLat, midLng), L.latLng(end)],
-            options: { profile: 'driving', alternative: true }
+            options: { profile: 'driving', alternative: true },
+            icon: '🛣️',
+            color: '#ff9800'
         };
         
         routesCalculated++;
-        if (routesCalculated === totalRoutes) renderRouteOptions();
+        updateProgress((routesCalculated / totalRoutes) * 100);
+        if (routesCalculated === totalRoutes) {
+            renderRouteOptions();
+            showToast('Itinéraires calculés avec succès!', 'success');
+        }
     });
     
-    // Calculer une route plus directe (walking profile pour simulation)
+    // Calculate more direct route
     const route3Profile = L.Routing.control({
         waypoints: [L.latLng(start), L.latLng(end)],
         language: 'fr',
@@ -2547,8 +2905,8 @@ function calculateRouteOptions(start, end, destinationName) {
     
     route3Profile.on('routesfound', (e) => {
         const route = e.routes[0];
-        const duration = Math.round(route.summary.totalTime / 60) + 3; // Ajouter du temps pour simuler
-        const distance = (route.summary.totalDistance / 1000 * 0.85).toFixed(1); // Distance plus courte
+        const duration = Math.round(route.summary.totalTime / 60) + 3;
+        const distance = (route.summary.totalDistance / 1000 * 0.85).toFixed(1);
         
         availableRoutes[2] = {
             type: "Itinéraire le plus court",
@@ -2557,22 +2915,33 @@ function calculateRouteOptions(start, end, destinationName) {
             description: "Parcours direct - Peut avoir plus de trafic",
             routeData: route,
             waypoints: [L.latLng(start), L.latLng(end)],
-            options: { profile: 'driving', shortest: true }
+            options: { profile: 'driving', shortest: true },
+            icon: '🏁',
+            color: '#2196f3'
         };
         
         routesCalculated++;
-        if (routesCalculated === totalRoutes) renderRouteOptions();
+        updateProgress((routesCalculated / totalRoutes) * 100);
+        if (routesCalculated === totalRoutes) {
+            renderRouteOptions();
+            showToast('Itinéraires calculés avec succès!', 'success');
+        }
     });
     
-    // Démarrer les calculs
-    map.addControl(route1);
-    setTimeout(() => map.removeControl(route1), 100);
-    
-    map.addControl(routeAlt);
-    setTimeout(() => map.removeControl(routeAlt), 100);
-    
-    map.addControl(route3Profile);
-    setTimeout(() => map.removeControl(route3Profile), 100);
+    // Start calculations with error handling
+    try {
+        map.addControl(route1);
+        setTimeout(() => map.removeControl(route1), 100);
+        
+        map.addControl(routeAlt);
+        setTimeout(() => map.removeControl(routeAlt), 100);
+        
+        map.addControl(route3Profile);
+        setTimeout(() => map.removeControl(route3Profile), 100);
+    } catch (error) {
+        showToast('Erreur lors du calcul des itinéraires', 'error');
+        console.error('Route calculation error:', error);
+    }
 }
 
 function renderRouteOptions() {
@@ -2584,16 +2953,31 @@ function renderRouteOptions() {
         routeDiv.className = 'route-option';
         routeDiv.innerHTML = `
             <div class="route-header">
-                <div class="route-type">${route.type}</div>
-                <div class="route-duration">${route.duration}</div>
+                <div class="route-type">
+                    <span style="font-size: 1.2em; margin-right: 8px;">${route.icon || '🚗'}</span>
+                    ${route.type}
+                </div>
+                <div class="route-duration" style="background: ${route.color || '#4caf50'};">${route.duration}</div>
             </div>
             <div class="route-distance">📏 ${route.distance}</div>
             <div class="route-description">${route.description}</div>
+            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--divider-color); font-size: 0.8em; color: var(--text-secondary);">
+                ℹ️ Recommandé pour: ${getRouteRecommendation(index)}
+            </div>
         `;
         
         routeDiv.onclick = () => selectRoute(index);
         routesList.appendChild(routeDiv);
     });
+}
+
+function getRouteRecommendation(index) {
+    const recommendations = [
+        "Trajets urgents et livraisons prioritaires",
+        "Circulation dense, heures de pointe", 
+        "Trajets courts et connus"
+    ];
+    return recommendations[index] || "Trajets standards";
 }
 
 function selectRoute(index) {
@@ -2926,7 +3310,13 @@ function resetForm() {
 }
 
 document.getElementById('submit-report').onclick = () => {
+    const submitBtn = document.getElementById('submit-report');
+    
     if (!validateForm()) { return; }
+    
+    // Show loading state
+    showLoading(submitBtn, 'Envoi en cours...');
+    
     const deliveryStatus = document.querySelector('input[name="delivery-status"]:checked').value;
     const agentName = document.getElementById('agent-name').value.trim();
     const agentContact = document.getElementById('agent-contact').value.trim();
@@ -2954,14 +3344,20 @@ document.getElementById('submit-report').onclick = () => {
         } : null)
     };
     
-    deliveryReports.push(report);
-    saveReportsToLS(deliveryReports);
-    console.log('Rapport de livraison:', report);
-    
-    const statusText = deliveryStatus === 'delivered' ? 'livrée' : 'non livrée';
-    showMessage('success', `Rapport de facture ${statusText} envoyé avec succès !`);
+    // Simulate processing time for better UX
+    setTimeout(() => {
+        deliveryReports.push(report);
+        saveReportsToLS(deliveryReports);
+        console.log('Rapport de livraison:', report);
+        
+        hideLoading(submitBtn);
+        
+        const statusText = deliveryStatus === 'delivered' ? 'livrée' : 'non livrée';
+        showMessage('success', `Rapport de facture ${statusText} envoyé avec succès !`);
+        showToast(`Rapport de livraison enregistré!`, 'success');
 
-    setTimeout(() => { resetForm(); }, 2000);
+        setTimeout(() => { resetForm(); }, 2000);
+    }, 1500);
 };
 
 initializeDateTime();
