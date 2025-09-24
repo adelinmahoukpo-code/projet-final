@@ -1619,7 +1619,8 @@ body {
         <button id="menu-toggle">☰</button>
         <div class="header-content">
             <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin">
-            <h1>Système de Distribution des Factures impôts</h1>
+            <h1>Système de Distribution des Factures Impôts</h1>
+            <img src="https://www.impots.bj/sites/default/files/logo-dgi.png" alt="Logo DGI Bénin" style="width: 50px; height: 50px; margin-left: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
         </div>
         <div id="top-actions" style="display:none;">
             <button id="switch-to-admin" class="top-btn dark">Admin</button>
@@ -1835,6 +1836,8 @@ body {
             <strong>Interface Administrateur — Suivi des Rapports</strong>
         </div>
         <div id="admin-actions">
+            <button id="toggle-agent-sidebar" class="admin-btn secondary">☰ Menu Agent</button>
+            <button id="toggle-admin-layers" class="admin-btn">🗺️ Fonds de Carte</button>
             <button id="switch-to-agent" class="admin-btn secondary">Mode Agent</button>
             <button id="export-csv" class="admin-btn">Exporter CSV</button>
             <button id="logout-btn-admin" class="admin-btn danger">Déconnexion</button>
@@ -1842,6 +1845,10 @@ body {
     </div>
     <div id="admin-main">
         <div id="admin-map"></div>
+        
+        <!-- Admin Layer Controls -->
+        <div id="admin-layer-container" style="position: absolute; top: 10px; right: 10px; z-index: 1000; background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); padding: 10px; border-radius: 12px; display: none; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.25);"></div>
+        
         <div id="admin-panel">
             <h2>📑 Rapports reçus</h2>
             <input id="admin-search" placeholder="Rechercher (agent, statut, raison, contact, date, heure)...">
@@ -3598,14 +3605,29 @@ initializeSignature();
 // ====================== INTERFACE ADMIN ======================
 let adminMap = null;
 let adminMarkersLayer = null;
+let adminLayerContainer = null;
+let adminBaseLayers = {};
+let adminLayerContainerVisible = false;
+let agentSidebarVisible = false;
 
 function initializeAdmin() {
     setupTopActionsForRole();
 
     if (!adminMap) {
         adminMap = L.map('admin-map').setView([9.3077,2.3158],7);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:25, maxNativeZoom: 19}).addTo(adminMap);
+        
+        // Initialize admin base layers
+        adminBaseLayers = {
+            "OSM": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:25, maxNativeZoom: 19, attribution:'', errorTileUrl:''}).addTo(adminMap),
+            "Google Satellite": L.tileLayer('https://mt.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{maxZoom:25, maxNativeZoom: 19, attribution:'', errorTileUrl:''}),
+            "Google Earth": L.tileLayer('https://mt.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:25, maxNativeZoom: 19, attribution:'', errorTileUrl:''}),
+            "Google Terrain": L.tileLayer('https://mt.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{maxZoom:25, maxNativeZoom: 19, attribution:'', errorTileUrl:''})
+        };
+        
         adminMarkersLayer = L.layerGroup().addTo(adminMap);
+        
+        // Setup admin layer controls
+        setupAdminLayerControls();
     } else {
         adminMarkersLayer.clearLayers();
         adminMap.invalidateSize();
@@ -3635,6 +3657,76 @@ function initializeAdmin() {
     };
 
     document.getElementById('export-csv').onclick = () => exportReportsCSV(loadReportsFromLS());
+    
+    // Setup toggle buttons
+    setupAdminToggleButtons();
+}
+
+function setupAdminLayerControls() {
+    adminLayerContainer = document.getElementById('admin-layer-container');
+    adminLayerContainer.innerHTML = '';
+    
+    const layerThumbs = {
+        "OSM":"https://tile.openstreetmap.org/5/15/10.png",
+        "Google Satellite":"https://mt.google.com/vt/lyrs=s&x=10&y=10&z=5",
+        "Google Earth":"https://mt.google.com/vt/lyrs=y&x=10&y=10&z=5",
+        "Google Terrain":"https://mt.google.com/vt/lyrs=p&x=10&y=10&z=5"
+    };
+    
+    Object.keys(adminBaseLayers).forEach((key,idx)=>{
+        var div=document.createElement('div');
+        div.className="layer-preview"+(idx===0?" active":"");
+        div.style.backgroundImage=`url('${layerThumbs[key]}')`;
+        div.style.width = '50px';
+        div.style.height = '50px';
+        div.style.margin = '5px';
+        div.style.cursor = 'pointer';
+        div.style.border = '2px solid #ccc';
+        div.style.backgroundSize = 'cover';
+        div.style.backgroundPosition = 'center';
+        div.style.borderRadius = '8px';
+        div.style.transition = '0.3s all';
+        div.title=key;
+        div.onclick=()=>{
+            adminMap.eachLayer(l=>{ if(l instanceof L.TileLayer) adminMap.removeLayer(l); });
+            adminBaseLayers[key].addTo(adminMap);
+            adminLayerContainer.querySelectorAll('.layer-preview').forEach(p=>p.classList.remove('active'));
+            div.classList.add('active');
+        };
+        adminLayerContainer.appendChild(div);
+    });
+}
+
+function setupAdminToggleButtons() {
+    // Toggle agent sidebar
+    document.getElementById('toggle-agent-sidebar').onclick = () => {
+        agentSidebarVisible = !agentSidebarVisible;
+        const sidebar = document.getElementById('sidebar');
+        if (agentSidebarVisible) {
+            sidebar.style.display = 'flex';
+            sidebar.style.transform = 'translateX(0)';
+            sidebar.style.position = 'fixed';
+            sidebar.style.zIndex = '10000';
+            showToast('Menu agent affiché', 'info');
+        } else {
+            sidebar.style.transform = 'translateX(-100%)';
+            setTimeout(() => {
+                if (!agentSidebarVisible) {
+                    sidebar.style.display = 'none';
+                }
+            }, 300);
+            showToast('Menu agent masqué', 'info');
+        }
+    };
+    
+    // Toggle admin layers
+    document.getElementById('toggle-admin-layers').onclick = () => {
+        adminLayerContainerVisible = !adminLayerContainerVisible;
+        adminLayerContainer.style.display = adminLayerContainerVisible ? 'flex' : 'none';
+        const btn = document.getElementById('toggle-admin-layers');
+        btn.style.background = adminLayerContainerVisible ? 'var(--primary-dark)' : 'var(--primary-color)';
+        showToast(adminLayerContainerVisible ? 'Fonds de carte affichés' : 'Fonds de carte masqués', 'info');
+    };
 }
 
 function renderAdminTable(reports) {
@@ -3837,8 +3929,8 @@ document.addEventListener('click', (e) => {
 });
 </script>
 
-
-<script>
+</body>
+</html>
 // Charger la liste des entreprises depuis le serveur
 fetch("/entreprises")
   .then(response => {
