@@ -99,27 +99,32 @@
 
 /* Modern Material Design Variables */
 :root {
-    --primary-color: #1976d2;
-    --primary-dark: #1565c0;
-    --primary-light: #bbdefb;
-    --accent-color: #ff5722;
-    --success-color: #4caf50;
-    --warning-color: #ff9800;
-    --error-color: #f44336;
-    --text-primary: #212121;
-    --text-secondary: #757575;
-    --divider-color: #e0e0e0;
-    --background-color: #fafafa;
-    --surface-color: #ffffff;
-    --shadow-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-    --shadow-2: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-    --shadow-3: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
-    --shadow-4: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
-    --border-radius: 8px;
-    --border-radius-large: 16px;
+    --primary-color: #2E7D32;
+    --primary-dark: #1B5E20;
+    --primary-light: #66BB6A;
+    --accent-color: #FF6F00;
+    --secondary-color: #1976D2;
+    --success-color: #388E3C;
+    --warning-color: #F57C00;
+    --error-color: #D32F2F;
+    --text-primary: #1B5E20;
+    --text-secondary: #424242;
+    --divider-color: #E8F5E8;
+    --background-color: #F1F8E9;
+    --surface-color: #FFFFFF;
+    --card-color: #FAFAFA;
+    --shadow-1: 0 1px 3px rgba(46,125,50,0.12), 0 1px 2px rgba(46,125,50,0.24);
+    --shadow-2: 0 3px 6px rgba(46,125,50,0.16), 0 3px 6px rgba(46,125,50,0.23);
+    --shadow-3: 0 10px 20px rgba(46,125,50,0.19), 0 6px 6px rgba(46,125,50,0.23);
+    --shadow-4: 0 14px 28px rgba(46,125,50,0.25), 0 10px 10px rgba(46,125,50,0.22);
+    --border-radius: 12px;
+    --border-radius-large: 20px;
     --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-medium: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    --benin-red: #DC2626;
+    --benin-yellow: #FFD700;
+    --benin-green: #009642;
 }
 
 /* Global Styles with Modern Typography */
@@ -142,15 +147,15 @@ body {
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 50%, var(--benin-green) 100%);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     color: white; 
-    padding: 16px 24px; 
-    box-shadow: var(--shadow-2);
+    padding: 18px 28px; 
+    box-shadow: var(--shadow-3);
     position: relative; 
     z-index: 1001;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 3px solid var(--benin-yellow);
 }
 
 #header::before {
@@ -160,7 +165,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(220,38,38,0.05) 50%, rgba(0,150,66,0.1) 100%);
     pointer-events: none;
 }
 
@@ -205,18 +210,18 @@ body {
     top: 80px; 
     left: 0; 
     bottom: 0; 
-    width: 320px; 
+    width: 340px; 
     z-index: 1000; 
-    background: var(--surface-color);
+    background: linear-gradient(180deg, var(--surface-color) 0%, var(--card-color) 100%);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    padding: 24px; 
+    padding: 28px; 
     overflow-y: auto; 
     display: flex; 
     flex-direction: column; 
     border-radius: 0 var(--border-radius-large) var(--border-radius-large) 0; 
-    box-shadow: var(--shadow-3);
-    border-right: 1px solid var(--divider-color);
+    box-shadow: var(--shadow-4);
+    border-right: 3px solid var(--primary-light);
     transform: translateX(0);
     transition: transform var(--transition-medium);
 }
@@ -228,7 +233,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(25,118,210,0.02) 0%, rgba(25,118,210,0.01) 100%);
+    background: linear-gradient(135deg, rgba(46,125,50,0.03) 0%, rgba(102,187,106,0.02) 100%);
     pointer-events: none;
     border-radius: 0 var(--border-radius-large) var(--border-radius-large) 0;
 }
@@ -1140,30 +1145,35 @@ body {
 
 /* Status Cards */
 .status-card {
-    background: var(--surface-color);
+    background: linear-gradient(135deg, var(--surface-color) 0%, var(--card-color) 100%);
     border-radius: var(--border-radius);
-    padding: 16px;
-    margin: 8px 0;
-    box-shadow: var(--shadow-1);
-    border-left: 4px solid var(--primary-color);
+    padding: 20px;
+    margin: 12px 0;
+    box-shadow: var(--shadow-2);
+    border-left: 5px solid var(--primary-color);
+    border-top: 1px solid var(--primary-light);
     transition: all var(--transition-fast);
 }
 
 .status-card:hover {
-    box-shadow: var(--shadow-2);
-    transform: translateY(-2px);
+    box-shadow: var(--shadow-3);
+    transform: translateY(-3px);
+    border-left-color: var(--benin-green);
 }
 
 .status-card.success {
     border-left-color: var(--success-color);
+    background: linear-gradient(135deg, #E8F5E8 0%, #F1F8E9 100%);
 }
 
 .status-card.warning {
     border-left-color: var(--warning-color);
+    background: linear-gradient(135deg, #FFF3E0 0%, #FFF8E1 100%);
 }
 
 .status-card.error {
     border-left-color: var(--error-color);
+    background: linear-gradient(135deg, #FFEBEE 0%, #FCE4EC 100%);
 }
 
 /* Toast Notifications */
@@ -1617,10 +1627,11 @@ body {
 <div id="app-container">
     <div id="header">
         <button id="menu-toggle">☰</button>
+        <button id="sidebar-toggle" style="display: none; background: transparent; border: none; color: white; font-size: 1.2em; cursor: pointer; padding: 8px; margin-right: 10px;">📋</button>
         <div class="header-content">
             <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin">
             <h1>Système de Distribution des Factures Impôts</h1>
-            <img src="https://www.impots.bj/sites/default/files/logo-dgi.png" alt="Logo DGI Bénin" style="width: 50px; height: 50px; margin-left: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjQ4IiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0iI0ZGRkZGRiIvPgo8dGV4dCB4PSI1MCIgeT0iMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzAwMDAwMCI+RElSRUNUSU9OIEdFTkVSQUxFIERFUzwvdGV4dD4KPHN2ZyB4PSIxNSIgeT0iMjUiIHdpZHRoPSI3MCIgaGVpZ2h0PSI0MCI+CjxlbGxpcHNlIGN4PSIzNSIgY3k9IjIwIiByeD0iNCIgcnk9IjEwIiBmaWxsPSIjMDAwIi8+CjxwYXRoIGQ9Ik0yMCAzMCBRIDM1IDQwIDUwIDMwIiBzdHJva2U9IiNGRkYiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPgo8dGV4dCB4PSIzNSIgeT0iMzUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9ImJvbGQiPgo8dHNwYW4gZmlsbD0iI0RDMjYyNiI+RDwvdHNwYW4+PHRzcGFuIGZpbGw9IiNGRkQ3MDAiPkc8L3RzcGFuPjx0c3BhbiBmaWxsPSIjMDA5NjQyIj5JPC90c3Bhbj4KPC90ZXh0Pgo8L3N2Zz4KPHRleHQgeD0iNTAiIHk9Ijc1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNiIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IiMwMDAwMDAiPkVRVUlURSBJTlRFR1JJVEUgRUZGSUNBQ0lURTwvdGV4dD4KPHRleHQgeD0iNTAiIHk9Ijg1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNSIgZmlsbD0iIzAwMDAwMCI+SU1QT1RTPC90ZXh0Pgo8L3N2Zz4=" alt="Logo DGI Bénin" style="width: 50px; height: 50px; margin-left: 15px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.3); background: white; padding: 2px;">
         </div>
         <div id="top-actions" style="display:none;">
             <button id="switch-to-admin" class="top-btn dark">Admin</button>
@@ -1997,12 +2008,35 @@ function loadReportsFromLS() {
 // ====================== MENU MOBILE ======================
 function initMobileMenu() {
     const menuToggle = document.getElementById('menu-toggle');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
     
+    // Show sidebar toggle button for desktop users
+    if (window.innerWidth > 768) {
+        sidebarToggle.style.display = 'block';
+    }
+    
+    // Mobile menu toggle
     menuToggle.addEventListener('click', function() {
         sidebar.classList.toggle('show');
         sidebarOverlay.classList.toggle('show');
+    });
+    
+    // Desktop sidebar toggle
+    sidebarToggle.addEventListener('click', function() {
+        const isHidden = sidebar.classList.contains('hidden');
+        if (isHidden) {
+            sidebar.classList.remove('hidden');
+            sidebarToggle.innerHTML = '📋';
+            sidebarToggle.title = 'Masquer le menu';
+            showToast('Menu affiché', 'info', 2000);
+        } else {
+            sidebar.classList.add('hidden');
+            sidebarToggle.innerHTML = '📝';
+            sidebarToggle.title = 'Afficher le menu';
+            showToast('Menu masqué', 'info', 2000);
+        }
     });
     
     sidebarOverlay.addEventListener('click', function() {
@@ -2019,6 +2053,18 @@ function initMobileMenu() {
                     sidebarOverlay.classList.remove('show');
                 }, 300);
             }
+        }
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            sidebarToggle.style.display = 'block';
+            sidebar.classList.remove('show');
+            sidebarOverlay.classList.remove('show');
+        } else {
+            sidebarToggle.style.display = 'none';
+            sidebar.classList.remove('hidden');
         }
     });
 }
@@ -3897,34 +3943,6 @@ function saveEdit() {
 window.addEventListener('storage', (e)=>{
     if (e.key === LS_KEY && document.getElementById('admin-container').style.display === 'block') {
         initializeAdmin();
-    }
-});
-
-// ====================== SIGNATURE VIEWING FUNCTIONS ======================
-function viewSignature(signatureData) {
-    document.getElementById('signature-view-image').src = signatureData;
-    document.getElementById('signature-view-modal').style.display = 'flex';
-    
-    // Set up download functionality
-    document.getElementById('download-signature').onclick = () => {
-        const link = document.createElement('a');
-        link.href = signatureData;
-        link.download = 'signature_' + Date.now() + '.png';
-        link.click();
-    };
-}
-
-function closeSignatureViewModal() {
-    document.getElementById('signature-view-modal').style.display = 'none';
-}
-
-// Add click event for signature view buttons
-document.addEventListener('click', (e) => {
-    if (e.target.classList.contains('view-signature')) {
-        const signatureData = e.target.getAttribute('data-signature');
-        if (signatureData) {
-            viewSignature(signatureData);
-        }
     }
 });
 </script>
