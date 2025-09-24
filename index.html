@@ -1001,6 +1001,77 @@ body {
     background: none !important;
 }
 
+/* Styles pour les lignes de route */
+.main-route-line {
+    border-radius: 3px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.route-progress-line {
+    border-radius: 3px;
+    box-shadow: 0 2px 6px rgba(0,123,255,0.3);
+    z-index: 1000;
+}
+
+/* Amélioration des contrôles de navigation */
+#zoom-controls {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(5px);
+}
+
+.zoom-btn {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.zoom-btn:hover {
+    background: #007bff;
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,123,255,0.3);
+}
+
+.zoom-btn:active {
+    transform: scale(0.95);
+}
+
+/* Masquer les contrôles par défaut de Leaflet Routing Machine */
+.leaflet-routing-container {
+    display: none !important;
+}
+
+.leaflet-routing-alternatives-container {
+    display: none !important;
+}
+
+/* Amélioration de la carte pendant la navigation */
+.leaflet-container.navigation-mode {
+    cursor: crosshair;
+}
+
+/* Styles pour les marqueurs personnalisés */
+.custom-marker {
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+}
+
+/* Animation fluide pour les marqueurs */
+@keyframes markerPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.pulse-marker {
+    animation: markerPulse 2s infinite;
+}
+
 /* ====================== MEDIA QUERIES RESPONSIVE ====================== */
 
 /* Tablettes */
@@ -1868,11 +1939,24 @@ function initZoomControls() {
     const zoomOutBtn = document.getElementById('zoom-out');
     const zoomFollowBtn = document.getElementById('zoom-follow');
     
+    // Permettre le zoom libre pendant la navigation
     zoomInBtn.onclick = () => {
+        if (isNavigating) {
+            // Désactiver temporairement le suivi automatique lors du zoom manuel
+            followUserPosition = false;
+            zoomFollowBtn.style.background = 'rgba(255, 255, 255, 0.9)';
+            zoomFollowBtn.style.color = '#333';
+        }
         map.zoomIn();
     };
     
     zoomOutBtn.onclick = () => {
+        if (isNavigating) {
+            // Désactiver temporairement le suivi automatique lors du zoom manuel
+            followUserPosition = false;
+            zoomFollowBtn.style.background = 'rgba(255, 255, 255, 0.9)';
+            zoomFollowBtn.style.color = '#333';
+        }
         map.zoomOut();
     };
     
@@ -1886,13 +1970,35 @@ function initZoomControls() {
         }
     };
     
+    // Permettre l'interaction libre avec la carte pendant la navigation
+    map.on('dragstart', () => {
+        if (isNavigating) {
+            followUserPosition = false;
+            zoomFollowBtn.style.background = 'rgba(255, 255, 255, 0.9)';
+            zoomFollowBtn.style.color = '#333';
+        }
+    });
+    
+    map.on('zoomstart', (e) => {
+        if (isNavigating && !e.originalEvent) {
+            followUserPosition = false;
+            zoomFollowBtn.style.background = 'rgba(255, 255, 255, 0.9)';
+            zoomFollowBtn.style.color = '#333';
+        }
+    });
+    
     // Afficher les contrôles seulement pendant la navigation
     function showZoomControls() {
         zoomControls.style.display = 'flex';
+        // Activer le suivi par défaut au début de la navigation
+        followUserPosition = true;
+        zoomFollowBtn.style.background = '#007bff';
+        zoomFollowBtn.style.color = 'white';
     }
     
     function hideZoomControls() {
         zoomControls.style.display = 'none';
+        followUserPosition = true;
     }
     
     return { showZoomControls, hideZoomControls };
@@ -1913,11 +2019,36 @@ function speak(text){
 }
 document.getElementById('toggleVoice').onclick=()=>{ voiceEnabled=!voiceEnabled; alert('Voix '+(voiceEnabled?'activée':'désactivée')); };
 
-document.getElementById('locateBtn').onclick=()=>{ map.locate({setView:true,maxZoom:25}); };
+document.getElementById('locateBtn').onclick = () => {
+    if (isNavigating && movingCursor) {
+        // Pendant la navigation, utiliser le marqueur de déplacement existant
+        if (currentUserPosition) {
+            map.setView(currentUserPosition, Math.max(map.getZoom(), 18), {animate: true});
+            followUserPosition = true;
+            
+            // Mettre à jour le bouton de suivi s'il est visible
+            const zoomFollowBtn = document.getElementById('zoom-follow');
+            if (zoomFollowBtn) {
+                zoomFollowBtn.style.background = '#007bff';
+                zoomFollowBtn.style.color = 'white';
+            }
+        } else {
+            // Si pas de position courante, obtenir la position GPS
+            map.locate({setView: true, maxZoom: 18});
+        }
+    } else {
+        // Mode normal, localisation classique
+        map.locate({setView: true, maxZoom: 25});
+    }
+};
+
 map.on('locationfound', e => {
-    if(userMarker) map.removeLayer(userMarker);
-    userMarker = L.marker(e.latlng,{icon:arriveeIcon}).addTo(map);
-    map.setView(e.latlng,25,{animate:true});
+    if (!isNavigating) {
+        // Seulement créer/mettre à jour le marqueur utilisateur si on n'est pas en navigation
+        if (userMarker) map.removeLayer(userMarker);
+        userMarker = L.marker(e.latlng, {icon: positionIcon}).addTo(map);
+        map.setView(e.latlng, 25, {animate: true});
+    }
     currentUserPosition = [e.latlng.lat, e.latlng.lng];
 });
 map.on('locationerror',()=>{ alert("Impossible de vous localiser."); });
@@ -2021,12 +2152,31 @@ function clearRoute(){
     isNavigating = false;
     followUserPosition = true;
 
-    if(movingMarkerStart) map.removeLayer(movingMarkerStart);
-    if(movingMarkerEnd) map.removeLayer(movingMarkerEnd);
-    if(movingCursor) map.removeLayer(movingCursor);
-    if(routeLine) map.removeLayer(routeLine);
-    if(progressLine) map.removeLayer(progressLine);
-    if(routingControl) map.removeControl(routingControl);
+    // Nettoyer tous les marqueurs et lignes de route
+    if(movingMarkerStart) {
+        map.removeLayer(movingMarkerStart);
+        movingMarkerStart = null;
+    }
+    if(movingMarkerEnd) {
+        map.removeLayer(movingMarkerEnd);
+        movingMarkerEnd = null;
+    }
+    if(movingCursor) {
+        map.removeLayer(movingCursor);
+        movingCursor = null;
+    }
+    if(routeLine) {
+        map.removeLayer(routeLine);
+        routeLine = null;
+    }
+    if(progressLine) {
+        map.removeLayer(progressLine);
+        progressLine = null;
+    }
+    if(routingControl) {
+        map.removeControl(routingControl);
+        routingControl = null;
+    }
 
     routeCoords=[];
     routeInstructions=[];
@@ -2034,6 +2184,7 @@ function clearRoute(){
     currentInstructionIndex = 0;
     lastSpokenInstruction = -1;
     lastSpokenInstructionTimestamp = 0;
+    currentRouteProgress = 0;
 
     document.getElementById('instructionsList').innerHTML='';
     hideZoomControls();
@@ -2050,25 +2201,6 @@ function distance(latlng1,latlng2){
 }
 
 // ====================== SUIVI GPS RÉEL AMÉLIORÉ ======================
-function startRealTimeGPSTracking(){
-    if(!routeInstructions || routeInstructions.length===0) return;
-    if (gpsWatchId) navigator.geolocation.clearWatch(gpsWatchId);
-    
-    isNavigating = true;
-    showZoomControls();
-    
-    gpsWatchId = navigator.geolocation.watchPosition(pos => {
-        const userPos = [pos.coords.latitude, pos.coords.longitude];
-        currentUserPosition = userPos;
-        
-        // Mettre à jour la position du curseur avec la position GPS réelle
-        if (movingCursor) {
-            movingCursor.setLatLng(userPos);
-        }
-        
-        // Mettre à jour la ligne progressive
-        updateProgressiveLine(userPos);
-        
 function updateProgressiveLine(userPos) {
     if (!routeCoords || routeCoords.length === 0) return;
     
@@ -2084,30 +2216,98 @@ function updateProgressiveLine(userPos) {
         }
     });
     
-    // Mettre à jour la ligne de progression
+    // Projeter la position utilisateur sur la ligne de route pour un suivi précis
+    let projectedPos = userPos;
+    if (closestIndex < routeCoords.length - 1) {
+        const currentPoint = routeCoords[closestIndex];
+        const nextPoint = routeCoords[closestIndex + 1];
+        
+        // Projection de la position sur le segment de route le plus proche
+        projectedPos = projectPointOnSegment(
+            userPos, 
+            [currentPoint.lat, currentPoint.lng], 
+            [nextPoint.lat, nextPoint.lng]
+        );
+    }
+    
+    // Mettre à jour la position du curseur avec la position projetée sur la route
+    if (movingCursor) {
+        movingCursor.setLatLng(projectedPos);
+    }
+    
+    // Supprimer l'ancienne ligne de progression
     if (progressLine) {
         map.removeLayer(progressLine);
     }
     
-    // Créer une ligne depuis la position actuelle jusqu'à la destination
+    // Créer une ligne progressive qui diminue au fur et à mesure de l'avancement
     const remainingCoords = routeCoords.slice(closestIndex);
     if (remainingCoords.length > 1) {
-        progressLine = L.polyline(remainingCoords, { 
+        // Ajouter la position projetée au début des coordonnées restantes
+        const progressCoords = [projectedPos, ...remainingCoords.map(c => [c.lat, c.lng])];
+        
+        progressLine = L.polyline(progressCoords, { 
             color: '#007bff', 
-            weight: 5, 
-            opacity: 0.8
+            weight: 6, 
+            opacity: 0.9,
+            className: 'route-progress-line'
         }).addTo(map);
     }
     
     // Calculer le progrès
     currentRouteProgress = (closestIndex / routeCoords.length) * 100;
 }
+
+// Fonction pour projeter un point sur un segment de ligne
+function projectPointOnSegment(point, segmentStart, segmentEnd) {
+    const [px, py] = point;
+    const [x1, y1] = segmentStart;
+    const [x2, y2] = segmentEnd;
+    
+    const A = px - x1;
+    const B = py - y1;
+    const C = x2 - x1;
+    const D = y2 - y1;
+    
+    const dot = A * C + B * D;
+    const lenSq = C * C + D * D;
+    
+    if (lenSq === 0) return segmentStart;
+    
+    let param = dot / lenSq;
+    
+    if (param < 0) {
+        return segmentStart;
+    } else if (param > 1) {
+        return segmentEnd;
+    } else {
+        return [x1 + param * C, y1 + param * D];
+    }
+}
+
+function startRealTimeGPSTracking(){
+    if(!routeInstructions || routeInstructions.length===0) return;
+    if (gpsWatchId) navigator.geolocation.clearWatch(gpsWatchId);
+    
+    isNavigating = true;
+    showZoomControls();
+    
+    gpsWatchId = navigator.geolocation.watchPosition(pos => {
+        const userPos = [pos.coords.latitude, pos.coords.longitude];
+        currentUserPosition = userPos;
         
-        // Suivre la position utilisateur si activé
+        // Mettre à jour la ligne progressive et la position du curseur
+        updateProgressiveLine(userPos);
+        
+        // Suivre la position utilisateur si activé avec transition fluide
         if (followUserPosition) {
             const currentZoom = map.getZoom();
-            const targetZoom = Math.max(currentZoom, 18); // Zoom minimum pour navigation
-            map.setView(userPos, targetZoom, {animate: true, duration: 0.5});
+            const targetZoom = Math.max(currentZoom, 16); // Zoom optimisé pour navigation
+            map.setView(userPos, targetZoom, {
+                animate: true, 
+                duration: 1.0,
+                easeLinearity: 0.5
+            });
         }
         
         // Gestion des instructions vocales basées sur la position réelle
@@ -2181,20 +2381,29 @@ function resumeRouteAnimation(){
         if(!isPaused && isNavigating) {
             if(currentStep<routeCoords.length-1){
                 currentStep++;
+                const currentPos = [routeCoords[currentStep].lat, routeCoords[currentStep].lng];
+                
                 if (movingCursor) {
-                    movingCursor.setLatLng(routeCoords[currentStep]);
+                    movingCursor.setLatLng(currentPos);
                 }
+                
+                // Mettre à jour la ligne progressive même en mode simulation
+                updateProgressiveLine(currentPos);
                 
                 // Ne centrer que si on suit la position et qu'il n'y a pas de GPS
                 if (followUserPosition && !gpsWatchId) {
-                    map.panTo(routeCoords[currentStep], {animate:true, duration:0.5, easeLinearity:0.5});
+                    map.setView(currentPos, Math.max(map.getZoom(), 16), {
+                        animate: true, 
+                        duration: 0.8, 
+                        easeLinearity: 0.5
+                    });
                 }
             }else{
                 if(voiceEnabled) speak("Vous êtes arrivé à destination.");
                 clearRoute();
             }
         }
-    },1000); // Plus lent que le GPS réel
+    },2000); // Intervalle plus lent pour simulation
 }
 
 // ====================== GESTION DES OPTIONS DE ROUTE ======================
@@ -2451,11 +2660,28 @@ function startRouteWithSelectedOption(lat, lng, name, selectedRoute) {
             routeCoords = route.coordinates;
             routeInstructions = route.instructions;
             
-            routeLine = L.polyline(routeCoords, { color: 'blue', weight: 5 }).addTo(map);
+            // Supprimer l'ancienne ligne de route par défaut du contrôle
+            if (routeLine) map.removeLayer(routeLine);
+            
+            // Créer notre propre ligne de route complète
+            routeLine = L.polyline(routeCoords, {
+                color: '#1e90ff', 
+                weight: 6, 
+                opacity: 0.8,
+                className: 'main-route-line'
+            }).addTo(map);
+            
+            // Créer les trois marqueurs uniques
+            // 1. Marqueur de départ (vert)
             movingMarkerStart = L.marker(routeCoords[0], { icon: departIcon }).addTo(map);
+            
+            // 2. Marqueur d'arrivée (rouge)
             movingMarkerEnd = L.marker(routeCoords[routeCoords.length - 1], { icon: arriveeIcon }).addTo(map);
+            
+            // 3. Marqueur de position actuelle (bleu) - commence au départ
             movingCursor = L.marker(start, { icon: positionIcon }).addTo(map);
             
+            // Ajuster la vue pour voir tout l'itinéraire
             map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
 
             var instrList = document.getElementById('instructionsList');
@@ -2489,11 +2715,11 @@ function startRoute(lat,lng,name){
         routingControl=L.Routing.control({
             waypoints:[L.latLng(start),L.latLng(end)],
             language:'fr',
-            createMarker:()=>null,
+            createMarker:()=>null, // Ne pas créer de marqueurs automatiques
             addWaypoints:false,
             routeWhileDragging:false,
-            show:false,
-            lineOptions:{styles:[{color:'blue',weight:5}]}
+            show:false, // Masquer l'interface par défaut
+            lineOptions:{styles:[{opacity: 0}]} // Masquer la ligne par défaut
         }).addTo(map);
 
         routingControl.on('routesfound',e=>{
@@ -2501,12 +2727,19 @@ function startRoute(lat,lng,name){
             routeCoords=route.coordinates;
             routeInstructions=route.instructions; 
             
-            routeLine=L.polyline(routeCoords,{color:'blue',weight:5}).addTo(map);
-            movingMarkerStart=L.marker(routeCoords[0],{icon:greenIcon}).addTo(map);
-            movingMarkerEnd=L.marker(routeCoords[routeCoords.length-1],{icon:redIcon}).addTo(map);
-            movingCursor=L.marker(start,{icon:googleCursorIcon}).addTo(map);
+            // Créer notre propre ligne de route
+            routeLine=L.polyline(routeCoords, {
+                color:'#1e90ff', 
+                weight:6, 
+                opacity:0.8,
+                className: 'main-route-line'
+            }).addTo(map);
             
-            // Ajuster la vue initiale
+            // Créer les trois marqueurs
+            movingMarkerStart=L.marker(routeCoords[0],{icon:departIcon}).addTo(map);
+            movingMarkerEnd=L.marker(routeCoords[routeCoords.length-1],{icon:arriveeIcon}).addTo(map);
+            movingCursor=L.marker(start,{icon:positionIcon}).addTo(map);
+            
             map.fitBounds(routeLine.getBounds(),{padding:[50,50]});
 
             var instrList=document.getElementById('instructionsList');
@@ -2522,7 +2755,6 @@ function startRoute(lat,lng,name){
             lastSpokenInstruction = -1;
             lastSpokenInstructionTimestamp = 0;
             
-            // Démarrer le suivi GPS réel
             startRealTimeGPSTracking();
         });
     },()=>{ alert("Position introuvable"); });
@@ -2540,11 +2772,11 @@ function startRouteWithoutVoice(lat,lng,name){
         routingControl=L.Routing.control({
             waypoints:[L.latLng(start),L.latLng(end)],
             language:'fr',
-            createMarker:()=>null,
+            createMarker:()=>null, // Ne pas créer de marqueurs automatiques
             addWaypoints:false,
             routeWhileDragging:false,
-            show:false,
-            lineOptions:{styles:[{color:'blue',weight:5}]}
+            show:false, // Masquer l'interface par défaut
+            lineOptions:{styles:[{opacity: 0}]} // Masquer la ligne par défaut
         }).addTo(map);
 
         routingControl.on('routesfound',e=>{
@@ -2552,10 +2784,18 @@ function startRouteWithoutVoice(lat,lng,name){
             routeCoords=route.coordinates;
             routeInstructions=route.instructions; 
             
-            routeLine=L.polyline(routeCoords,{color:'blue',weight:5}).addTo(map);
-            movingMarkerStart=L.marker(routeCoords[0],{icon:greenIcon}).addTo(map);
-            movingMarkerEnd=L.marker(routeCoords[routeCoords.length-1],{icon:redIcon}).addTo(map);
-            movingCursor=L.marker(start,{icon:googleCursorIcon}).addTo(map);
+            // Créer notre propre ligne de route
+            routeLine=L.polyline(routeCoords, {
+                color:'#1e90ff', 
+                weight:6, 
+                opacity:0.8,
+                className: 'main-route-line'
+            }).addTo(map);
+            
+            // Créer les trois marqueurs
+            movingMarkerStart=L.marker(routeCoords[0],{icon:departIcon}).addTo(map);
+            movingMarkerEnd=L.marker(routeCoords[routeCoords.length-1],{icon:arriveeIcon}).addTo(map);
+            movingCursor=L.marker(start,{icon:positionIcon}).addTo(map);
             
             map.fitBounds(routeLine.getBounds(),{padding:[50,50]});
 
@@ -2572,7 +2812,6 @@ function startRouteWithoutVoice(lat,lng,name){
             lastSpokenInstruction = -1;
             lastSpokenInstructionTimestamp = 0;
             
-            // Démarrer le suivi GPS réel même sans voix
             startRealTimeGPSTracking();
         });
     },()=>{ alert("Position introuvable"); });
