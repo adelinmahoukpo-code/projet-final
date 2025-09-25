@@ -1148,7 +1148,7 @@ body {
     color: #007bff; 
 }
 
-/* Suppression des bordures des tuiles */
+/* Suppression des bordures des tuiles et grilles */
 .leaflet-tile,
 .leaflet-tile-container img,
 .leaflet-layer,
@@ -1159,6 +1159,23 @@ body {
     box-shadow: none !important;
     outline: none !important;
     background: none !important;
+}
+
+/* Supprimer les grilles de coordonnées */
+.leaflet-control-scale,
+.leaflet-control-scale-line {
+    display: none !important;
+}
+
+.leaflet-container {
+    background: transparent !important;
+}
+
+/* Masquer les lignes de grille sur les tuiles */
+.leaflet-tile {
+    filter: none !important;
+    border: none !important;
+    outline: none !important;
 }
 
 /* Loading States and Progress Indicators */
@@ -1706,7 +1723,7 @@ body {
         <div class="header-content">
             <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin">
             <h1>Système de Distribution des Factures Impôts</h1>
-            <img src="https://www.impots.bj/sites/default/files/logo-dgi.png" alt="Logo DGI Bénin" style="width: 50px; height: 50px; margin-left: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin" style="width: 50px; height: 50px; margin-left: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
         </div>
         <div id="top-actions" style="display:none;">
             <button id="switch-to-admin" class="top-btn dark">Admin</button>
@@ -1715,26 +1732,31 @@ body {
     </div>
     
     <div id="sidebar">
-        <div id="coordContainer">
-            <h3>Recherche par coordonnées</h3>
-            <input id="latInput" placeholder="Latitude / Est" type="text">
-            <input id="lngInput" placeholder="Longitude / Nord" type="text">
-            <select id="coordType">
-                <option value="geo">Géographique (Lat/Lng)</option>
-                <option value="utm">UTM / Métrique</option>
-            </select>
-            <button id="coordBtnSidebar">📍 Aller</button>
+        <div style="margin-bottom: 15px;">
+            <button id="toggleSidebarContent" style="width: 100%; padding: 12px; background: linear-gradient(145deg, #6c757d, #495057); color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.3s;">☰ Menu Navigation</button>
         </div>
-        <div id="searchControls">
-            <h3>Rechercher une Structure</h3>
-            <input type="text" id="searchStructureInput" placeholder="Nom de la structure">
-            <button id="searchStructureBtn">🔍 Rechercher</button>
-            <button id="locateBtn">📍 Me localiser</button>
-            <button id="toggleVoice">🔊 Voix ON/OFF</button>
-        </div>
-        <div id="companySection">
-            <button id="toggleCompanies">📂 Afficher/Cacher entreprises</button>
-            <ul id="companyList"></ul>
+        <div id="sidebarContent" style="display: block;">
+            <div id="coordContainer">
+                <h3>Recherche par coordonnées</h3>
+                <input id="latInput" placeholder="Latitude / Est" type="text">
+                <input id="lngInput" placeholder="Longitude / Nord" type="text">
+                <select id="coordType">
+                    <option value="geo">Géographique (Lat/Lng)</option>
+                    <option value="utm">UTM / Métrique</option>
+                </select>
+                <button id="coordBtnSidebar">📍 Aller</button>
+            </div>
+            <div id="searchControls">
+                <h3>Rechercher une Structure</h3>
+                <input type="text" id="searchStructureInput" placeholder="Nom de la structure">
+                <button id="searchStructureBtn">🔍 Rechercher</button>
+                <button id="locateBtn">📍 Me localiser</button>
+                <button id="toggleVoice">🔊 Voix ON/OFF</button>
+            </div>
+            <div id="companySection">
+                <button id="toggleCompanies">📂 Afficher/Cacher entreprises</button>
+                <ul id="companyList"></ul>
+            </div>
         </div>
         <div id="routeControls">
             <h3>Navigation</h3>
@@ -1758,6 +1780,12 @@ body {
             <button id="stopRoute">🛑 Arrêter</button>
             <button id="toggle-delivery-report">📋 Rapport Livraison</button>
             <button id="toggle-invoice-send">✉️ Envoi Facture</button>
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                <button id="toggleQuickActions" style="width: 100%; padding: 10px; background: linear-gradient(145deg, #17a2b8, #138496); color: white; border: none; border-radius: 8px; font-size: 0.9em; font-weight: 600; cursor: pointer; transition: all 0.3s;">⚡ Actions Rapides</button>
+                <div id="quickActionsContainer" style="display: none; margin-top: 10px;">
+                    <!-- Quick actions will be moved here dynamically -->
+                </div>
+            </div>
         </div>
     </div>
     
@@ -1916,11 +1944,6 @@ body {
     <div id="instructions-container">
         <button id="toggleInstructions">Instructions</button>
         <ul id="instructionsList" style="display:none;"></ul>
-        <div style="font-size: 0.75em; color: #666; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
-            🔄 <strong>Rotation :</strong> Utilisez les flèches de rotation à droite ou maintenez Shift + glisser pour tourner la carte<br>
-            🔍 <strong>Zoom :</strong> Utilisez les boutons + / - ou la molette de la souris<br>
-            📍 <strong>Suivi :</strong> Cliquez sur l'icône de localisation pour recentrer
-        </div>
     </div>
 </div>
 
@@ -1931,7 +1954,7 @@ body {
 <div id="admin-container">
     <div id="admin-header">
         <div class="title">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="BJ">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin">
             <strong>Interface Administrateur — Suivi des Rapports</strong>
         </div>
         <div id="admin-actions">
@@ -2270,6 +2293,56 @@ function globalLogout() {
     document.getElementById('app-container').style.display = 'none';
     document.getElementById('admin-container').style.display = 'none';
     document.getElementById('login-overlay').style.display = 'flex';
+}
+
+// ====================== TOGGLE SIDEBAR CONTENT ======================
+document.getElementById('toggleSidebarContent').onclick = () => {
+    const content = document.getElementById('sidebarContent');
+    const btn = document.getElementById('toggleSidebarContent');
+    const isVisible = content.style.display !== 'none';
+    
+    content.style.display = isVisible ? 'none' : 'block';
+    btn.innerHTML = isVisible ? '☰ Afficher Menu' : '☰ Masquer Menu';
+    btn.style.background = isVisible ? 'linear-gradient(145deg, #28a745, #1e7e34)' : 'linear-gradient(145deg, #6c757d, #495057)';
+};
+
+// ====================== TOGGLE QUICK ACTIONS ======================
+document.getElementById('toggleQuickActions').onclick = () => {
+    const container = document.getElementById('quickActionsContainer');
+    const btn = document.getElementById('toggleQuickActions');
+    const isVisible = container.style.display !== 'none';
+    
+    container.style.display = isVisible ? 'none' : 'block';
+    btn.innerHTML = isVisible ? '⚡ Afficher Actions' : '⚡ Masquer Actions';
+    btn.style.background = isVisible ? 'linear-gradient(145deg, #28a745, #1e7e34)' : 'linear-gradient(145deg, #17a2b8, #138496)';
+    
+    // Move controls to quick actions container when visible
+    if (!isVisible) {
+        moveControlsToQuickActions();
+    }
+};
+
+function moveControlsToQuickActions() {
+    const container = document.getElementById('quickActionsContainer');
+    const layerBtn = document.getElementById('toggleLayersBtn');
+    const layerContainer = document.getElementById('layer-container');
+    const instructionsContainer = document.getElementById('instructions-container');
+    
+    if (container && layerBtn && !container.querySelector('#toggleLayersBtn')) {
+        // Create a wrapper for better organization
+        container.innerHTML = `
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+                    <button onclick="document.getElementById('toggleLayersBtn').click()" style="flex: 1; min-width: 100px; padding: 8px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8em;">🗺️ Fonds Carte</button>
+                    <button onclick="document.getElementById('toggleInstructions').click()" style="flex: 1; min-width: 100px; padding: 8px; background: #17a2b8; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8em;">📝 Instructions</button>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+                    <button onclick="document.getElementById('locateBtn').click()" style="flex: 1; min-width: 100px; padding: 8px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8em;">📍 Localiser</button>
+                    <button onclick="document.getElementById('toggleVoice').click()" style="flex: 1; min-width: 100px; padding: 8px; background: #ffc107; color: black; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8em;">🔊 Voix</button>
+                </div>
+            </div>
+        `;
+    }
 }
 
 // ====================== CODE APPLICATION AGENT ======================
@@ -3359,7 +3432,7 @@ function startRouteWithSelectedOption(lat, lng, name, selectedRoute) {
             // Créer notre propre ligne de route qui reste visible
             if (routeLine) map.removeLayer(routeLine);
             routeLine = L.polyline(routeCoords, {
-                color: '#1e90ff', 
+                color: '#0000ff', 
                 weight: 6, 
                 opacity: 0.8,
                 className: 'main-route-line',
@@ -3426,7 +3499,7 @@ function startRoute(lat,lng,name){
             // Créer notre propre ligne de route
             if (routeLine) map.removeLayer(routeLine);
             routeLine=L.polyline(routeCoords, {
-                color:'#1e90ff', 
+                color:'#0000ff', 
                 weight:6, 
                 opacity:0.8,
                 className: 'main-route-line',
@@ -3486,7 +3559,7 @@ function startRouteWithoutVoice(lat,lng,name){
             // Créer notre propre ligne de route
             if (routeLine) map.removeLayer(routeLine);
             routeLine=L.polyline(routeCoords, {
-                color:'#1e90ff', 
+                color:'#0000ff', 
                 weight:6, 
                 opacity:0.8,
                 className: 'main-route-line',
@@ -3911,6 +3984,16 @@ document.getElementById('not-delivered-radio').addEventListener('change', functi
 
 setupTopActionsForRole();
 initializeSignature();
+
+// Add signature modal event listeners
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('view-signature')) {
+        const signatureData = e.target.getAttribute('data-signature');
+        if (signatureData) {
+            viewSignature(signatureData);
+        }
+    }
+});
 }
 
 // ====================== INTERFACE ADMIN ======================
@@ -4047,7 +4130,7 @@ function renderAdminTable(reports) {
             <td>${escapeHtml(r.deliveryTime||'')}</td>
             <td style="max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(r.reason||'')}">${escapeHtml(r.reason||'')}</td>
             <td style="max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(r.structure||'')}">${escapeHtml(r.structure||'')}</td>
-            <td>${r.signature ? '<button class="view-signature" data-signature="' + r.signature + '" style="background:#007bff;color:white;border:none;border-radius:4px;padding:3px 6px;cursor:pointer;font-size:0.7em;">📷 Voir</button>' : '<span style="color:#6c757d;">⭕ Non signée</span>'}</td>
+            <td>${r.signature ? '<button class="view-signature" onclick="viewSignature(\'' + r.signature + '\')" style="background:#007bff;color:white;border:none;border-radius:4px;padding:3px 6px;cursor:pointer;font-size:0.7em;">📷 Voir</button>' : '<span style="color:#6c757d;">⭕ Non signée</span>'}</td>
             <td>${posTxt}</td>
             <td style="font-size:0.7em;">${created}</td>
             <td class="row-actions">
