@@ -759,6 +759,38 @@ body {
 }
 .status-ok { background: #d4edda; color: #155724; }
 .status-ko { background: #f8d7da; color: #721c24; }
+
+/* Style pour route Google Maps */
+.main-route-line {
+    z-index: 1000;
+}
+.route-border {
+    z-index: 999;
+}
+
+/* Contrôles de rotation */
+.leaflet-control-rotate {
+    background: white;
+    border: 2px solid rgba(0,0,0,0.2);
+    border-radius: 4px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+}
+
+.leaflet-control-rotate a {
+    background-color: #fff;
+    color: #333;
+    text-decoration: none;
+    font-size: 18px;
+    line-height: 26px;
+    text-align: center;
+    display: block;
+    border-radius: 4px;
+}
+
+.leaflet-control-rotate a:hover {
+    background-color: #f4f4f4;
+    color: #000;
+}
 .row-actions button { 
     border: none; 
     border-radius: 6px; 
@@ -1609,7 +1641,7 @@ body {
         <div id="login-error">Identifiants incorrects. Veuillez réessayer.</div>
         <!-- Astuce d'identifiants -->
         <div style="margin-top:10px;color:#ffffffcc;font-size:0.9em">
-            <div><strong>Agent :</strong> IMPOTS / IMPOTS 229</div>
+            <div><strong>Agent :</strong> IMPOTS / IMPOTS229</div>
             <div><strong>Admin :</strong> ADMIN / ADMIN229</div>
         </div>
     </div>
@@ -1784,8 +1816,6 @@ body {
       </form>
 
       <button id="send-invoice">🚀 Envoyer la facture</button>
-      <div class="small-muted accepted-types">Formats acceptés: .pdf, .jpg, .jpeg, .png</div>
-      <div class="small-muted">Astuce: le nom et le contact de l'agent (du Rapport de Livraison) sont repris comme expéditeur.</div>
     </div>
     
     <!-- Container pour les options de route -->
@@ -1815,11 +1845,14 @@ body {
     <div id="map"></div>
     <div id="toggleLayersBtn">Fonds</div>
     
-    <!-- Contrôles de zoom pour navigation -->
+    <!-- Contrôles de zoom et rotation pour navigation -->
     <div id="zoom-controls">
         <button class="zoom-btn" id="zoom-in">+</button>
         <button class="zoom-btn" id="zoom-out">−</button>
         <button class="zoom-btn" id="zoom-follow" title="Suivre position">📍</button>
+        <button class="zoom-btn" id="rotate-left" title="Rotation gauche">↺</button>
+        <button class="zoom-btn" id="rotate-right" title="Rotation droite">↻</button>
+        <button class="zoom-btn" id="reset-bearing" title="Reset orientation">🧭</button>
     </div>
     
     <div id="instructions-container">
@@ -1923,6 +1956,7 @@ body {
 <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 <script src="https://unpkg.com/leaflet-minimap/dist/Control.MiniMap.min.js"></script>
+<script src="https://unpkg.com/leaflet-rotate@0.2.8/dist/leaflet-rotate.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.8.0/proj4.js"></script>
 <script>
 // ====================== PROFESSIONAL TOAST NOTIFICATIONS ======================
@@ -2176,7 +2210,15 @@ var signatureCtx = null;
 var isDrawing = false;
 var currentSignature = null;
 
-var map = L.map('map').setView([9.3077,2.3158],7);
+var map = L.map('map', {
+    rotate: true,
+    bearing: 0,
+    trackResize: true,
+    touchRotate: true,
+    rotateControl: {
+        closeOnZeroBearing: false
+    }
+}).setView([9.3077,2.3158],7);
 var allCompanies = [];
 var selectedCompany = null;
 var routingControl=null, movingMarkerStart=null, movingMarkerEnd=null, movingCursor=null, routeLine=null;
@@ -2295,6 +2337,53 @@ function initZoomControls() {
             map.setView(currentUserPosition, Math.max(map.getZoom(), 18), {animate: true});
         }
     };
+
+    // Contrôles de rotation
+    const rotateLeftBtn = document.getElementById('rotate-left');
+    const rotateRightBtn = document.getElementById('rotate-right');
+    const resetBearingBtn = document.getElementById('reset-bearing');
+    
+    if (rotateLeftBtn) {
+        rotateLeftBtn.onclick = () => {
+            const currentBearing = map.getBearing ? map.getBearing() : 0;
+            if (map.setBearing) map.setBearing(currentBearing - 15);
+        };
+    }
+    
+    if (rotateRightBtn) {
+        rotateRightBtn.onclick = () => {
+            const currentBearing = map.getBearing ? map.getBearing() : 0;
+            if (map.setBearing) map.setBearing(currentBearing + 15);
+        };
+    }
+    
+    if (resetBearingBtn) {
+        resetBearingBtn.onclick = () => {
+            if (map.setBearing) map.setBearing(0);
+        };
+    }
+
+    // Rotation tactile et souris
+    map.on('touchstart mousedown', function(e) {
+        if (e.originalEvent.ctrlKey || (e.originalEvent.touches && e.originalEvent.touches.length === 2)) {
+            map.dragging.disable();
+            map.on('touchmove mousemove', rotateMap);
+        }
+    });
+
+    map.on('touchend mouseup', function() {
+        map.dragging.enable();
+        map.off('touchmove mousemove', rotateMap);
+    });
+
+    function rotateMap(e) {
+        if (e.originalEvent.touches && e.originalEvent.touches.length === 2) {
+            const touch1 = e.originalEvent.touches[0];
+            const touch2 = e.originalEvent.touches[1];
+            const angle = Math.atan2(touch2.clientY - touch1.clientY, touch2.clientX - touch1.clientX) * 180 / Math.PI;
+            if (map.setBearing) map.setBearing(angle);
+        }
+    }
     
     // Permettre l'interaction libre avec la carte pendant la navigation
     map.on('dragstart', () => {
@@ -2464,7 +2553,33 @@ document.getElementById('coordBtnSidebar').onclick = () => {
 };
 
 function clearRoute(){
-    clearInterval(routeInterval);
+    isNavigating = false;
+    isPaused = false;
+    
+    if (routeInterval) {
+        clearInterval(routeInterval);
+        routeInterval = null;
+    }
+    if (voiceGuidanceInterval) {
+        clearInterval(voiceGuidanceInterval);
+        voiceGuidanceInterval = null;
+    }
+    if (gpsWatchId) {
+        navigator.geolocation.clearWatch(gpsWatchId);
+        gpsWatchId = null;
+    }
+    if (routeInterval) {
+        clearInterval(routeInterval);
+        routeInterval = null;
+    }
+    if (voiceGuidanceInterval) {
+        clearInterval(voiceGuidanceInterval);
+        voiceGuidanceInterval = null;
+    }
+    if (gpsWatchId) {
+        navigator.geolocation.clearWatch(gpsWatchId);
+        gpsWatchId = null;
+    }
     if (voiceGuidanceInterval) clearInterval(voiceGuidanceInterval);
     if (gpsWatchId) {
         navigator.geolocation.clearWatch(gpsWatchId);
@@ -2709,14 +2824,18 @@ function startRealTimeGPSTracking(){
             }
         }
 
-        // Vérifier si on est arrivé à destination
+        // Vérifier si on est arrivé à destination (distance réduite pour éviter disparition prématurée)
         if (routeCoords.length > 0) {
             const destination = routeCoords[routeCoords.length - 1];
             const distToDestination = distance(userPos, [destination.lat, destination.lng]);
             
-            if (distToDestination < 20) { // 20 mètres de la destination
+            if (distToDestination < 5) { // 5 mètres seulement pour éviter disparition prématurée
                 if (voiceEnabled) speak("Vous êtes arrivé à destination.");
-                clearRoute();
+                // Ne pas supprimer la route immédiatement, juste arrêter le suivi
+                isNavigating = false;
+                if (voiceEnabled) setTimeout(() => {
+                    speak("Navigation terminée. Félicitations!");
+                }, 1000);
                 return;
             }
         }
@@ -3092,12 +3211,23 @@ function startRouteWithSelectedOption(lat, lng, name, selectedRoute) {
             // Supprimer l'ancienne ligne de route par défaut du contrôle
             if (routeLine) map.removeLayer(routeLine);
             
-            // Créer notre propre ligne de route complète
+// Remplacer routeLine par notre style Google Maps
             routeLine = L.polyline(routeCoords, {
-                color: '#1e90ff', 
-                weight: 6, 
-                opacity: 0.8,
-                className: 'main-route-line'
+                color: '#4285f4', 
+                weight: 8, 
+                opacity: 0.9,
+                className: 'main-route-line',
+                dashArray: null,
+                lineCap: 'round',
+                lineJoin: 'round'
+            }).addTo(map);
+            
+            // Bordure pour effet 3D comme Google Maps
+            var routeBorder = L.polyline(routeCoords, {
+                color: '#1a73e8', 
+                weight: 12, 
+                opacity: 0.3,
+                className: 'route-border'
             }).addTo(map);
             
             // Créer les trois marqueurs uniques
@@ -3158,10 +3288,12 @@ function startRoute(lat,lng,name){
             
             // Créer notre propre ligne de route
             routeLine=L.polyline(routeCoords, {
-                color:'#1e90ff', 
-                weight:6, 
-                opacity:0.8,
-                className: 'main-route-line'
+                color:'#4285f4', 
+                weight:8, 
+                opacity:0.9,
+                className: 'main-route-line',
+                lineCap: 'round',
+                lineJoin: 'round'
             }).addTo(map);
             
             // Créer les trois marqueurs
@@ -3215,10 +3347,12 @@ function startRouteWithoutVoice(lat,lng,name){
             
             // Créer notre propre ligne de route
             routeLine=L.polyline(routeCoords, {
-                color:'#1e90ff', 
-                weight:6, 
-                opacity:0.8,
-                className: 'main-route-line'
+                color:'#4285f4', 
+                weight:8, 
+                opacity:0.9,
+                className: 'main-route-line',
+                lineCap: 'round',
+                lineJoin: 'round'
             }).addTo(map);
             
             // Créer les trois marqueurs
