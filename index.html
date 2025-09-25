@@ -1872,7 +1872,7 @@ body {
             <strong>Interface Administrateur — Suivi des Rapports</strong>
         </div>
         <div id="admin-actions">
-            <button id="toggle-agent-sidebar" class="admin-btn secondary">☰ Menu Agent</button>
+
             <button id="toggle-admin-layers" class="admin-btn">🗺️ Fonds de Carte</button>
             <button id="switch-to-agent" class="admin-btn secondary">Mode Agent</button>
             <button id="export-csv" class="admin-btn">Exporter CSV</button>
@@ -3870,27 +3870,6 @@ function setupAdminLayerControls() {
 }
 
 function setupAdminToggleButtons() {
-    // Toggle agent sidebar
-    document.getElementById('toggle-agent-sidebar').onclick = () => {
-        agentSidebarVisible = !agentSidebarVisible;
-        const sidebar = document.getElementById('sidebar');
-        if (agentSidebarVisible) {
-            sidebar.style.display = 'flex';
-            sidebar.style.transform = 'translateX(0)';
-            sidebar.style.position = 'fixed';
-            sidebar.style.zIndex = '10000';
-            showToast('Menu agent affiché', 'info');
-        } else {
-            sidebar.style.transform = 'translateX(-100%)';
-            setTimeout(() => {
-                if (!agentSidebarVisible) {
-                    sidebar.style.display = 'none';
-                }
-            }, 300);
-            showToast('Menu agent masqué', 'info');
-        }
-    };
-    
     // Toggle admin layers
     document.getElementById('toggle-admin-layers').onclick = () => {
         adminLayerContainerVisible = !adminLayerContainerVisible;
@@ -3940,9 +3919,14 @@ function renderAdminTable(reports) {
         const focusBtn = tr.querySelector('.focus');
         const editBtn = tr.querySelector('.edit');
         const delBtn = tr.querySelector('.delete');
+        const viewSignatureBtn = tr.querySelector('.view-signature');
+        
         focusBtn.onclick = () => focusOnReport(r);
         if (editBtn) editBtn.onclick = () => openEditModal(r);
         delBtn.onclick = () => deleteReport(r.id);
+        if (viewSignatureBtn) {
+            viewSignatureBtn.onclick = () => viewSignature(r.signature);
+        }
 
         tbody.appendChild(tr);
       });
@@ -4071,74 +4055,25 @@ window.addEventListener('storage', (e)=>{
         initializeAdmin();
     }
 });
+
+// ====================== SIGNATURE VIEWING FUNCTIONS ======================
+function viewSignature(signatureData) {
+    document.getElementById('signature-view-image').src = signatureData;
+    document.getElementById('signature-view-modal').style.display = 'flex';
+    
+    // Set up download functionality
+    document.getElementById('download-signature').onclick = () => {
+        const link = document.createElement('a');
+        link.href = signatureData;
+        link.download = 'signature_' + Date.now() + '.png';
+        link.click();
+    };
+}
+
+function closeSignatureViewModal() {
+    document.getElementById('signature-view-modal').style.display = 'none';
+}
 </script>
 
 </body>
 </html>
-// Charger la liste des entreprises depuis le serveur
-fetch("/entreprises")
-  .then(response => {
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.json();
-  })
-  .then(data => {
-    console.log("Entreprises chargées depuis le serveur:", data);
-    // Ne pas écraser allCompanies si les données du CSV sont déjà chargées
-    if (allCompanies.length === 0) {
-      allCompanies = data.filter(e => e.Nom_Entreprise && e.Latitude && e.Longitude);
-      var list = document.getElementById('companyList');
-      list.innerHTML = '';
-      allCompanies.forEach(e => {
-        var li = document.createElement('li');
-        li.textContent = e.Nom_Entreprise;
-        li.title = `ID: ${e.ID || ''} - Coordonnées: ${e.Latitude}, ${e.Longitude}`;
-        li.onclick = () => {
-          selectedCompany = e;
-          showRouteOptions(parseFloat(e.Latitude), parseFloat(e.Longitude), e.Nom_Entreprise);
-        };
-        list.appendChild(li);
-      });
-      console.log(`${allCompanies.length} entreprises chargées depuis le serveur`);
-    }
-  })
-  .catch(err => {
-    console.error("Erreur lors du chargement depuis le serveur:", err);
-    // Le fallback CSV prendra le relais
-  });
-</script>
-
-```
-
-// Add signature modal for viewing
-<div id="signature-view-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:15000;padding:20px;">
-  <div style="background:#fff;padding:20px;border-radius:8px;width:100%;max-width:500px;box-shadow:0 6px 18px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto;">
-    <h3 style="margin-top:0;color:#007bff;text-align:center;">📷 Signature de réception</h3>
-    <div style="text-align:center;margin:20px 0;">
-      <img id="signature-view-image" style="max-width:100%;max-height:300px;border:1px solid #ddd;border-radius:8px;" />
-    </div>
-    <div style="text-align:center;">
-      <button onclick="closeSignatureViewModal()" style="background:#6c757d;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;">Fermer</button>
-      <button id="download-signature" style="background:#28a745;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;margin-left:10px;">💾 Télécharger</button>
-    </div>
-  </div>
-</div>
-
-// Add signature viewing functions
-function viewSignature(signatureData) {
-  document.getElementById('signature-view-image').src = signatureData;
-  document.getElementById('signature-view-modal').style.display = 'flex';
-  
-  // Set up download functionality
-  document.getElementById('download-signature').onclick = () => {
-    const link = document.createElement('a');
-    link.href = signatureData;
-    link.download = 'signature_' + Date.now() + '.png';
-    link.click();
-  };
-}
-
-function closeSignatureViewModal() {
-  document.getElementById('signature-view-modal').style.display = 'none';
-}
