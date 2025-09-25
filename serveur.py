@@ -206,13 +206,4 @@ if __name__ == "__main__":
     
     # Récupérer le port fourni par Render ou utiliser 5000 par défaut
     port = int(os.environ.get("PORT", 5000))
-    
-    try:
-        app.run(host="0.0.0.0", port=port, debug=False, threaded=True)
-    except Exception as e:
-        print(f"Erreur lors du démarrage du serveur: {e}")
-        print("Tentative de redémarrage sur le port 5001...")
-        try:
-            app.run(host="0.0.0.0", port=5001, debug=False, threaded=True)
-        except Exception as e2:
-            print(f"Erreur critique: {e2}")
+    app.run(host="0.0.0.0", port=port, debug=True)

@@ -103,7 +103,6 @@
     --primary-dark: #1565c0;
     --primary-light: #bbdefb;
     --accent-color: #ff5722;
-    --secondary-color: #1976D2;
     --success-color: #4caf50;
     --warning-color: #ff9800;
     --error-color: #f44336;
@@ -112,7 +111,6 @@
     --divider-color: #e0e0e0;
     --background-color: #fafafa;
     --surface-color: #ffffff;
-    --card-color: #fafafa;
     --shadow-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
     --shadow-2: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     --shadow-3: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
@@ -759,38 +757,6 @@ body {
 }
 .status-ok { background: #d4edda; color: #155724; }
 .status-ko { background: #f8d7da; color: #721c24; }
-
-/* Style pour route Google Maps */
-.main-route-line {
-    z-index: 1000;
-}
-.route-border {
-    z-index: 999;
-}
-
-/* Contrôles de rotation */
-.leaflet-control-rotate {
-    background: white;
-    border: 2px solid rgba(0,0,0,0.2);
-    border-radius: 4px;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.4);
-}
-
-.leaflet-control-rotate a {
-    background-color: #fff;
-    color: #333;
-    text-decoration: none;
-    font-size: 18px;
-    line-height: 26px;
-    text-align: center;
-    display: block;
-    border-radius: 4px;
-}
-
-.leaflet-control-rotate a:hover {
-    background-color: #f4f4f4;
-    color: #000;
-}
 .row-actions button { 
     border: none; 
     border-radius: 6px; 
@@ -1641,7 +1607,7 @@ body {
         <div id="login-error">Identifiants incorrects. Veuillez réessayer.</div>
         <!-- Astuce d'identifiants -->
         <div style="margin-top:10px;color:#ffffffcc;font-size:0.9em">
-            <div><strong>Agent :</strong> IMPOTS / IMPOTS229</div>
+            <div><strong>Agent :</strong> IMPOTS / IMPOTS 229</div>
             <div><strong>Admin :</strong> ADMIN / ADMIN229</div>
         </div>
     </div>
@@ -1651,11 +1617,10 @@ body {
 <div id="app-container">
     <div id="header">
         <button id="menu-toggle">☰</button>
-        <button id="sidebar-toggle" style="display: none; background: transparent; border: none; color: white; font-size: 1.2em; cursor: pointer; padding: 8px; margin-right: 10px;">📋</button>
         <div class="header-content">
             <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin">
             <h1>Système de Distribution des Factures Impôts</h1>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin">
+            <img src="https://www.impots.bj/sites/default/files/logo-dgi.png" alt="Logo DGI Bénin" style="width: 50px; height: 50px; margin-left: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
         </div>
         <div id="top-actions" style="display:none;">
             <button id="switch-to-admin" class="top-btn dark">Admin</button>
@@ -1816,6 +1781,8 @@ body {
       </form>
 
       <button id="send-invoice">🚀 Envoyer la facture</button>
+      <div class="small-muted accepted-types">Formats acceptés: .pdf, .jpg, .jpeg, .png</div>
+      <div class="small-muted">Astuce: le nom et le contact de l'agent (du Rapport de Livraison) sont repris comme expéditeur.</div>
     </div>
     
     <!-- Container pour les options de route -->
@@ -1845,14 +1812,11 @@ body {
     <div id="map"></div>
     <div id="toggleLayersBtn">Fonds</div>
     
-    <!-- Contrôles de zoom et rotation pour navigation -->
+    <!-- Contrôles de zoom pour navigation -->
     <div id="zoom-controls">
         <button class="zoom-btn" id="zoom-in">+</button>
         <button class="zoom-btn" id="zoom-out">−</button>
         <button class="zoom-btn" id="zoom-follow" title="Suivre position">📍</button>
-        <button class="zoom-btn" id="rotate-left" title="Rotation gauche">↺</button>
-        <button class="zoom-btn" id="rotate-right" title="Rotation droite">↻</button>
-        <button class="zoom-btn" id="reset-bearing" title="Reset orientation">🧭</button>
     </div>
     
     <div id="instructions-container">
@@ -1872,7 +1836,7 @@ body {
             <strong>Interface Administrateur — Suivi des Rapports</strong>
         </div>
         <div id="admin-actions">
-
+            <button id="toggle-agent-sidebar" class="admin-btn secondary">☰ Menu Agent</button>
             <button id="toggle-admin-layers" class="admin-btn">🗺️ Fonds de Carte</button>
             <button id="switch-to-agent" class="admin-btn secondary">Mode Agent</button>
             <button id="export-csv" class="admin-btn">Exporter CSV</button>
@@ -1956,7 +1920,6 @@ body {
 <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 <script src="https://unpkg.com/leaflet-minimap/dist/Control.MiniMap.min.js"></script>
-<script src="https://unpkg.com/leaflet-rotate@0.2.8/dist/leaflet-rotate.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.8.0/proj4.js"></script>
 <script>
 // ====================== PROFESSIONAL TOAST NOTIFICATIONS ======================
@@ -2034,35 +1997,12 @@ function loadReportsFromLS() {
 // ====================== MENU MOBILE ======================
 function initMobileMenu() {
     const menuToggle = document.getElementById('menu-toggle');
-    const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
     
-    // Show sidebar toggle button for desktop users
-    if (window.innerWidth > 768) {
-        sidebarToggle.style.display = 'block';
-    }
-    
-    // Mobile menu toggle
     menuToggle.addEventListener('click', function() {
         sidebar.classList.toggle('show');
         sidebarOverlay.classList.toggle('show');
-    });
-    
-    // Desktop sidebar toggle
-    sidebarToggle.addEventListener('click', function() {
-        const isHidden = sidebar.classList.contains('hidden');
-        if (isHidden) {
-            sidebar.classList.remove('hidden');
-            sidebarToggle.innerHTML = '📋';
-            sidebarToggle.title = 'Masquer le menu';
-            showToast('Menu affiché', 'info', 2000);
-        } else {
-            sidebar.classList.add('hidden');
-            sidebarToggle.innerHTML = '📝';
-            sidebarToggle.title = 'Afficher le menu';
-            showToast('Menu masqué', 'info', 2000);
-        }
     });
     
     sidebarOverlay.addEventListener('click', function() {
@@ -2079,18 +2019,6 @@ function initMobileMenu() {
                     sidebarOverlay.classList.remove('show');
                 }, 300);
             }
-        }
-    });
-    
-    // Handle window resize
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 768) {
-            sidebarToggle.style.display = 'block';
-            sidebar.classList.remove('show');
-            sidebarOverlay.classList.remove('show');
-        } else {
-            sidebarToggle.style.display = 'none';
-            sidebar.classList.remove('hidden');
         }
     });
 }
@@ -2210,15 +2138,7 @@ var signatureCtx = null;
 var isDrawing = false;
 var currentSignature = null;
 
-var map = L.map('map', {
-    rotate: true,
-    bearing: 0,
-    trackResize: true,
-    touchRotate: true,
-    rotateControl: {
-        closeOnZeroBearing: false
-    }
-}).setView([9.3077,2.3158],7);
+var map = L.map('map').setView([9.3077,2.3158],7);
 var allCompanies = [];
 var selectedCompany = null;
 var routingControl=null, movingMarkerStart=null, movingMarkerEnd=null, movingCursor=null, routeLine=null;
@@ -2295,15 +2215,10 @@ Object.keys(baseLayers).forEach((key,idx)=>{
 });
 
 var layerContainerVisible = true;
-const toggleLayersBtn = document.getElementById('toggleLayersBtn');
-if (toggleLayersBtn) {
-    toggleLayersBtn.onclick = () => {
-        layerContainerVisible = !layerContainerVisible;
-        layerContainer.style.display = layerContainerVisible ? 'flex' : 'none';
-        toggleLayersBtn.style.background = layerContainerVisible ? '#007bff' : '#6c757d';
-        showToast(layerContainerVisible ? 'Fonds de carte affichés' : 'Fonds de carte masqués', 'info');
-    };
-}
+document.getElementById('toggleLayersBtn').onclick = () => {
+    layerContainerVisible = !layerContainerVisible;
+    layerContainer.style.display = layerContainerVisible ? 'flex' : 'none';
+};
 
 // ====================== CONTRÔLES DE ZOOM POUR NAVIGATION ======================
 function initZoomControls() {
@@ -2342,53 +2257,6 @@ function initZoomControls() {
             map.setView(currentUserPosition, Math.max(map.getZoom(), 18), {animate: true});
         }
     };
-
-    // Contrôles de rotation
-    const rotateLeftBtn = document.getElementById('rotate-left');
-    const rotateRightBtn = document.getElementById('rotate-right');
-    const resetBearingBtn = document.getElementById('reset-bearing');
-    
-    if (rotateLeftBtn) {
-        rotateLeftBtn.onclick = () => {
-            const currentBearing = map.getBearing ? map.getBearing() : 0;
-            if (map.setBearing) map.setBearing(currentBearing - 15);
-        };
-    }
-    
-    if (rotateRightBtn) {
-        rotateRightBtn.onclick = () => {
-            const currentBearing = map.getBearing ? map.getBearing() : 0;
-            if (map.setBearing) map.setBearing(currentBearing + 15);
-        };
-    }
-    
-    if (resetBearingBtn) {
-        resetBearingBtn.onclick = () => {
-            if (map.setBearing) map.setBearing(0);
-        };
-    }
-
-    // Rotation tactile et souris
-    map.on('touchstart mousedown', function(e) {
-        if (e.originalEvent.ctrlKey || (e.originalEvent.touches && e.originalEvent.touches.length === 2)) {
-            map.dragging.disable();
-            map.on('touchmove mousemove', rotateMap);
-        }
-    });
-
-    map.on('touchend mouseup', function() {
-        map.dragging.enable();
-        map.off('touchmove mousemove', rotateMap);
-    });
-
-    function rotateMap(e) {
-        if (e.originalEvent.touches && e.originalEvent.touches.length === 2) {
-            const touch1 = e.originalEvent.touches[0];
-            const touch2 = e.originalEvent.touches[1];
-            const angle = Math.atan2(touch2.clientY - touch1.clientY, touch2.clientX - touch1.clientX) * 180 / Math.PI;
-            if (map.setBearing) map.setBearing(angle);
-        }
-    }
     
     // Permettre l'interaction libre avec la carte pendant la navigation
     map.on('dragstart', () => {
@@ -2558,33 +2426,7 @@ document.getElementById('coordBtnSidebar').onclick = () => {
 };
 
 function clearRoute(){
-    isNavigating = false;
-    isPaused = false;
-    
-    if (routeInterval) {
-        clearInterval(routeInterval);
-        routeInterval = null;
-    }
-    if (voiceGuidanceInterval) {
-        clearInterval(voiceGuidanceInterval);
-        voiceGuidanceInterval = null;
-    }
-    if (gpsWatchId) {
-        navigator.geolocation.clearWatch(gpsWatchId);
-        gpsWatchId = null;
-    }
-    if (routeInterval) {
-        clearInterval(routeInterval);
-        routeInterval = null;
-    }
-    if (voiceGuidanceInterval) {
-        clearInterval(voiceGuidanceInterval);
-        voiceGuidanceInterval = null;
-    }
-    if (gpsWatchId) {
-        navigator.geolocation.clearWatch(gpsWatchId);
-        gpsWatchId = null;
-    }
+    clearInterval(routeInterval);
     if (voiceGuidanceInterval) clearInterval(voiceGuidanceInterval);
     if (gpsWatchId) {
         navigator.geolocation.clearWatch(gpsWatchId);
@@ -2829,18 +2671,14 @@ function startRealTimeGPSTracking(){
             }
         }
 
-        // Vérifier si on est arrivé à destination (distance réduite pour éviter disparition prématurée)
+        // Vérifier si on est arrivé à destination
         if (routeCoords.length > 0) {
             const destination = routeCoords[routeCoords.length - 1];
             const distToDestination = distance(userPos, [destination.lat, destination.lng]);
             
-            if (distToDestination < 5) { // 5 mètres seulement pour éviter disparition prématurée
+            if (distToDestination < 20) { // 20 mètres de la destination
                 if (voiceEnabled) speak("Vous êtes arrivé à destination.");
-                // Ne pas supprimer la route immédiatement, juste arrêter le suivi
-                isNavigating = false;
-                if (voiceEnabled) setTimeout(() => {
-                    speak("Navigation terminée. Félicitations!");
-                }, 1000);
+                clearRoute();
                 return;
             }
         }
@@ -3216,23 +3054,12 @@ function startRouteWithSelectedOption(lat, lng, name, selectedRoute) {
             // Supprimer l'ancienne ligne de route par défaut du contrôle
             if (routeLine) map.removeLayer(routeLine);
             
-// Remplacer routeLine par notre style Google Maps
+            // Créer notre propre ligne de route complète
             routeLine = L.polyline(routeCoords, {
-                color: '#4285f4', 
-                weight: 8, 
-                opacity: 0.9,
-                className: 'main-route-line',
-                dashArray: null,
-                lineCap: 'round',
-                lineJoin: 'round'
-            }).addTo(map);
-            
-            // Bordure pour effet 3D comme Google Maps
-            var routeBorder = L.polyline(routeCoords, {
-                color: '#1a73e8', 
-                weight: 12, 
-                opacity: 0.3,
-                className: 'route-border'
+                color: '#1e90ff', 
+                weight: 6, 
+                opacity: 0.8,
+                className: 'main-route-line'
             }).addTo(map);
             
             // Créer les trois marqueurs uniques
@@ -3293,12 +3120,10 @@ function startRoute(lat,lng,name){
             
             // Créer notre propre ligne de route
             routeLine=L.polyline(routeCoords, {
-                color:'#4285f4', 
-                weight:8, 
-                opacity:0.9,
-                className: 'main-route-line',
-                lineCap: 'round',
-                lineJoin: 'round'
+                color:'#1e90ff', 
+                weight:6, 
+                opacity:0.8,
+                className: 'main-route-line'
             }).addTo(map);
             
             // Créer les trois marqueurs
@@ -3352,12 +3177,10 @@ function startRouteWithoutVoice(lat,lng,name){
             
             // Créer notre propre ligne de route
             routeLine=L.polyline(routeCoords, {
-                color:'#4285f4', 
-                weight:8, 
-                opacity:0.9,
-                className: 'main-route-line',
-                lineCap: 'round',
-                lineJoin: 'round'
+                color:'#1e90ff', 
+                weight:6, 
+                opacity:0.8,
+                className: 'main-route-line'
             }).addTo(map);
             
             // Créer les trois marqueurs
@@ -3530,27 +3353,15 @@ document.getElementById('submit-report').onclick = () => {
     
     // Simulate processing time for better UX
     setTimeout(() => {
-        // Load existing reports and add new one
-        let existingReports = loadReportsFromLS();
-        existingReports.push(report);
-        
-        // Save updated reports
-        saveReportsToLS(existingReports);
-        
-        console.log('Rapport de livraison enregistré:', report);
-        console.log('Total rapports en localStorage:', existingReports.length);
+        deliveryReports.push(report);
+        saveReportsToLS(deliveryReports);
+        console.log('Rapport de livraison:', report);
         
         hideLoading(submitBtn);
         
         const statusText = deliveryStatus === 'delivered' ? 'livrée' : 'non livrée';
         showMessage('success', `Rapport de facture ${statusText} envoyé avec succès !`);
         showToast(`Rapport de livraison enregistré!`, 'success');
-
-        // Trigger storage event for admin interface sync
-        window.dispatchEvent(new StorageEvent('storage', {
-            key: LS_KEY,
-            newValue: JSON.stringify(existingReports)
-        }));
 
         setTimeout(() => { resetForm(); }, 2000);
     }, 1500);
@@ -3822,40 +3633,30 @@ function initializeAdmin() {
         adminMap.invalidateSize();
     }
 
-    // Load reports from localStorage and refresh display
     const reports = loadReportsFromLS();
-    console.log('Admin: Loading reports from localStorage:', reports);
-    
     renderAdminTable(reports);
     plotAdminMarkers(reports);
 
-    // Setup search functionality
     const searchInput = document.getElementById('admin-search');
-    if (searchInput) {
-        searchInput.oninput = () => {
-            const q = (searchInput.value || '').toLowerCase();
-            const filtered = reports.filter(r => {
-                const fields = [
-                    r.status,
-                    r.agentName,
-                    r.agentContact,
-                    r.reason,
-                    r.deliveryDate,
-                    r.deliveryTime,
-                    r.timestamp
-                ].map(x => (x || '').toString().toLowerCase()).join(' ');
-                return fields.includes(q);
-            });
-            renderAdminTable(filtered);
-            plotAdminMarkers(filtered);
-        };
-    }
+    searchInput.oninput = () => {
+        const q = (searchInput.value || '').toLowerCase();
+        const filtered = reports.filter(r => {
+            const fields = [
+                r.status,
+                r.agentName,
+                r.agentContact,
+                r.reason,
+                r.deliveryDate,
+                r.deliveryTime,
+                r.timestamp
+            ].map(x => (x || '').toString().toLowerCase()).join(' ');
+            return fields.includes(q);
+        });
+        renderAdminTable(filtered);
+        plotAdminMarkers(filtered);
+    };
 
-    // Setup export button
-    const exportBtn = document.getElementById('export-csv');
-    if (exportBtn) {
-        exportBtn.onclick = () => exportReportsCSV(loadReportsFromLS());
-    }
+    document.getElementById('export-csv').onclick = () => exportReportsCSV(loadReportsFromLS());
     
     // Setup toggle buttons
     setupAdminToggleButtons();
@@ -3897,36 +3698,46 @@ function setupAdminLayerControls() {
 }
 
 function setupAdminToggleButtons() {
+    // Toggle agent sidebar
+    document.getElementById('toggle-agent-sidebar').onclick = () => {
+        agentSidebarVisible = !agentSidebarVisible;
+        const sidebar = document.getElementById('sidebar');
+        if (agentSidebarVisible) {
+            sidebar.style.display = 'flex';
+            sidebar.style.transform = 'translateX(0)';
+            sidebar.style.position = 'fixed';
+            sidebar.style.zIndex = '10000';
+            showToast('Menu agent affiché', 'info');
+        } else {
+            sidebar.style.transform = 'translateX(-100%)';
+            setTimeout(() => {
+                if (!agentSidebarVisible) {
+                    sidebar.style.display = 'none';
+                }
+            }, 300);
+            showToast('Menu agent masqué', 'info');
+        }
+    };
+    
     // Toggle admin layers
-    const toggleLayersBtn = document.getElementById('toggle-admin-layers');
-    if (toggleLayersBtn) {
-        toggleLayersBtn.onclick = () => {
-            adminLayerContainerVisible = !adminLayerContainerVisible;
-            adminLayerContainer.style.display = adminLayerContainerVisible ? 'flex' : 'none';
-            toggleLayersBtn.style.background = adminLayerContainerVisible ? '#1565c0' : '#007bff';
-            showToast(adminLayerContainerVisible ? 'Fonds de carte affichés' : 'Fonds de carte masqués', 'info');
-        };
-    }
+    document.getElementById('toggle-admin-layers').onclick = () => {
+        adminLayerContainerVisible = !adminLayerContainerVisible;
+        adminLayerContainer.style.display = adminLayerContainerVisible ? 'flex' : 'none';
+        const btn = document.getElementById('toggle-admin-layers');
+        btn.style.background = adminLayerContainerVisible ? 'var(--primary-dark)' : 'var(--primary-color)';
+        showToast(adminLayerContainerVisible ? 'Fonds de carte affichés' : 'Fonds de carte masqués', 'info');
+    };
 }
 
 function renderAdminTable(reports) {
-    console.log('renderAdminTable called with:', reports);
     const tbody = document.getElementById('reports-tbody');
     const empty = document.getElementById('empty-state');
-    
-    if (!tbody || !empty) {
-        console.error('Missing admin table elements:', { tbody, empty });
-        return;
-    }
-    
     tbody.innerHTML = '';
     if (!reports || reports.length === 0) {
         empty.style.display = 'block';
-        console.log('No reports to display');
         return;
     }
     empty.style.display = 'none';
-    console.log(`Displaying ${reports.length} reports`);
 
     reports
       .sort((a,b)=> (b.id||0)-(a.id||0))
@@ -3957,14 +3768,9 @@ function renderAdminTable(reports) {
         const focusBtn = tr.querySelector('.focus');
         const editBtn = tr.querySelector('.edit');
         const delBtn = tr.querySelector('.delete');
-        const viewSignatureBtn = tr.querySelector('.view-signature');
-        
         focusBtn.onclick = () => focusOnReport(r);
         if (editBtn) editBtn.onclick = () => openEditModal(r);
         delBtn.onclick = () => deleteReport(r.id);
-        if (viewSignatureBtn) {
-            viewSignatureBtn.onclick = () => viewSignature(r.signature);
-        }
 
         tbody.appendChild(tr);
       });
@@ -4093,25 +3899,74 @@ window.addEventListener('storage', (e)=>{
         initializeAdmin();
     }
 });
-
-// ====================== SIGNATURE VIEWING FUNCTIONS ======================
-function viewSignature(signatureData) {
-    document.getElementById('signature-view-image').src = signatureData;
-    document.getElementById('signature-view-modal').style.display = 'flex';
-    
-    // Set up download functionality
-    document.getElementById('download-signature').onclick = () => {
-        const link = document.createElement('a');
-        link.href = signatureData;
-        link.download = 'signature_' + Date.now() + '.png';
-        link.click();
-    };
-}
-
-function closeSignatureViewModal() {
-    document.getElementById('signature-view-modal').style.display = 'none';
-}
 </script>
 
 </body>
 </html>
+// Charger la liste des entreprises depuis le serveur
+fetch("/entreprises")
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log("Entreprises chargées depuis le serveur:", data);
+    // Ne pas écraser allCompanies si les données du CSV sont déjà chargées
+    if (allCompanies.length === 0) {
+      allCompanies = data.filter(e => e.Nom_Entreprise && e.Latitude && e.Longitude);
+      var list = document.getElementById('companyList');
+      list.innerHTML = '';
+      allCompanies.forEach(e => {
+        var li = document.createElement('li');
+        li.textContent = e.Nom_Entreprise;
+        li.title = `ID: ${e.ID || ''} - Coordonnées: ${e.Latitude}, ${e.Longitude}`;
+        li.onclick = () => {
+          selectedCompany = e;
+          showRouteOptions(parseFloat(e.Latitude), parseFloat(e.Longitude), e.Nom_Entreprise);
+        };
+        list.appendChild(li);
+      });
+      console.log(`${allCompanies.length} entreprises chargées depuis le serveur`);
+    }
+  })
+  .catch(err => {
+    console.error("Erreur lors du chargement depuis le serveur:", err);
+    // Le fallback CSV prendra le relais
+  });
+</script>
+
+```
+
+// Add signature modal for viewing
+<div id="signature-view-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:15000;padding:20px;">
+  <div style="background:#fff;padding:20px;border-radius:8px;width:100%;max-width:500px;box-shadow:0 6px 18px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto;">
+    <h3 style="margin-top:0;color:#007bff;text-align:center;">📷 Signature de réception</h3>
+    <div style="text-align:center;margin:20px 0;">
+      <img id="signature-view-image" style="max-width:100%;max-height:300px;border:1px solid #ddd;border-radius:8px;" />
+    </div>
+    <div style="text-align:center;">
+      <button onclick="closeSignatureViewModal()" style="background:#6c757d;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;">Fermer</button>
+      <button id="download-signature" style="background:#28a745;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;margin-left:10px;">💾 Télécharger</button>
+    </div>
+  </div>
+</div>
+
+// Add signature viewing functions
+function viewSignature(signatureData) {
+  document.getElementById('signature-view-image').src = signatureData;
+  document.getElementById('signature-view-modal').style.display = 'flex';
+  
+  // Set up download functionality
+  document.getElementById('download-signature').onclick = () => {
+    const link = document.createElement('a');
+    link.href = signatureData;
+    link.download = 'signature_' + Date.now() + '.png';
+    link.click();
+  };
+}
+
+function closeSignatureViewModal() {
+  document.getElementById('signature-view-modal').style.display = 'none';
+}
