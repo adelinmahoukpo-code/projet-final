@@ -2295,10 +2295,15 @@ Object.keys(baseLayers).forEach((key,idx)=>{
 });
 
 var layerContainerVisible = true;
-document.getElementById('toggleLayersBtn').onclick = () => {
-    layerContainerVisible = !layerContainerVisible;
-    layerContainer.style.display = layerContainerVisible ? 'flex' : 'none';
-};
+const toggleLayersBtn = document.getElementById('toggleLayersBtn');
+if (toggleLayersBtn) {
+    toggleLayersBtn.onclick = () => {
+        layerContainerVisible = !layerContainerVisible;
+        layerContainer.style.display = layerContainerVisible ? 'flex' : 'none';
+        toggleLayersBtn.style.background = layerContainerVisible ? '#007bff' : '#6c757d';
+        showToast(layerContainerVisible ? 'Fonds de carte affichés' : 'Fonds de carte masqués', 'info');
+    };
+}
 
 // ====================== CONTRÔLES DE ZOOM POUR NAVIGATION ======================
 function initZoomControls() {
@@ -3525,15 +3530,27 @@ document.getElementById('submit-report').onclick = () => {
     
     // Simulate processing time for better UX
     setTimeout(() => {
-        deliveryReports.push(report);
-        saveReportsToLS(deliveryReports);
-        console.log('Rapport de livraison:', report);
+        // Load existing reports and add new one
+        let existingReports = loadReportsFromLS();
+        existingReports.push(report);
+        
+        // Save updated reports
+        saveReportsToLS(existingReports);
+        
+        console.log('Rapport de livraison enregistré:', report);
+        console.log('Total rapports en localStorage:', existingReports.length);
         
         hideLoading(submitBtn);
         
         const statusText = deliveryStatus === 'delivered' ? 'livrée' : 'non livrée';
         showMessage('success', `Rapport de facture ${statusText} envoyé avec succès !`);
         showToast(`Rapport de livraison enregistré!`, 'success');
+
+        // Trigger storage event for admin interface sync
+        window.dispatchEvent(new StorageEvent('storage', {
+            key: LS_KEY,
+            newValue: JSON.stringify(existingReports)
+        }));
 
         setTimeout(() => { resetForm(); }, 2000);
     }, 1500);
@@ -3805,30 +3822,40 @@ function initializeAdmin() {
         adminMap.invalidateSize();
     }
 
+    // Load reports from localStorage and refresh display
     const reports = loadReportsFromLS();
+    console.log('Admin: Loading reports from localStorage:', reports);
+    
     renderAdminTable(reports);
     plotAdminMarkers(reports);
 
+    // Setup search functionality
     const searchInput = document.getElementById('admin-search');
-    searchInput.oninput = () => {
-        const q = (searchInput.value || '').toLowerCase();
-        const filtered = reports.filter(r => {
-            const fields = [
-                r.status,
-                r.agentName,
-                r.agentContact,
-                r.reason,
-                r.deliveryDate,
-                r.deliveryTime,
-                r.timestamp
-            ].map(x => (x || '').toString().toLowerCase()).join(' ');
-            return fields.includes(q);
-        });
-        renderAdminTable(filtered);
-        plotAdminMarkers(filtered);
-    };
+    if (searchInput) {
+        searchInput.oninput = () => {
+            const q = (searchInput.value || '').toLowerCase();
+            const filtered = reports.filter(r => {
+                const fields = [
+                    r.status,
+                    r.agentName,
+                    r.agentContact,
+                    r.reason,
+                    r.deliveryDate,
+                    r.deliveryTime,
+                    r.timestamp
+                ].map(x => (x || '').toString().toLowerCase()).join(' ');
+                return fields.includes(q);
+            });
+            renderAdminTable(filtered);
+            plotAdminMarkers(filtered);
+        };
+    }
 
-    document.getElementById('export-csv').onclick = () => exportReportsCSV(loadReportsFromLS());
+    // Setup export button
+    const exportBtn = document.getElementById('export-csv');
+    if (exportBtn) {
+        exportBtn.onclick = () => exportReportsCSV(loadReportsFromLS());
+    }
     
     // Setup toggle buttons
     setupAdminToggleButtons();
@@ -3871,24 +3898,35 @@ function setupAdminLayerControls() {
 
 function setupAdminToggleButtons() {
     // Toggle admin layers
-    document.getElementById('toggle-admin-layers').onclick = () => {
-        adminLayerContainerVisible = !adminLayerContainerVisible;
-        adminLayerContainer.style.display = adminLayerContainerVisible ? 'flex' : 'none';
-        const btn = document.getElementById('toggle-admin-layers');
-        btn.style.background = adminLayerContainerVisible ? 'var(--primary-dark)' : 'var(--primary-color)';
-        showToast(adminLayerContainerVisible ? 'Fonds de carte affichés' : 'Fonds de carte masqués', 'info');
-    };
+    const toggleLayersBtn = document.getElementById('toggle-admin-layers');
+    if (toggleLayersBtn) {
+        toggleLayersBtn.onclick = () => {
+            adminLayerContainerVisible = !adminLayerContainerVisible;
+            adminLayerContainer.style.display = adminLayerContainerVisible ? 'flex' : 'none';
+            toggleLayersBtn.style.background = adminLayerContainerVisible ? '#1565c0' : '#007bff';
+            showToast(adminLayerContainerVisible ? 'Fonds de carte affichés' : 'Fonds de carte masqués', 'info');
+        };
+    }
 }
 
 function renderAdminTable(reports) {
+    console.log('renderAdminTable called with:', reports);
     const tbody = document.getElementById('reports-tbody');
     const empty = document.getElementById('empty-state');
+    
+    if (!tbody || !empty) {
+        console.error('Missing admin table elements:', { tbody, empty });
+        return;
+    }
+    
     tbody.innerHTML = '';
     if (!reports || reports.length === 0) {
         empty.style.display = 'block';
+        console.log('No reports to display');
         return;
     }
     empty.style.display = 'none';
+    console.log(`Displaying ${reports.length} reports`);
 
     reports
       .sort((a,b)=> (b.id||0)-(a.id||0))
