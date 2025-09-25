@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet-minimap/dist/Control.MiniMap.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-minimap/dist/Control.MiniMap.min.css" />
 <style>
 /* Styles pour la page de connexion */
 #login-overlay {
@@ -1817,6 +1818,8 @@ body {
         <button class="zoom-btn" id="zoom-in">+</button>
         <button class="zoom-btn" id="zoom-out">−</button>
         <button class="zoom-btn" id="zoom-follow" title="Suivre position">📍</button>
+        <button class="zoom-btn" id="rotate-map" title="Rotation de la carte">🧭</button>
+        <button class="zoom-btn" id="reset-rotation" title="Remettre au nord">⬆️</button>
     </div>
     
     <div id="instructions-container">
@@ -2138,7 +2141,10 @@ var signatureCtx = null;
 var isDrawing = false;
 var currentSignature = null;
 
-var map = L.map('map').setView([9.3077,2.3158],7);
+var map = L.map('map', {
+    attributionControl: false,
+    zoomControl: false
+}).setView([9.3077,2.3158],7);
 var allCompanies = [];
 var selectedCompany = null;
 var routingControl=null, movingMarkerStart=null, movingMarkerEnd=null, movingCursor=null, routeLine=null;
@@ -2166,6 +2172,9 @@ var infraAlertDistance = 25;
 var progressLine = null;
 var totalRouteDistance = 0;
 var currentRouteProgress = 0;
+var fullRouteLine = null;
+var currentBearing = 0;
+var isRotationEnabled = false;
 
 // Icônes personnalisés pour départ, arrivée et position
 var departIcon = new L.Icon({ 
@@ -2184,12 +2193,40 @@ var positionIcon = new L.Icon({
     iconAnchor: [16,32]
 });
 
+// Custom CSS to hide Leaflet attribution and zoom controls text
+var customStyle = document.createElement('style');
+customStyle.innerHTML = `
+    .leaflet-control-attribution {
+        display: none !important;
+    }
+    .leaflet-bottom {
+        display: none !important;
+    }
+    .leaflet-control-container .leaflet-bottom {
+        display: none !important;
+    }
+    .leaflet-control-zoom a {
+        text-decoration: none !important;
+        color: #333 !important;
+        font-weight: bold !important;
+    }
+    .leaflet-routing-container {
+        display: none !important;
+    }
+`;
+document.head.appendChild(customStyle);
+
 var baseLayers = {
 "OSM": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:25, maxNativeZoom: 19, attribution:'', errorTileUrl:''}).addTo(map),
 "Google Satellite": L.tileLayer('https://mt.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{maxZoom:25, maxNativeZoom: 19, attribution:'', errorTileUrl:''}),
 "Google Earth": L.tileLayer('https://mt.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:25, maxNativeZoom: 19, attribution:'', errorTileUrl:''}),
 "Google Terrain": L.tileLayer('https://mt.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{maxZoom:25, maxNativeZoom: 19, attribution:'', errorTileUrl:''})
 };
+
+// Add custom zoom control
+L.control.zoom({
+    position: 'topright'
+}).addTo(map);
 
 var layerThumbs = {
 "OSM":"https://tile.openstreetmap.org/5/15/10.png",
@@ -3053,13 +3090,22 @@ function startRouteWithSelectedOption(lat, lng, name, selectedRoute) {
             
             // Supprimer l'ancienne ligne de route par défaut du contrôle
             if (routeLine) map.removeLayer(routeLine);
+            if (fullRouteLine) map.removeLayer(fullRouteLine);
             
-            // Créer notre propre ligne de route complète
-            routeLine = L.polyline(routeCoords, {
+            // Créer la ligne complète de l'itinéraire (qui ne disparaît jamais)
+            fullRouteLine = L.polyline(routeCoords, {
+                color: '#87CEEB',  // Bleu clair pour la route complète
+                weight: 4, 
+                opacity: 0.6,
+                className: 'full-route-line'
+            }).addTo(map);
+            
+            // Créer la ligne de progression (s'étend au fur et à mesure)
+            routeLine = L.polyline([], {
                 color: '#1e90ff', 
                 weight: 6, 
-                opacity: 0.8,
-                className: 'main-route-line'
+                opacity: 0.9,
+                className: 'progress-route-line'
             }).addTo(map);
             
             // Créer les trois marqueurs uniques
@@ -3394,72 +3440,107 @@ document.getElementById('toggle-invoice-send').onclick = () => {
 };
 
 document.getElementById('send-invoice').onclick = async (e) => {
-  e.preventDefault();
-  const form = document.getElementById('invoice-form');
-  const sendBtn = document.getElementById('send-invoice');
-  const successMsg = document.getElementById('invoice-success-msg');
-  const errorMsg = document.getElementById('invoice-error-msg');
+    e.preventDefault();
+    const form = document.getElementById('invoice-form');
+    const sendBtn = document.getElementById('send-invoice');
+    const successMsg = document.getElementById('invoice-success-msg');
+    const errorMsg = document.getElementById('invoice-error-msg');
 
-  successMsg.style.display = "none";
-  errorMsg.style.display = "none";
+    // Clear previous messages
+    successMsg.style.display = "none";
+    errorMsg.style.display = "none";
 
-  const fileInput = document.getElementById('invoice-file');
-  const toInput   = document.getElementById('invoice-to');
+    const fileInput = document.getElementById('invoice-file');
+    const toInput = document.getElementById('invoice-to');
 
-  if (!fileInput.files.length) {
-    errorMsg.textContent = "❌ Veuillez choisir un fichier facture.";
-    errorMsg.style.display = "block";
-    return;
-  }
-  if (!toInput.value) {
-    errorMsg.textContent = "❌ Adresse e-mail destinataire requise.";
-    errorMsg.style.display = "block";
-    return;
-  }
+    // Validation
+    if (!fileInput.files.length) {
+        errorMsg.textContent = "❌ Veuillez choisir un fichier facture.";
+        errorMsg.style.display = "block";
+        return;
+    }
+    if (!toInput.value.trim()) {
+        errorMsg.textContent = "❌ Adresse e-mail destinataire requise.";
+        errorMsg.style.display = "block";
+        return;
+    }
 
-  const formData = new FormData(form);
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(toInput.value.trim())) {
+        errorMsg.textContent = "❌ Format d'email invalide.";
+        errorMsg.style.display = "block";
+        return;
+    }
 
-  sendBtn.disabled = true;
-  sendBtn.textContent = '⏳ Envoi...';
+    // Prepare form data
+    const formData = new FormData();
+    formData.append('attachment', fileInput.files[0]);
+    formData.append('to_email', toInput.value.trim());
+    formData.append('invoice_ref', document.getElementById('invoice-ref').value.trim());
+    formData.append('message', document.getElementById('invoice-message').value.trim());
+    formData.append('from_name', document.getElementById('invoice-from-name').value.trim() || 'Service des Impôts');
+    formData.append('agent_contact', document.getElementById('invoice-from-contact').value.trim());
+    formData.append('subject', document.getElementById('invoice-subject').value.trim() || 'Facture Direction Générale des Impôts');
+    formData.append('company_name', document.getElementById('invoice-company-name').value.trim());
 
-  try {
-    // Essayer d'abord avec l'URL locale
-    let response;
+    // Show loading state
+    sendBtn.disabled = true;
+    sendBtn.textContent = '⏳ Envoi en cours...';
+
     try {
-      response = await fetch("http://127.0.0.1:5000/sendmail", {
-        method: "POST",
-        body: formData
-      });
-    } catch (localErr) {
-      // Si l'URL locale échoue, essayer avec l'URL relative pour le déploiement
-      response = await fetch("/sendmail", {
-        method: "POST",
-        body: formData
-      });
-    }
+        const response = await fetch('/sendmail', {
+            method: 'POST',
+            body: formData
+        });
 
-    const result = await response.json();
-    if (result.status === "success") {
-      successMsg.textContent = "✅ " + result.message;
-      successMsg.style.display = "block";
-      form.reset();
-      // Réinitialiser les champs cachés
-      document.getElementById('invoice-from-name').value = '';
-      document.getElementById('invoice-from-contact').value = '';
-      document.getElementById('invoice-subject').value = '';
-      document.getElementById('invoice-company-name').value = '';
-    } else {
-      errorMsg.textContent = "❌ " + result.message;
-      errorMsg.style.display = "block";
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        
+        if (result.status === "success") {
+            successMsg.textContent = "✅ " + result.message;
+            successMsg.style.display = "block";
+            showToast('Facture envoyée avec succès!', 'success');
+            
+            // Reset form
+            form.reset();
+            document.getElementById('invoice-from-name').value = '';
+            document.getElementById('invoice-from-contact').value = '';
+            document.getElementById('invoice-subject').value = '';
+            document.getElementById('invoice-company-name').value = '';
+            
+            // Auto-hide panel after success
+            setTimeout(() => {
+                document.getElementById('invoice-send-container').style.display = 'none';
+                invoicePanelVisible = false;
+            }, 3000);
+        } else {
+            errorMsg.textContent = "❌ " + (result.message || 'Erreur inconnue');
+            errorMsg.style.display = "block";
+            showToast('Erreur lors de l\'envoi', 'error');
+        }
+    } catch (err) {
+        console.error('Erreur détaillée:', err);
+        let errorMessage = "❌ Erreur de connexion au serveur.";
+        
+        if (err.message.includes('NetworkError') || err.message.includes('Failed to fetch')) {
+            errorMessage += " Vérifiez que le serveur est en marche et accessible.";
+        } else if (err.message.includes('500')) {
+            errorMessage += " Erreur interne du serveur. Vérifiez la configuration email.";
+        } else if (err.message.includes('400')) {
+            errorMessage += " Données invalides. Vérifiez le fichier et l'email.";
+        }
+        
+        errorMsg.textContent = errorMessage;
+        errorMsg.style.display = "block";
+        showToast('Erreur de connexion', 'error');
+    } finally {
+        sendBtn.disabled = false;
+        sendBtn.textContent = '🚀 Envoyer la facture';
     }
-  } catch (err) {
-    console.error('Erreur détaillée:', err);
-    errorMsg.textContent = "❌ Erreur de connexion au serveur. Vérifiez que le serveur est en marche.";
-    errorMsg.style.display = "block";
-  } finally {
-    sendBtn.disabled = false;
-    sendBtn.textContent = '🚀 Envoyer la facture';
-  }
 };
 
 document.getElementById('toggleInstructions').onclick=()=>{ 
@@ -3899,27 +3980,15 @@ window.addEventListener('storage', (e)=>{
         initializeAdmin();
     }
 });
-</script>
 
-</body>
-</html>
-// Charger la liste des entreprises depuis le serveur
-fetch("/entreprises")
-  .then(response => {
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+// Initialize zoom controls on app start
+setTimeout(() => {
+    if (document.getElementById('zoom-in')) {
+        document.getElementById('zoom-in').onclick = () => map.zoomIn();
+        document.getElementById('zoom-out').onclick = () => map.zoomOut();
     }
-    return response.json();
-  })
-  .then(data => {
-    console.log("Entreprises chargées depuis le serveur:", data);
-    // Ne pas écraser allCompanies si les données du CSV sont déjà chargées
-    if (allCompanies.length === 0) {
-      allCompanies = data.filter(e => e.Nom_Entreprise && e.Latitude && e.Longitude);
-      var list = document.getElementById('companyList');
-      list.innerHTML = '';
-      allCompanies.forEach(e => {
-        var li = document.createElement('li');
+}, 1000);
+
         li.textContent = e.Nom_Entreprise;
         li.title = `ID: ${e.ID || ''} - Coordonnées: ${e.Latitude}, ${e.Longitude}`;
         li.onclick = () => {
