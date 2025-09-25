@@ -1719,7 +1719,7 @@ body {
 <!-- Application principale (Agent) -->
 <div id="app-container">
     <div id="header">
-        <button id="menu-toggle">☰</button>
+        <button id="toggle-sidebar-btn" style="background: rgba(255,255,255,0.2); border: none; color: white; font-size: 1.2em; cursor: pointer; padding: 8px 12px; border-radius: 6px; margin-right: 15px; transition: all 0.3s;">☰</button>
         <div class="header-content">
             <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin">
             <h1>Système de Distribution des Factures Impôts</h1>
@@ -1732,9 +1732,6 @@ body {
     </div>
     
     <div id="sidebar">
-        <div style="margin-bottom: 15px;">
-            <button id="toggleSidebarContent" style="width: 100%; padding: 12px; background: linear-gradient(145deg, #6c757d, #495057); color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.3s;">☰ Menu Navigation</button>
-        </div>
         <div id="sidebarContent" style="display: block;">
             <div id="coordContainer">
                 <h3>Recherche par coordonnées</h3>
@@ -1783,7 +1780,10 @@ body {
             <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
                 <button id="toggleQuickActions" style="width: 100%; padding: 10px; background: linear-gradient(145deg, #17a2b8, #138496); color: white; border: none; border-radius: 8px; font-size: 0.9em; font-weight: 600; cursor: pointer; transition: all 0.3s;">⚡ Actions Rapides</button>
                 <div id="quickActionsContainer" style="display: none; margin-top: 10px;">
-                    <!-- Quick actions will be moved here dynamically -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <button onclick="document.getElementById('toggleLayersBtn').click()" style="width: 100%; padding: 8px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8em;">🗺️ Fonds Carte</button>
+                        <button id="enableRotationMode" style="width: 100%; padding: 8px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8em;">🔄 Mode Rotation</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2172,14 +2172,12 @@ function loadReportsFromLS() {
 
 // ====================== MENU MOBILE ======================
 function initMobileMenu() {
-    const menuToggle = document.getElementById('menu-toggle');
+    const menuToggle = document.getElementById('toggle-sidebar-btn');
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
     
-    menuToggle.addEventListener('click', function() {
-        sidebar.classList.toggle('show');
-        sidebarOverlay.classList.toggle('show');
-    });
+    // The click handler is already defined above in the sidebar toggle section
+}
     
     sidebarOverlay.addEventListener('click', function() {
         sidebar.classList.remove('show');
@@ -2295,17 +2293,33 @@ function globalLogout() {
     document.getElementById('login-overlay').style.display = 'flex';
 }
 
-// ====================== TOGGLE SIDEBAR CONTENT ======================
-document.getElementById('toggleSidebarContent').onclick = () => {
-    const content = document.getElementById('sidebarContent');
-    const btn = document.getElementById('toggleSidebarContent');
-    const isVisible = content.style.display !== 'none';
+// ====================== SIDEBAR TOGGLE ======================
+document.getElementById('toggle-sidebar-btn').onclick = () => {
+    const sidebar = document.getElementById('sidebar');
+    const map = document.getElementById('map');
+    const btn = document.getElementById('toggle-sidebar-btn');
     
-    content.style.display = isVisible ? 'none' : 'block';
-    btn.innerHTML = isVisible ? '☰ Afficher Menu' : '☰ Masquer Menu';
-    btn.style.background = isVisible ? 'linear-gradient(145deg, #28a745, #1e7e34)' : 'linear-gradient(145deg, #6c757d, #495057)';
+    if (sidebar.classList.contains('hidden')) {
+        sidebar.classList.remove('hidden');
+        map.style.marginLeft = '320px';
+        btn.innerHTML = '☰';
+        btn.style.background = 'rgba(255,255,255,0.2)';
+    } else {
+        sidebar.classList.add('hidden');
+        map.style.marginLeft = '0';
+        btn.innerHTML = '☰';
+        btn.style.background = 'rgba(255,255,255,0.4)';
+    }
+    
+    // Redimensionner la carte après changement
+    setTimeout(() => {
+        if (window.map) {
+            map.invalidateSize();
+        }
+    }, 300);
 };
 
+// ====================== QUICK ACTIONS AND ROTATION ======================
 // ====================== TOGGLE QUICK ACTIONS ======================
 document.getElementById('toggleQuickActions').onclick = () => {
     const container = document.getElementById('quickActionsContainer');
@@ -2315,34 +2329,99 @@ document.getElementById('toggleQuickActions').onclick = () => {
     container.style.display = isVisible ? 'none' : 'block';
     btn.innerHTML = isVisible ? '⚡ Afficher Actions' : '⚡ Masquer Actions';
     btn.style.background = isVisible ? 'linear-gradient(145deg, #28a745, #1e7e34)' : 'linear-gradient(145deg, #17a2b8, #138496)';
+};
+
+// ====================== ROTATION MODE ======================
+let rotationModeEnabled = false;
+let isDraggingForRotation = false;
+let startRotationY = 0;
+
+document.getElementById('enableRotationMode').onclick = () => {
+    rotationModeEnabled = !rotationModeEnabled;
+    const btn = document.getElementById('enableRotationMode');
     
-    // Move controls to quick actions container when visible
-    if (!isVisible) {
-        moveControlsToQuickActions();
+    if (rotationModeEnabled) {
+        btn.innerHTML = '🔄 Désactiver Rotation';
+        btn.style.background = '#dc3545';
+        if (window.map) {
+            map.dragging.disable();
+            showToast('Mode rotation activé. Glissez pour tourner la carte.', 'info');
+            
+            // Enable rotation with mouse drag
+            map.on('mousedown', startMapRotation);
+            map.on('mousemove', rotateMapWithMouse);
+            map.on('mouseup', stopMapRotation);
+            
+            // Enable rotation with touch
+            map.on('touchstart', startMapRotation);
+            map.on('touchmove', rotateMapWithTouch);
+            map.on('touchend', stopMapRotation);
+        }
+    } else {
+        btn.innerHTML = '🔄 Mode Rotation';
+        btn.style.background = '#28a745';
+        if (window.map) {
+            map.dragging.enable();
+            showToast('Mode rotation désactivé.', 'info');
+            
+            // Disable rotation events
+            map.off('mousedown', startMapRotation);
+            map.off('mousemove', rotateMapWithMouse);
+            map.off('mouseup', stopMapRotation);
+            map.off('touchstart', startMapRotation);
+            map.off('touchmove', rotateMapWithTouch);
+            map.off('touchend', stopMapRotation);
+        }
     }
 };
 
-function moveControlsToQuickActions() {
-    const container = document.getElementById('quickActionsContainer');
-    const layerBtn = document.getElementById('toggleLayersBtn');
-    const layerContainer = document.getElementById('layer-container');
-    const instructionsContainer = document.getElementById('instructions-container');
-    
-    if (container && layerBtn && !container.querySelector('#toggleLayersBtn')) {
-        // Create a wrapper for better organization
-        container.innerHTML = `
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-                <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
-                    <button onclick="document.getElementById('toggleLayersBtn').click()" style="flex: 1; min-width: 100px; padding: 8px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8em;">🗺️ Fonds Carte</button>
-                    <button onclick="document.getElementById('toggleInstructions').click()" style="flex: 1; min-width: 100px; padding: 8px; background: #17a2b8; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8em;">📝 Instructions</button>
-                </div>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
-                    <button onclick="document.getElementById('locateBtn').click()" style="flex: 1; min-width: 100px; padding: 8px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8em;">📍 Localiser</button>
-                    <button onclick="document.getElementById('toggleVoice').click()" style="flex: 1; min-width: 100px; padding: 8px; background: #ffc107; color: black; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8em;">🔊 Voix</button>
-                </div>
-            </div>
-        `;
+function startMapRotation(e) {
+    if (!rotationModeEnabled) return;
+    isDraggingForRotation = true;
+    startRotationY = e.originalEvent.clientY || (e.originalEvent.touches && e.originalEvent.touches[0].clientY);
+    e.originalEvent.preventDefault();
+}
+
+function rotateMapWithMouse(e) {
+    if (!rotationModeEnabled || !isDraggingForRotation) return;
+    const deltaY = e.originalEvent.clientY - startRotationY;
+    const rotationDelta = deltaY * 0.5;
+    if (typeof currentBearing !== 'undefined') {
+        currentBearing = (currentBearing + rotationDelta) % 360;
+        if (currentBearing < 0) currentBearing += 360;
+        if (map.setBearing) {
+            map.setBearing(currentBearing);
+        }
+        if (typeof updateBearingIndicator === 'function') {
+            updateBearingIndicator();
+        }
+        startRotationY = e.originalEvent.clientY;
     }
+}
+
+function rotateMapWithTouch(e) {
+    if (!rotationModeEnabled || !isDraggingForRotation || !e.originalEvent.touches || e.originalEvent.touches.length !== 1) return;
+    const deltaY = e.originalEvent.touches[0].clientY - startRotationY;
+    const rotationDelta = deltaY * 0.3;
+    if (typeof currentBearing !== 'undefined') {
+        currentBearing = (currentBearing + rotationDelta) % 360;
+        if (currentBearing < 0) currentBearing += 360;
+        if (map.setBearing) {
+            map.setBearing(currentBearing);
+        }
+        if (typeof updateBearingIndicator === 'function') {
+            updateBearingIndicator();
+        }
+        startRotationY = e.originalEvent.touches[0].clientY;
+    }
+}
+
+function stopMapRotation() {
+    isDraggingForRotation = false;
+}
+
+function moveControlsToQuickActions() {
+    // This function is no longer needed as controls are now static
 }
 
 // ====================== CODE APPLICATION AGENT ======================
@@ -2700,34 +2779,11 @@ Papa.parse("public/entreprises_geocodes.csv", {
     },
     error: function(error) {
         console.error("Erreur lors du chargement du CSV:", error);
-        // Fallback avec les données intégrées si le CSV ne se charge pas
-        allCompanies = [
-            {ID: "1", Nom_Entreprise: "EREVAN", Latitude: "6.348958", Longitude: "2.386909"},
-            {ID: "2", Nom_Entreprise: "Le Plasma Bar", Latitude: "6.381497", Longitude: "2.334261"},
-            {ID: "3", Nom_Entreprise: "Poulet Piquet", Latitude: "6.382206", Longitude: "2.336388"},
-            {ID: "4", Nom_Entreprise: "Sofitel Hôtel", Latitude: "6.350114", Longitude: "2.393706"},
-            {ID: "5", Nom_Entreprise: "Séminaire St Jean Eudes", Latitude: "6.38906", Longitude: "2.321026"},
-            {ID: "6", Nom_Entreprise: "Eglise de Jésus-Christ des Saints des derniers Jours", Latitude: "6.392349", Longitude: "2.317976"},
-            {ID: "7", Nom_Entreprise: "Collège Sainte Mireille", Latitude: "6.3891", Longitude: "2.3156"},
-            {ID: "8", Nom_Entreprise: "GENIE BTP GROUP SARL", Latitude: "6.3845", Longitude: "2.3198"},
-            {ID: "9", Nom_Entreprise: "Lena Création", Latitude: "6.3812", Longitude: "2.3167"},
-            {ID: "10", Nom_Entreprise: "Centre de Santé Municipal", Latitude: "6.3876", Longitude: "2.3201"},
-            {ID: "11", Nom_Entreprise: "Marché Central Akpakpa", Latitude: "6.3823", Longitude: "2.3145"},
-            {ID: "12", Nom_Entreprise: "Station ORYX", Latitude: "6.3867", Longitude: "2.3178"}
-        ];
+        // Ne pas utiliser de données de fallback, laisser la liste vide
+        allCompanies = [];
         var list = document.getElementById('companyList');
-        list.innerHTML = ''; 
-        allCompanies.forEach(e => {
-            var li = document.createElement('li');
-            li.textContent = e.Nom_Entreprise;
-            li.title = `ID: ${e.ID} - Coordonnées: ${e.Latitude}, ${e.Longitude}`;
-            li.onclick = () => { 
-                selectedCompany = e; 
-                showRouteOptions(parseFloat(e.Latitude), parseFloat(e.Longitude), e.Nom_Entreprise); 
-            };
-            list.appendChild(li);
-        });
-        console.log("Utilisation des données de fallback");
+        list.innerHTML = '<li style="color: #666; font-style: italic;">Aucune entreprise disponible</li>';
+        console.log("Aucune donnée de fallback utilisée");
     }
 });
 
@@ -4130,7 +4186,7 @@ function renderAdminTable(reports) {
             <td>${escapeHtml(r.deliveryTime||'')}</td>
             <td style="max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(r.reason||'')}">${escapeHtml(r.reason||'')}</td>
             <td style="max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(r.structure||'')}">${escapeHtml(r.structure||'')}</td>
-            <td>${r.signature ? '<button class="view-signature" onclick="viewSignature(\'' + r.signature + '\')" style="background:#007bff;color:white;border:none;border-radius:4px;padding:3px 6px;cursor:pointer;font-size:0.7em;">📷 Voir</button>' : '<span style="color:#6c757d;">⭕ Non signée</span>'}</td>
+            <td>${r.signature ? '<button onclick="viewSignature(\'' + r.signature + '\')" style="background:#007bff;color:white;border:none;border-radius:4px;padding:3px 6px;cursor:pointer;font-size:0.7em;">📷 Voir</button>' : '<span style="color:#6c757d;">⭕ Non signée</span>'}</td>
             <td>${posTxt}</td>
             <td style="font-size:0.7em;">${created}</td>
             <td class="row-actions">
@@ -4332,6 +4388,7 @@ function viewSignature(signatureData) {
   document.getElementById('signature-view-image').src = signatureData;
   document.getElementById('signature-view-modal').style.display = 'flex';
   
+// Fix the login function closing
   // Set up download functionality
   document.getElementById('download-signature').onclick = () => {
     const link = document.createElement('a');
