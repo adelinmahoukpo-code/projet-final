@@ -173,15 +173,49 @@ body {
 
 #header img { 
     width: 40px; 
-    height: auto;
-    margin-right: 15px; 
+    height: 30px;
+    margin: 0 15px; 
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    object-fit: cover;
 }
 
 #header h1 { 
     margin: 0; 
-    font-size: 1.4em; 
-    text-shadow: 1px 1px 2px #000;
+    font-size: clamp(1.1em, 2.5vw, 1.4em);
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
     text-align: center;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+}
+
+/* Small sidebar toggle button */
+#sidebar-toggle-btn {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1002;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 6px;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #333;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#sidebar-toggle-btn:hover {
+    background: rgba(255,255,255,1);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 /* Bouton hamburger pour mobile */
@@ -198,10 +232,11 @@ body {
 
 #map { 
     height: calc(100vh - 80px);
+    margin-left: 320px;
     transition: margin-left 0.3s ease;
 }
 
-#sidebar {
+#sidebar { 
     position: fixed;
     top: 80px; 
     left: 0; 
@@ -235,45 +270,17 @@ body {
 }
 
 #sidebar.hidden {
-    transform: translateX(-320px);
+    transform: translateX(-100%);
 }
 
-/* Petit bouton de toggle pour la sidebar */
-#toggleSidebarVisibility {
-    position: fixed !important;
-    top: 90px !important;
-    left: 10px !important;
-    z-index: 1002 !important;
-    width: 35px !important;
-    height: 35px !important;
-    padding: 0 !important;
-    background: linear-gradient(145deg, #007bff, #0056b3) !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 8px !important;
-    font-size: 1.1em !important;
-    font-weight: 600 !important;
-    cursor: pointer !important;
-    transition: all 0.3s !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-#toggleSidebarVisibility:hover {
-    background: linear-gradient(145deg, #0056b3, #003f7f) !important;
-    transform: scale(1.05) !important;
-}
-
-/* Ajuster la carte quand la sidebar est masquée */
-#map {
-    margin-left: 320px;
-    transition: margin-left 0.3s ease;
-}
-
-#map.full-width {
-    margin-left: 0;
+#sidebar h3 { 
+    margin-top: 0; 
+    margin-bottom: 16px;
+    text-align: center; 
+    color: #007bff;
+    font-size: clamp(1.0em, 2vw, 1.1em);
+    font-weight: 600;
+    letter-spacing: 0.3px;
 }
 
 #sidebar input, #sidebar select { 
@@ -312,13 +319,14 @@ body {
     color: white; 
     cursor: pointer; 
     font-weight: 600; 
-    font-size: 0.95em;
+    font-size: clamp(0.85em, 1.8vw, 0.95em);
     letter-spacing: 0.025em;
     transition: all var(--transition-fast); 
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
     box-shadow: var(--shadow-1);
     position: relative;
     overflow: hidden;
+    line-height: 1.3;
 }
 
 #sidebar button::before {
@@ -566,6 +574,12 @@ body {
 
 .rotation-btn:active {
     transform: scale(0.95);
+}
+
+.rotation-btn.navigation-active {
+    background: #007bff !important;
+    color: white !important;
+    box-shadow: 0 4px 8px rgba(0,123,255,0.4) !important;
 }
 
 #bearing-indicator {
@@ -1180,7 +1194,7 @@ body {
     color: #007bff; 
 }
 
-/* Suppression des bordures des tuiles et grilles */
+/* Suppression complète des bordures, grilles et croix sur la carte */
 .leaflet-tile,
 .leaflet-tile-container img,
 .leaflet-layer,
@@ -1193,9 +1207,10 @@ body {
     background: none !important;
 }
 
-/* Supprimer les grilles de coordonnées */
+/* Supprimer les grilles de coordonnées et échelles */
 .leaflet-control-scale,
-.leaflet-control-scale-line {
+.leaflet-control-scale-line,
+.leaflet-control-attribution {
     display: none !important;
 }
 
@@ -1203,11 +1218,29 @@ body {
     background: transparent !important;
 }
 
-/* Masquer les lignes de grille sur les tuiles */
+/* Masquer complètement les lignes de grille et croix sur les tuiles */
 .leaflet-tile {
     filter: none !important;
     border: none !important;
     outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Supprimer les indicateurs de zoom et autres contrôles par défaut */
+.leaflet-control-zoom,
+.leaflet-control-layers,
+.leaflet-bar {
+    display: none !important;
+}
+
+/* S'assurer qu'aucune grille ou croix n'apparaisse */
+.leaflet-tile-loaded {
+    border: none !important;
+    outline: none !important;
+}
+
+.leaflet-zoom-hide {
+    visibility: hidden !important;
 }
 
 /* Loading States and Progress Indicators */
@@ -1310,6 +1343,65 @@ body {
 .toast.warning {
     border-left-color: var(--warning-color);
 }
+
+/* Quick Actions Container */
+#quick-actions-container {
+    position: fixed;
+    top: 90px;
+    left: 300px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    width: 300px;
+    max-width: calc(100vw - 40px);
+    display: none;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#quick-actions-container h3 {
+    margin-top: 0;
+    color: #007bff;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+}
+
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.quick-action-btn {
+    padding: 12px 8px;
+    background: linear-gradient(145deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.quick-action-btn:hover {
+    background: linear-gradient(145deg, #0056b3, #003f7f);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.quick-action-btn:active {
+    transform: translateY(0);
+}
+
+.quick-action-btn.navigation-active {
+    background: linear-gradient(145deg, #28a745, #1e7e34) !important;
+}
 .main-route-line {
     border-radius: 3px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
@@ -1411,6 +1503,15 @@ body {
 
 /* ====================== MEDIA QUERIES RESPONSIVE ====================== */
 
+/* Responsive improvements for all screen sizes */
+@media screen and (max-width: 1200px) {
+    #quick-actions-container {
+        left: 50%;
+        transform: translateX(-50%);
+        width: 280px;
+    }
+}
+
 /* Tablettes */
 @media screen and (max-width: 1024px) {
     #admin-main {
@@ -1484,6 +1585,15 @@ body {
         border-radius: 0;
     }
     
+    #sidebar h3 {
+        font-size: 1.0em;
+    }
+    
+    #sidebar button {
+        font-size: 0.85em;
+        padding: 10px 16px;
+    }
+    
     #sidebar.show {
         transform: translateX(0);
     }
@@ -1507,6 +1617,27 @@ body {
     /* Map prend toute la largeur sur mobile */
     #map {
         margin-left: 0;
+    }
+    
+    /* Quick actions responsive */
+    #quick-actions-container {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 320px;
+        z-index: 1200;
+    }
+    
+    .quick-actions-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .quick-action-btn {
+        padding: 10px;
+        font-size: 0.85em;
     }
     
     /* Repositionnement des containers de rapport et facture */
@@ -1652,13 +1783,7 @@ body {
     
     #header img {
         width: 30px;
-        height: auto;
         margin-right: 8px;
-    }
-    
-    #header .header-content img:last-child {
-        margin-left: 8px;
-        margin-right: 0;
     }
     
     #sidebar {
@@ -1667,12 +1792,18 @@ body {
     }
     
     #sidebar h3 {
-        font-size: 1em;
+        font-size: 0.95em;
     }
     
     #sidebar button {
+        padding: 8px 12px;
+        font-size: 0.8em;
+        margin-bottom: 8px;
+    }
+    
+    .quick-action-btn {
         padding: 8px;
-        font-size: 0.85em;
+        font-size: 0.8em;
     }
     
     #delivery-report-container,
@@ -1757,11 +1888,13 @@ body {
 <!-- Application principale (Agent) -->
 <div id="app-container">
     <div id="header">
+        <!-- Small toggle button for sidebar -->
+        <button id="sidebar-toggle-btn" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 1002; background: rgba(255,255,255,0.9); border: 1px solid rgba(0,0,0,0.1); border-radius: 6px; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #333; transition: all 0.3s;">☰</button>
         <button id="menu-toggle">☰</button>
         <div class="header-content">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin" style="width: 40px; height: auto; margin-right: 15px;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin">
             <h1>Système de Distribution des Factures Impôts</h1>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin" style="width: 40px; height: auto; margin-left: 15px;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin">
         </div>
         <div id="top-actions" style="display:none;">
             <button id="switch-to-admin" class="top-btn dark">Admin</button>
@@ -1770,10 +1903,7 @@ body {
     </div>
     
     <div id="sidebar">
-        <div style="margin-bottom: 15px;">
-            <button id="toggleSidebarVisibility" style="width: 30px; height: 30px; padding: 0; background: linear-gradient(145deg, #007bff, #0056b3); color: white; border: none; border-radius: 6px; font-size: 0.9em; font-weight: 600; cursor: pointer; transition: all 0.3s; position: absolute; top: -40px; right: 10px; z-index: 1002;">☰</button>
-        </div>
-        <div id="sidebarContent" style="display: block;">
+        <div id="sidebarContent">
             <div id="coordContainer">
                 <h3>Recherche par coordonnées</h3>
                 <input id="latInput" placeholder="Latitude / Est" type="text">
@@ -1790,7 +1920,6 @@ body {
                 <button id="searchStructureBtn">🔍 Rechercher</button>
                 <button id="locateBtn">📍 Me localiser</button>
                 <button id="toggleVoice">🔊 Voix ON/OFF</button>
-                <button id="toggleMapRotation">🔄 Rotation Carte</button>
             </div>
             <div id="companySection">
                 <button id="toggleCompanies">📂 Afficher/Cacher entreprises</button>
@@ -1819,24 +1948,7 @@ body {
             <button id="stopRoute">🛑 Arrêter</button>
             <button id="toggle-delivery-report">📋 Rapport Livraison</button>
             <button id="toggle-invoice-send">✉️ Envoi Facture</button>
-            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
-                <button id="toggleQuickActions" style="width: 100%; padding: 10px; background: linear-gradient(145deg, #17a2b8, #138496); color: white; border: none; border-radius: 8px; font-size: 0.9em; font-weight: 600; cursor: pointer; transition: all 0.3s;">⚡ Actions Rapides</button>
-                <div id="quickActionsContainer" style="display: none; margin-top: 10px;">
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
-                            <button onclick="document.getElementById('toggleLayersBtn').click()" style="flex: 1; min-width: 100px; padding: 8px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8em;">🗺️ Fonds Carte</button>
-                        </div>
-                        <div id="rotationControlsInActions" style="display: none; background: rgba(255, 255, 255, 0.95); border-radius: 8px; padding: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                            <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
-                                <button id="rotate-left-action" style="width: 35px; height: 35px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1em;">↻</button>
-                                <button id="rotate-right-action" style="width: 35px; height: 35px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1em;">↺</button>
-                                <button id="reset-bearing-action" style="width: 35px; height: 35px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1em;">⬆</button>
-                                <div id="bearing-indicator-action" style="font-size: 0.8em; color: #666; min-width: 30px; text-align: center;">0°</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <button id="toggle-quick-actions">⚡ Actions Rapides</button>
         </div>
     </div>
     
@@ -1950,6 +2062,17 @@ body {
       <div class="small-muted">Astuce: le nom et le contact de l'agent (du Rapport de Livraison) sont repris comme expéditeur.</div>
     </div>
     
+    <!-- Container pour les actions rapides -->
+    <div id="quick-actions-container">
+        <h3>⚡ Actions Rapides</h3>
+        <div class="quick-actions-grid">
+            <button class="quick-action-btn" id="rotate-left-quick" title="Tourner à gauche">↻ Gauche</button>
+            <button class="quick-action-btn" id="rotate-right-quick" title="Tourner à droite">↺ Droite</button>
+            <button class="quick-action-btn" id="reset-bearing-quick" title="Remettre le nord">⬆ Nord</button>
+            <button class="quick-action-btn" id="toggle-navigation-mode-quick" title="Mode navigation libre">🗺️ Navigation</button>
+        </div>
+    </div>
+    
     <!-- Container pour les options de route -->
     <div id="route-options-container">
         <h3>🛣️ Choisir votre itinéraire</h3>
@@ -1984,9 +2107,13 @@ body {
         <button class="zoom-btn" id="zoom-follow" title="Suivre position">📍</button>
     </div>
     
-    <!-- Contrôles de rotation de la carte - MASQUÉS PAR DÉFAUT -->
-    <div id="rotation-controls" style="display: none;">
-        <!-- Masqués car déplacés vers les actions rapides -->
+    <!-- Contrôles de rotation de la carte -->
+    <div id="rotation-controls">
+        <button class="rotation-btn" id="rotate-left" title="Tourner à gauche">↻</button>
+        <button class="rotation-btn" id="rotate-right" title="Tourner à droite">↺</button>
+        <button class="rotation-btn" id="reset-bearing" title="Remettre le nord">⬆</button>
+        <button class="rotation-btn" id="toggle-navigation-mode" title="Mode navigation libre">🗺️</button>
+        <div id="bearing-indicator">0°</div>
     </div>
     
     <div id="instructions-container">
@@ -2343,129 +2470,143 @@ function globalLogout() {
     document.getElementById('login-overlay').style.display = 'flex';
 }
 
-// ====================== TOGGLE SIDEBAR VISIBILITY ======================
-document.getElementById('toggleSidebarVisibility').onclick = () => {
+// ====================== QUICK ACTIONS FUNCTIONALITY ======================
+let quickActionsVisible = false;
+
+document.getElementById('toggle-quick-actions').onclick = () => {
+    quickActionsVisible = !quickActionsVisible;
+    const container = document.getElementById('quick-actions-container');
+    const btn = document.getElementById('toggle-quick-actions');
+    
+    container.style.display = quickActionsVisible ? 'block' : 'none';
+    btn.style.background = quickActionsVisible 
+        ? 'linear-gradient(145deg, #28a745, #1e7e34)' 
+        : 'linear-gradient(145deg, #007bff, #0056b3)';
+    
+    // Close other panels when opening quick actions
+    if (quickActionsVisible) {
+        document.getElementById('delivery-report-container').style.display = 'none';
+        document.getElementById('invoice-send-container').style.display = 'none';
+        document.getElementById('route-options-container').style.display = 'none';
+    }
+};
+
+// Initialize quick action button handlers
+function initializeQuickActions() {
+    // Rotate left
+    document.getElementById('rotate-left-quick').onclick = () => {
+        currentBearing = (currentBearing - 15) % 360;
+        if (currentBearing < 0) currentBearing += 360;
+        if (window.map && window.map.setBearing) {
+            window.map.setBearing(currentBearing);
+        }
+        updateBearingIndicator();
+        rotationEnabled = true;
+    };
+    
+    // Rotate right
+    document.getElementById('rotate-right-quick').onclick = () => {
+        currentBearing = (currentBearing + 15) % 360;
+        if (window.map && window.map.setBearing) {
+            window.map.setBearing(currentBearing);
+        }
+        updateBearingIndicator();
+        rotationEnabled = true;
+    };
+    
+    // Reset bearing
+    document.getElementById('reset-bearing-quick').onclick = () => {
+        currentBearing = 0;
+        if (window.map && window.map.setBearing) {
+            window.map.setBearing(0);
+        }
+        updateBearingIndicator();
+        rotationEnabled = false;
+        
+        // Reset navigation mode button
+        const navBtn = document.getElementById('toggle-navigation-mode-quick');
+        navBtn.classList.remove('navigation-active');
+    };
+    
+    // Toggle navigation mode
+    document.getElementById('toggle-navigation-mode-quick').onclick = () => {
+        const navBtn = document.getElementById('toggle-navigation-mode-quick');
+        const isNavigationMode = navBtn.classList.contains('navigation-active');
+        
+        if (isNavigationMode) {
+            navBtn.classList.remove('navigation-active');
+            navBtn.textContent = '🗺️ Navigation';
+            if (window.map) {
+                window.map.getContainer().style.cursor = 'grab';
+            }
+        } else {
+            navBtn.classList.add('navigation-active');
+            navBtn.textContent = '🗺️ Navigation';
+            if (window.map) {
+                window.map.getContainer().style.cursor = 'move';
+            }
+        }
+    };
+}
+
+// ====================== SIDEBAR CONTENT TOGGLE (SIMPLIFIED) ======================
+// Small sidebar toggle button functionality
+document.getElementById('sidebar-toggle-btn').onclick = () => {
     const sidebar = document.getElementById('sidebar');
-    const map = document.getElementById('map');
     const isHidden = sidebar.classList.contains('hidden');
     
+    sidebar.classList.toggle('hidden');
+    const btn = document.getElementById('sidebar-toggle-btn');
+    btn.innerHTML = isHidden ? '☰' : '×';
+    btn.style.background = isHidden ? 'rgba(255,255,255,0.9)' : 'rgba(255,100,100,0.9)';
+    btn.title = isHidden ? 'Masquer le menu' : 'Afficher le menu';
+    
+    // Adjust map margin
+    const map = document.getElementById('map');
     if (isHidden) {
-        sidebar.classList.remove('hidden');
         map.style.marginLeft = '320px';
-        document.getElementById('toggleSidebarVisibility').innerHTML = '☰';
-        document.getElementById('toggleSidebarVisibility').style.left = '10px';
     } else {
-        sidebar.classList.add('hidden');
         map.style.marginLeft = '0';
-        document.getElementById('toggleSidebarVisibility').innerHTML = '▶';
-        document.getElementById('toggleSidebarVisibility').style.left = '10px';
     }
     
-    // Redimensionner la carte après le changement
-    setTimeout(() => {
-        if (map) map.invalidateSize();
-    }, 300);
-};
-
-// ====================== TOGGLE SIDEBAR CONTENT ======================
-
-
-// ====================== MAP ROTATION TOGGLE ======================
-document.getElementById('toggleMapRotation').onclick = () => {
-    rotationEnabled = !rotationEnabled;
-    const btn = document.getElementById('toggleMapRotation');
-    const rotationControls = document.getElementById('rotationControlsInActions');
-    
-    if (rotationEnabled) {
-        btn.style.background = 'linear-gradient(145deg, #28a745, #1e7e34)';
-        btn.innerHTML = '🔄 Rotation ON';
-        rotationControls.style.display = 'block';
-        
-        // Start automatic rotation
-        startAutoRotation();
-        
-        showToast('Rotation activée - Utilisez les boutons pour contrôler', 'info');
-    } else {
-        btn.style.background = 'linear-gradient(145deg, #6c757d, #495057)';
-        btn.innerHTML = '🔄 Rotation OFF';
-        rotationControls.style.display = 'none';
-        
-        // Stop automatic rotation
-        stopAutoRotation();
-        
-        // Reset map orientation
-        currentBearing = 0;
-        if (map.setBearing) map.setBearing(0);
-        updateBearingIndicator();
-        showToast('Rotation désactivée', 'info');
+    // Trigger map resize if map exists
+    if (typeof window.map !== 'undefined' && window.map && window.map.invalidateSize) {
+        setTimeout(() => window.map.invalidateSize(), 300);
     }
 };
 
-// Variables for automatic rotation
-let autoRotationInterval = null;
-
-function startAutoRotation() {
-    stopAutoRotation(); // Stop any existing rotation
-    autoRotationInterval = setInterval(() => {
-        if (rotationEnabled) {
-            currentBearing = (currentBearing + 2) % 360; // Rotate 2 degrees every interval
-            if (map.setBearing) map.setBearing(currentBearing);
-            updateBearingIndicator();
-        }
-    }, 100); // Smooth rotation every 100ms
-}
-
-function stopAutoRotation() {
-    if (autoRotationInterval) {
-        clearInterval(autoRotationInterval);
-        autoRotationInterval = null;
-    }
-}
-
-// ====================== TOGGLE QUICK ACTIONS ======================
-document.getElementById('toggleQuickActions').onclick = () => {
-    const container = document.getElementById('quickActionsContainer');
-    const btn = document.getElementById('toggleQuickActions');
-    const isVisible = container.style.display !== 'none';
-    
-    container.style.display = isVisible ? 'none' : 'block';
-    btn.innerHTML = isVisible ? '⚡ Afficher Actions' : '⚡ Masquer Actions';
-    btn.style.background = isVisible ? 'linear-gradient(145deg, #28a745, #1e7e34)' : 'linear-gradient(145deg, #17a2b8, #138496)';
-    
-    // Move controls to quick actions container when visible
-    if (!isVisible) {
-        moveControlsToQuickActions();
-    }
-};
-
-function moveControlsToQuickActions() {
-    const container = document.getElementById('quickActionsContainer');
-    
-    if (container && !container.querySelector('.actions-initialized')) {
-        // Marquer comme initialisé pour éviter la duplication
-        container.classList.add('actions-initialized');
-        
-        // Garder seulement les actions principales dans le conteneur rapide
-        container.innerHTML = `
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-                <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
-                    <button onclick="document.getElementById('toggleLayersBtn').click()" style="flex: 1; min-width: 100px; padding: 8px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8em;">🗺️ Fonds Carte</button>
-                    <button onclick="document.getElementById('toggleMapRotation').click()" style="flex: 1; min-width: 100px; padding: 8px; background: #17a2b8; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8em;">🔄 Rotation</button>
-                </div>
-                <div id="rotationControlsInActions" style="display: none; background: rgba(255, 255, 255, 0.95); border-radius: 8px; padding: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
-                        <button id="rotate-left-action" style="width: 35px; height: 35px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1em;">↻</button>
-                        <button id="rotate-right-action" style="width: 35px; height: 35px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1em;">↺</button>
-                        <button id="reset-bearing-action" style="width: 35px; height: 35px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1em;">⬆</button>
-                        <div id="bearing-indicator-action" style="font-size: 0.8em; color: #666; min-width: 30px; text-align: center;">0°</div>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        // Setup rotation control event listeners
-        setupRotationControlListeners();
-    }
+// Function to load companies from server
+function loadCompaniesFromServer() {
+    fetch("/entreprises")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Entreprises chargées depuis le serveur:", data);
+            if (allCompanies.length === 0) {
+                allCompanies = data.filter(e => e.Nom_Entreprise && e.Latitude && e.Longitude);
+                var list = document.getElementById('companyList');
+                list.innerHTML = '';
+                allCompanies.forEach(e => {
+                    var li = document.createElement('li');
+                    li.textContent = e.Nom_Entreprise;
+                    li.title = `ID: ${e.ID || ''} - Coordonnées: ${e.Latitude}, ${e.Longitude}`;
+                    li.onclick = () => {
+                        selectedCompany = e;
+                        showRouteOptions(parseFloat(e.Latitude), parseFloat(e.Longitude), e.Nom_Entreprise);
+                    };
+                    list.appendChild(li);
+                });
+                console.log(`${allCompanies.length} entreprises chargées depuis le serveur`);
+            }
+        })
+        .catch(err => {
+            console.error("Erreur lors du chargement depuis le serveur:", err);
+            console.log("Aucune entreprise chargée - seules les données CSV seront utilisées");
+        });
 }
 
 // ====================== CODE APPLICATION AGENT ======================
@@ -2488,6 +2629,7 @@ var isDrawing = false;
 var currentSignature = null;
 
 var map = L.map('map').setView([9.3077,2.3158],7);
+window.map = map; // Make it globally accessible
 var allCompanies = [];
 var selectedCompany = null;
 var routingControl=null, movingMarkerStart=null, movingMarkerEnd=null, movingCursor=null, routeLine=null;
@@ -2579,62 +2721,113 @@ function initZoomControls() {
     const zoomInBtn = document.getElementById('zoom-in');
     const zoomOutBtn = document.getElementById('zoom-out');
     const zoomFollowBtn = document.getElementById('zoom-follow');
-    
-    // Setup rotation control listeners
-    setupRotationControlListeners();
-    
-    // ... existing zoom control code ...
-}
-
-function setupRotationControlListeners() {
-    // Original rotation controls (if they exist)
     const rotateLeftBtn = document.getElementById('rotate-left');
     const rotateRightBtn = document.getElementById('rotate-right');
     const resetBearingBtn = document.getElementById('reset-bearing');
     const bearingIndicator = document.getElementById('bearing-indicator');
     
-    // New action rotation controls
-    const rotateLeftActionBtn = document.getElementById('rotate-left-action');
-    const rotateRightActionBtn = document.getElementById('rotate-right-action');
-    const resetBearingActionBtn = document.getElementById('reset-bearing-action');
-    const bearingIndicatorAction = document.getElementById('bearing-indicator-action');
+    // Permettre le zoom libre pendant la navigation
+    zoomInBtn.onclick = () => {
+        if (isNavigating) {
+            // Désactiver temporairement le suivi automatique lors du zoom manuel
+            followUserPosition = false;
+            zoomFollowBtn.style.background = 'rgba(255, 255, 255, 0.9)';
+            zoomFollowBtn.style.color = '#333';
+        }
+        map.zoomIn();
+    };
     
-    // Functions for rotation
-    const rotateLeft = () => {
-        stopAutoRotation(); // Stop auto rotation when manually controlling
+    zoomOutBtn.onclick = () => {
+        if (isNavigating) {
+            // Désactiver temporairement le suivi automatique lors du zoom manuel
+            followUserPosition = false;
+            zoomFollowBtn.style.background = 'rgba(255, 255, 255, 0.9)';
+            zoomFollowBtn.style.color = '#333';
+        }
+        map.zoomOut();
+    };
+    
+    zoomFollowBtn.onclick = () => {
+        followUserPosition = !followUserPosition;
+        zoomFollowBtn.style.background = followUserPosition ? '#007bff' : 'rgba(255, 255, 255, 0.9)';
+        zoomFollowBtn.style.color = followUserPosition ? 'white' : '#333';
+        
+        if (followUserPosition && currentUserPosition) {
+            map.setView(currentUserPosition, Math.max(map.getZoom(), 18), {animate: true});
+        }
+    };
+    
+    // Permettre l'interaction libre avec la carte pendant la navigation
+    map.on('dragstart', () => {
+        if (isNavigating) {
+            followUserPosition = false;
+            zoomFollowBtn.style.background = 'rgba(255, 255, 255, 0.9)';
+            zoomFollowBtn.style.color = '#333';
+        }
+    });
+    
+    map.on('zoomstart', (e) => {
+        if (isNavigating && !e.originalEvent) {
+            followUserPosition = false;
+            zoomFollowBtn.style.background = 'rgba(255, 255, 255, 0.9)';
+            zoomFollowBtn.style.color = '#333';
+        }
+    });
+    
+    // Contrôles de rotation de la carte
+    rotateLeftBtn.onclick = () => {
         currentBearing = (currentBearing - 15) % 360;
         if (currentBearing < 0) currentBearing += 360;
-        if (map.setBearing) map.setBearing(currentBearing);
-        updateBearingIndicator();
+        map.setBearing(currentBearing);
+        bearingIndicator.textContent = `${Math.round(currentBearing)}°`;
         rotationEnabled = true;
     };
     
-    const rotateRight = () => {
-        stopAutoRotation(); // Stop auto rotation when manually controlling
+    rotateRightBtn.onclick = () => {
         currentBearing = (currentBearing + 15) % 360;
-        if (map.setBearing) map.setBearing(currentBearing);
-        updateBearingIndicator();
+        map.setBearing(currentBearing);
+        bearingIndicator.textContent = `${Math.round(currentBearing)}°`;
         rotationEnabled = true;
     };
     
-    const resetBearing = () => {
-        stopAutoRotation();
+    resetBearingBtn.onclick = () => {
         currentBearing = 0;
-        if (map.setBearing) map.setBearing(0);
-        updateBearingIndicator();
+        map.setBearing(0);
+        bearingIndicator.textContent = '0°';
         rotationEnabled = false;
     };
     
-    // Attach event listeners
-    if (rotateLeftBtn) rotateLeftBtn.onclick = rotateLeft;
-    if (rotateRightBtn) rotateRightBtn.onclick = rotateRight;
-    if (resetBearingBtn) resetBearingBtn.onclick = resetBearing;
+    // New navigation mode toggle button (keep existing functionality)
+    const toggleNavigationBtn = document.getElementById('toggle-navigation-mode');
+    if (toggleNavigationBtn) {
+        toggleNavigationBtn.onclick = () => {
+            const isNavigationMode = toggleNavigationBtn.classList.contains('navigation-active');
+            
+            if (isNavigationMode) {
+                // Disable navigation mode
+                toggleNavigationBtn.classList.remove('navigation-active');
+                toggleNavigationBtn.style.background = 'rgba(255, 255, 255, 0.95)';
+                toggleNavigationBtn.style.color = '#333';
+                toggleNavigationBtn.title = 'Mode navigation libre';
+                map.getContainer().style.cursor = 'grab';
+            } else {
+                // Enable navigation mode
+                toggleNavigationBtn.classList.add('navigation-active');
+                toggleNavigationBtn.style.background = '#007bff';
+                toggleNavigationBtn.style.color = 'white';
+                toggleNavigationBtn.title = 'Mode normal';
+                map.getContainer().style.cursor = 'move';
+            }
+        };
+    }
     
-    if (rotateLeftActionBtn) rotateLeftActionBtn.onclick = rotateLeft;
-    if (rotateRightActionBtn) rotateRightActionBtn.onclick = rotateRight;
-    if (resetBearingActionBtn) resetBearingActionBtn.onclick = resetBearing;
-    
-    // ... rest of existing initZoomControls code ...
+    // Mettre à jour l'indicateur de bearing
+    function updateBearingIndicator() {
+        if (map.getBearing) {
+            const bearing = map.getBearing() || 0;
+            bearingIndicator.textContent = `${Math.round(bearing)}°`;
+        }
+    }
     
     // Permettre la rotation manuelle avec la souris (toucher et glisser)
     let isDraggingForRotation = false;
@@ -2724,18 +2917,6 @@ function setupRotationControlListeners() {
     return { showZoomControls, hideZoomControls, updateBearingIndicator };
 }
 
-// Update bearing indicator for both locations
-function updateBearingIndicator() {
-    if (map.getBearing) {
-        const bearing = map.getBearing() || 0;
-        const bearingIndicator = document.getElementById('bearing-indicator');
-        const bearingIndicatorAction = document.getElementById('bearing-indicator-action');
-        
-        if (bearingIndicator) bearingIndicator.textContent = `${Math.round(bearing)}°`;
-        if (bearingIndicatorAction) bearingIndicatorAction.textContent = `${Math.round(bearing)}°`;
-    }
-}
-
 const { showZoomControls, hideZoomControls, updateBearingIndicator } = initZoomControls();
 
 function speak(text){
@@ -2791,71 +2972,27 @@ Papa.parse("entreprises_geocodes.csv", {
     header: true,
     complete: function(results) {
         console.log("Données CSV chargées:", results.data);
-        // Filtrer uniquement les entreprises valides du CSV
-        allCompanies = results.data.filter(e => 
-            e.Nom_Entreprise && 
-            e.Nom_Entreprise.trim() !== '' && 
-            e.Latitude && 
-            e.Longitude && 
-            !isNaN(parseFloat(e.Latitude)) && 
-            !isNaN(parseFloat(e.Longitude))
-        );
-        
-        updateCompanyList(allCompanies);
+        allCompanies = results.data.filter(e => e.Nom_Entreprise && e.Latitude && e.Longitude);
+        var list = document.getElementById('companyList');
+        list.innerHTML = ''; 
+        allCompanies.forEach(e => {
+            var li = document.createElement('li');
+            li.textContent = e.Nom_Entreprise;
+            li.title = `ID: ${e.ID || ''} - Coordonnées: ${e.Latitude}, ${e.Longitude}`;
+            li.onclick = () => { 
+                selectedCompany = e; 
+                showRouteOptions(parseFloat(e.Latitude), parseFloat(e.Longitude), e.Nom_Entreprise); 
+            };
+            list.appendChild(li);
+        });
         console.log(`${allCompanies.length} entreprises chargées depuis le CSV`);
     },
     error: function(error) {
         console.error("Erreur lors du chargement du CSV:", error);
-        // En cas d'erreur, charger depuis le serveur comme fallback
-        loadFromServer();
+        // Essayer de charger depuis le serveur en cas d'erreur CSV
+        loadCompaniesFromServer();
     }
 });
-
-function loadFromServer() {
-    fetch("/entreprises")
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log("Entreprises chargées depuis le serveur:", data);
-        // Filtrer uniquement les entreprises valides
-        allCompanies = data.filter(e => 
-            e.Nom_Entreprise && 
-            e.Nom_Entreprise.trim() !== '' && 
-            e.Latitude && 
-            e.Longitude && 
-            !isNaN(parseFloat(e.Latitude)) && 
-            !isNaN(parseFloat(e.Longitude))
-        );
-        
-        updateCompanyList(allCompanies);
-        console.log(`${allCompanies.length} entreprises chargées depuis le serveur`);
-    })
-    .catch(err => {
-        console.error("Erreur lors du chargement depuis le serveur:", err);
-        // Utiliser les données de fallback en dernier recours
-        allCompanies = [];
-        console.log("Aucune entreprise disponible");
-    });
-}
-
-function updateCompanyList(companies) {
-    var list = document.getElementById('companyList');
-    list.innerHTML = ''; 
-    companies.forEach(e => {
-        var li = document.createElement('li');
-        li.textContent = e.Nom_Entreprise;
-        li.title = `ID: ${e.ID || ''} - Coordonnées: ${e.Latitude}, ${e.Longitude}`;
-        li.onclick = () => { 
-            selectedCompany = e; 
-            showRouteOptions(parseFloat(e.Latitude), parseFloat(e.Longitude), e.Nom_Entreprise); 
-        };
-        list.appendChild(li);
-    });
-}
 
 document.getElementById('toggleCompanies').onclick = () => {
     var list = document.getElementById('companyList');
@@ -4110,13 +4247,7 @@ document.getElementById('not-delivered-radio').addEventListener('change', functi
 
 setupTopActionsForRole();
 initializeSignature();
-
-// Initialize the sidebar toggle button position
-const toggleBtn = document.getElementById('toggleSidebarVisibility');
-if (toggleBtn) {
-    // Place the button outside the sidebar initially
-    document.body.appendChild(toggleBtn);
-}
+initializeQuickActions();
 
 // Add signature modal event listeners
 document.addEventListener('click', function(e) {
@@ -4263,7 +4394,7 @@ function renderAdminTable(reports) {
             <td>${escapeHtml(r.deliveryTime||'')}</td>
             <td style="max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(r.reason||'')}">${escapeHtml(r.reason||'')}</td>
             <td style="max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(r.structure||'')}">${escapeHtml(r.structure||'')}</td>
-            <td>${r.signature ? '<button class="view-signature" onclick="viewSignature(\'' + r.signature + '\')" style="background:#007bff;color:white;border:none;border-radius:4px;padding:3px 6px;cursor:pointer;font-size:0.7em;">📷 Voir</button>' : '<span style="color:#6c757d;">⭕ Non signée</span>'}</td>
+            <td>${r.signature ? '<button class="view-signature" onclick="viewSignature(\"' + r.signature + '\")" style="background:#007bff;color:white;border:none;border-radius:4px;padding:3px 6px;cursor:pointer;font-size:0.7em;">📷 Voir</button>' : '<span style="color:#6c757d;">⭕ Non signée</span>'}</td>
             <td>${posTxt}</td>
             <td style="font-size:0.7em;">${created}</td>
             <td class="row-actions">
@@ -4406,30 +4537,10 @@ window.addEventListener('storage', (e)=>{
         initializeAdmin();
     }
 });
-
-// Add signature viewing functions
-function viewSignature(signatureData) {
-    document.getElementById('signature-view-image').src = signatureData;
-    document.getElementById('signature-view-modal').style.display = 'flex';
-    
-    // Set up download functionality
-    document.getElementById('download-signature').onclick = () => {
-        const link = document.createElement('a');
-        link.href = signatureData;
-        link.download = 'signature_' + Date.now() + '.png';
-        link.click();
-    };
-}
-
-function closeSignatureViewModal() {
-    document.getElementById('signature-view-modal').style.display = 'none';
-}
 </script>
 
 </body>
 </html>
-
-</script>
 
 ```
 
@@ -4463,4 +4574,10 @@ function viewSignature(signatureData) {
 
 function closeSignatureViewModal() {
   document.getElementById('signature-view-modal').style.display = 'none';
+}
+</script>
+
+</body>
+</html>
+
 }
