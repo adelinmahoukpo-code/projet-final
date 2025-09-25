@@ -15,7 +15,6 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet-minimap/dist/Control.MiniMap.min.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet-minimap/dist/Control.MiniMap.min.css" />
 <style>
 /* Styles pour la page de connexion */
 #login-overlay {
@@ -459,7 +458,7 @@ body {
     font-size: 0.85em;
 }
 
-/* Contrôles de zoom personnalisés pour navigation */
+/* Contrôles de zoom et rotation personnalisés pour navigation */
 #zoom-controls {
     position: absolute;
     top: 150px;
@@ -491,6 +490,63 @@ body {
     background: #007bff;
     color: white;
     transform: scale(1.1);
+}
+
+/* Contrôles de rotation de la carte */
+#rotation-controls {
+    position: absolute;
+    top: 280px;
+    right: 10px;
+    z-index: 1002;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    padding: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    backdrop-filter: blur(5px);
+}
+
+.rotation-btn {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #333;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.rotation-btn:hover {
+    background: #007bff;
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,123,255,0.3);
+}
+
+.rotation-btn:active {
+    transform: scale(0.95);
+}
+
+#bearing-indicator {
+    font-size: 0.7em;
+    text-align: center;
+    color: #666;
+    margin-top: 4px;
+    font-weight: normal;
+}
+
+/* Classe pour désactiver la rotation automatique de l'image */
+.leaflet-container .leaflet-control-zoom {
+    display: none;
 }
 
 /* Rapport de livraison */
@@ -1208,12 +1264,28 @@ body {
 .main-route-line {
     border-radius: 3px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 400 !important;
 }
 
 .route-progress-line {
     border-radius: 3px;
-    box-shadow: 0 2px 6px rgba(0,123,255,0.3);
-    z-index: 1000;
+    box-shadow: 0 2px 6px rgba(40,167,69,0.4);
+    z-index: 500 !important;
+}
+
+.route-completed-line {
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    z-index: 300 !important;
+}
+
+/* Assurer que les lignes de route restent visibles */
+.leaflet-overlay-pane svg {
+    pointer-events: auto !important;
+}
+
+.leaflet-overlay-pane path {
+    pointer-events: auto !important;
 }
 
 /* Amélioration des contrôles de navigation */
@@ -1252,9 +1324,22 @@ body {
     display: none !important;
 }
 
-/* Amélioration de la carte pendant la navigation */
+/* Amélioration de la carte pendant la navigation avec rotation */
 .leaflet-container.navigation-mode {
     cursor: crosshair;
+}
+
+.leaflet-container.rotation-enabled {
+    transition: transform 0.3s ease;
+}
+
+/* Maintenir les contrôles et marqueurs droits pendant la rotation */
+.leaflet-control {
+    transition: transform 0.3s ease;
+}
+
+.leaflet-marker-icon {
+    transition: transform 0.3s ease;
 }
 
 /* Styles pour les marqueurs personnalisés */
@@ -1818,13 +1903,24 @@ body {
         <button class="zoom-btn" id="zoom-in">+</button>
         <button class="zoom-btn" id="zoom-out">−</button>
         <button class="zoom-btn" id="zoom-follow" title="Suivre position">📍</button>
-        <button class="zoom-btn" id="rotate-map" title="Rotation de la carte">🧭</button>
-        <button class="zoom-btn" id="reset-rotation" title="Remettre au nord">⬆️</button>
+    </div>
+    
+    <!-- Contrôles de rotation de la carte -->
+    <div id="rotation-controls">
+        <button class="rotation-btn" id="rotate-left" title="Tourner à gauche">↻</button>
+        <button class="rotation-btn" id="rotate-right" title="Tourner à droite">↺</button>
+        <button class="rotation-btn" id="reset-bearing" title="Remettre le nord">⬆</button>
+        <div id="bearing-indicator">0°</div>
     </div>
     
     <div id="instructions-container">
         <button id="toggleInstructions">Instructions</button>
         <ul id="instructionsList" style="display:none;"></ul>
+        <div style="font-size: 0.75em; color: #666; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
+            🔄 <strong>Rotation :</strong> Utilisez les flèches de rotation à droite ou maintenez Shift + glisser pour tourner la carte<br>
+            🔍 <strong>Zoom :</strong> Utilisez les boutons + / - ou la molette de la souris<br>
+            📍 <strong>Suivi :</strong> Cliquez sur l'icône de localisation pour recentrer
+        </div>
     </div>
 </div>
 
@@ -1839,7 +1935,7 @@ body {
             <strong>Interface Administrateur — Suivi des Rapports</strong>
         </div>
         <div id="admin-actions">
-            <button id="toggle-agent-sidebar" class="admin-btn secondary">☰ Menu Agent</button>
+
             <button id="toggle-admin-layers" class="admin-btn">🗺️ Fonds de Carte</button>
             <button id="switch-to-agent" class="admin-btn secondary">Mode Agent</button>
             <button id="export-csv" class="admin-btn">Exporter CSV</button>
@@ -1924,6 +2020,60 @@ body {
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 <script src="https://unpkg.com/leaflet-minimap/dist/Control.MiniMap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.8.0/proj4.js"></script>
+<!-- Plugin pour la rotation de la carte -->
+<script>
+// Extension pour ajouter la rotation à Leaflet
+L.Map.include({
+    setBearing: function(bearing) {
+        this._bearing = bearing || 0;
+        if (this._loaded) {
+            this._rotatePanes(this._bearing);
+        }
+        return this;
+    },
+    
+    getBearing: function() {
+        return this._bearing || 0;
+    },
+    
+    _rotatePanes: function(bearing) {
+        const angle = bearing;
+        const transform = 'rotate(' + angle + 'deg)';
+        
+        if (this._mapPane) {
+            this._mapPane.style.transform = transform;
+            this._mapPane.style.transformOrigin = '50% 50%';
+        }
+        
+        // Ajuster les controles pour qu'ils restent droits
+        const controls = this.getContainer().querySelectorAll('.leaflet-control');
+        controls.forEach(control => {
+            control.style.transform = 'rotate(' + (-angle) + 'deg)';
+        });
+        
+        // Conserver les marqueurs droits aussi
+        const markers = this.getContainer().querySelectorAll('.leaflet-marker-icon');
+        markers.forEach(marker => {
+            marker.style.transform = marker.style.transform + ' rotate(' + (-angle) + 'deg)';
+        });
+    },
+    
+    _onResize: function() {
+        L.Map.prototype._onResize.call(this);
+        if (this._bearing) {
+            this._rotatePanes(this._bearing);
+        }
+    }
+});
+
+// Hook into the map initialization
+const originalOnAdd = L.Map.prototype.onAdd;
+L.Map.prototype.onAdd = function(layer) {
+    const result = originalOnAdd.call(this, layer);
+    this._bearing = 0;
+    return result;
+};
+</script>
 <script>
 // ====================== PROFESSIONAL TOAST NOTIFICATIONS ======================
 function showToast(message, type = 'info', duration = 5000) {
@@ -2141,10 +2291,7 @@ var signatureCtx = null;
 var isDrawing = false;
 var currentSignature = null;
 
-var map = L.map('map', {
-    attributionControl: false,
-    zoomControl: false
-}).setView([9.3077,2.3158],7);
+var map = L.map('map').setView([9.3077,2.3158],7);
 var allCompanies = [];
 var selectedCompany = null;
 var routingControl=null, movingMarkerStart=null, movingMarkerEnd=null, movingCursor=null, routeLine=null;
@@ -2172,9 +2319,6 @@ var infraAlertDistance = 25;
 var progressLine = null;
 var totalRouteDistance = 0;
 var currentRouteProgress = 0;
-var fullRouteLine = null;
-var currentBearing = 0;
-var isRotationEnabled = false;
 
 // Icônes personnalisés pour départ, arrivée et position
 var departIcon = new L.Icon({ 
@@ -2193,40 +2337,12 @@ var positionIcon = new L.Icon({
     iconAnchor: [16,32]
 });
 
-// Custom CSS to hide Leaflet attribution and zoom controls text
-var customStyle = document.createElement('style');
-customStyle.innerHTML = `
-    .leaflet-control-attribution {
-        display: none !important;
-    }
-    .leaflet-bottom {
-        display: none !important;
-    }
-    .leaflet-control-container .leaflet-bottom {
-        display: none !important;
-    }
-    .leaflet-control-zoom a {
-        text-decoration: none !important;
-        color: #333 !important;
-        font-weight: bold !important;
-    }
-    .leaflet-routing-container {
-        display: none !important;
-    }
-`;
-document.head.appendChild(customStyle);
-
 var baseLayers = {
 "OSM": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:25, maxNativeZoom: 19, attribution:'', errorTileUrl:''}).addTo(map),
 "Google Satellite": L.tileLayer('https://mt.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{maxZoom:25, maxNativeZoom: 19, attribution:'', errorTileUrl:''}),
 "Google Earth": L.tileLayer('https://mt.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{maxZoom:25, maxNativeZoom: 19, attribution:'', errorTileUrl:''}),
 "Google Terrain": L.tileLayer('https://mt.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',{maxZoom:25, maxNativeZoom: 19, attribution:'', errorTileUrl:''})
 };
-
-// Add custom zoom control
-L.control.zoom({
-    position: 'topright'
-}).addTo(map);
 
 var layerThumbs = {
 "OSM":"https://tile.openstreetmap.org/5/15/10.png",
@@ -2257,12 +2373,20 @@ document.getElementById('toggleLayersBtn').onclick = () => {
     layerContainer.style.display = layerContainerVisible ? 'flex' : 'none';
 };
 
-// ====================== CONTRÔLES DE ZOOM POUR NAVIGATION ======================
+// ====================== CONTRÔLES DE ZOOM ET ROTATION POUR NAVIGATION ======================
+let currentBearing = 0;
+let rotationEnabled = false;
+
 function initZoomControls() {
     const zoomControls = document.getElementById('zoom-controls');
+    const rotationControls = document.getElementById('rotation-controls');
     const zoomInBtn = document.getElementById('zoom-in');
     const zoomOutBtn = document.getElementById('zoom-out');
     const zoomFollowBtn = document.getElementById('zoom-follow');
+    const rotateLeftBtn = document.getElementById('rotate-left');
+    const rotateRightBtn = document.getElementById('rotate-right');
+    const resetBearingBtn = document.getElementById('reset-bearing');
+    const bearingIndicator = document.getElementById('bearing-indicator');
     
     // Permettre le zoom libre pendant la navigation
     zoomInBtn.onclick = () => {
@@ -2312,24 +2436,126 @@ function initZoomControls() {
         }
     });
     
+    // Contrôles de rotation de la carte
+    rotateLeftBtn.onclick = () => {
+        currentBearing = (currentBearing - 15) % 360;
+        if (currentBearing < 0) currentBearing += 360;
+        map.setBearing(currentBearing);
+        bearingIndicator.textContent = `${Math.round(currentBearing)}°`;
+        rotationEnabled = true;
+    };
+    
+    rotateRightBtn.onclick = () => {
+        currentBearing = (currentBearing + 15) % 360;
+        map.setBearing(currentBearing);
+        bearingIndicator.textContent = `${Math.round(currentBearing)}°`;
+        rotationEnabled = true;
+    };
+    
+    resetBearingBtn.onclick = () => {
+        currentBearing = 0;
+        map.setBearing(0);
+        bearingIndicator.textContent = '0°';
+        rotationEnabled = false;
+    };
+    
+    // Mettre à jour l'indicateur de bearing
+    function updateBearingIndicator() {
+        if (map.getBearing) {
+            const bearing = map.getBearing() || 0;
+            bearingIndicator.textContent = `${Math.round(bearing)}°`;
+        }
+    }
+    
+    // Permettre la rotation manuelle avec la souris (toucher et glisser)
+    let isDraggingForRotation = false;
+    let startRotationY = 0;
+    
+    map.on('mousedown', (e) => {
+        if (e.originalEvent.shiftKey) {
+            isDraggingForRotation = true;
+            startRotationY = e.originalEvent.clientY;
+            map.dragging.disable();
+            e.originalEvent.preventDefault();
+        }
+    });
+    
+    map.on('mousemove', (e) => {
+        if (isDraggingForRotation && e.originalEvent.shiftKey) {
+            const deltaY = e.originalEvent.clientY - startRotationY;
+            const rotationDelta = deltaY * 0.5; // Sensibilité de rotation
+            currentBearing = (currentBearing + rotationDelta) % 360;
+            if (currentBearing < 0) currentBearing += 360;
+            map.setBearing(currentBearing);
+            updateBearingIndicator();
+            startRotationY = e.originalEvent.clientY;
+            rotationEnabled = true;
+        }
+    });
+    
+    map.on('mouseup', (e) => {
+        if (isDraggingForRotation) {
+            isDraggingForRotation = false;
+            map.dragging.enable();
+        }
+    });
+    
+    // Support tactile pour la rotation
+    let isTouchRotating = false;
+    let startTouchY = 0;
+    
+    map.on('touchstart', (e) => {
+        if (e.originalEvent.touches.length === 2) {
+            isTouchRotating = true;
+            startTouchY = e.originalEvent.touches[0].clientY;
+            e.originalEvent.preventDefault();
+        }
+    });
+    
+    map.on('touchmove', (e) => {
+        if (isTouchRotating && e.originalEvent.touches.length === 2) {
+            const deltaY = e.originalEvent.touches[0].clientY - startTouchY;
+            const rotationDelta = deltaY * 0.3;
+            currentBearing = (currentBearing + rotationDelta) % 360;
+            if (currentBearing < 0) currentBearing += 360;
+            map.setBearing(currentBearing);
+            updateBearingIndicator();
+            startTouchY = e.originalEvent.touches[0].clientY;
+            rotationEnabled = true;
+        }
+    });
+    
+    map.on('touchend', (e) => {
+        if (isTouchRotating) {
+            isTouchRotating = false;
+        }
+    });
+    
     // Afficher les contrôles seulement pendant la navigation
     function showZoomControls() {
         zoomControls.style.display = 'flex';
+        rotationControls.style.display = 'flex';
         // Activer le suivi par défaut au début de la navigation
         followUserPosition = true;
         zoomFollowBtn.style.background = '#007bff';
         zoomFollowBtn.style.color = 'white';
+        updateBearingIndicator();
     }
     
     function hideZoomControls() {
         zoomControls.style.display = 'none';
+        rotationControls.style.display = 'none';
         followUserPosition = true;
+        // Réinitialiser la rotation quand on quitte la navigation
+        currentBearing = 0;
+        if (map.setBearing) map.setBearing(0);
+        rotationEnabled = false;
     }
     
-    return { showZoomControls, hideZoomControls };
+    return { showZoomControls, hideZoomControls, updateBearingIndicator };
 }
 
-const { showZoomControls, hideZoomControls } = initZoomControls();
+const { showZoomControls, hideZoomControls, updateBearingIndicator } = initZoomControls();
 
 function speak(text){
     if(!voiceEnabled) return;
@@ -2408,7 +2634,13 @@ Papa.parse("public/entreprises_geocodes.csv", {
             {ID: "3", Nom_Entreprise: "Poulet Piquet", Latitude: "6.382206", Longitude: "2.336388"},
             {ID: "4", Nom_Entreprise: "Sofitel Hôtel", Latitude: "6.350114", Longitude: "2.393706"},
             {ID: "5", Nom_Entreprise: "Séminaire St Jean Eudes", Latitude: "6.38906", Longitude: "2.321026"},
-            {ID: "6", Nom_Entreprise: "Eglise de Jésus-Christ des Saints des derniers Jours", Latitude: "6.392349", Longitude: "2.317976"}
+            {ID: "6", Nom_Entreprise: "Eglise de Jésus-Christ des Saints des derniers Jours", Latitude: "6.392349", Longitude: "2.317976"},
+            {ID: "7", Nom_Entreprise: "Collège Sainte Mireille", Latitude: "6.3891", Longitude: "2.3156"},
+            {ID: "8", Nom_Entreprise: "GENIE BTP GROUP SARL", Latitude: "6.3845", Longitude: "2.3198"},
+            {ID: "9", Nom_Entreprise: "Lena Création", Latitude: "6.3812", Longitude: "2.3167"},
+            {ID: "10", Nom_Entreprise: "Centre de Santé Municipal", Latitude: "6.3876", Longitude: "2.3201"},
+            {ID: "11", Nom_Entreprise: "Marché Central Akpakpa", Latitude: "6.3823", Longitude: "2.3145"},
+            {ID: "12", Nom_Entreprise: "Station ORYX", Latitude: "6.3867", Longitude: "2.3178"}
         ];
         var list = document.getElementById('companyList');
         list.innerHTML = ''; 
@@ -2600,23 +2832,47 @@ function updateProgressiveLine(userPos) {
         movingCursor.setLatLng(projectedPos);
     }
     
+    // Maintenir la ligne de route principale visible
+    if (!routeLine && routeCoords && routeCoords.length > 0) {
+        routeLine = L.polyline(routeCoords.map(c => [c.lat, c.lng]), {
+            color: '#1e90ff', 
+            weight: 4, 
+            opacity: 0.6,
+            className: 'main-route-line'
+        }).addTo(map);
+    }
+    
     // Supprimer l'ancienne ligne de progression
     if (progressLine) {
         map.removeLayer(progressLine);
     }
     
-    // Créer une ligne progressive qui diminue au fur et à mesure de l'avancement
+    // Créer une ligne progressive qui montre le trajet restant
     const remainingCoords = routeCoords.slice(closestIndex);
     if (remainingCoords.length > 1) {
         // Ajouter la position projetée au début des coordonnées restantes
         const progressCoords = [projectedPos, ...remainingCoords.map(c => [c.lat, c.lng])];
         
         progressLine = L.polyline(progressCoords, { 
-            color: '#007bff', 
-            weight: 6, 
+            color: '#28a745', 
+            weight: 8, 
             opacity: 0.9,
-            className: 'route-progress-line'
+            className: 'route-progress-line',
+            dashArray: '10, 5'
         }).addTo(map);
+    }
+    
+    // Créer une ligne pour le trajet déjà parcouru
+    if (closestIndex > 0) {
+        const completedCoords = routeCoords.slice(0, closestIndex + 1).map(c => [c.lat, c.lng]);
+        if (completedCoords.length > 1) {
+            L.polyline(completedCoords, {
+                color: '#6c757d',
+                weight: 6,
+                opacity: 0.5,
+                className: 'route-completed-line'
+            }).addTo(map);
+        }
     }
     
     // Calculer le progrès
@@ -2674,11 +2930,23 @@ function startRealTimeGPSTracking(){
         if (followUserPosition) {
             const currentZoom = map.getZoom();
             const targetZoom = Math.max(currentZoom, 16); // Zoom optimisé pour navigation
-            map.setView(userPos, targetZoom, {
-                animate: true, 
-                duration: 1.0,
-                easeLinearity: 0.5
-            });
+            
+            // Maintenir la rotation actuelle pendant le suivi
+            if (rotationEnabled && map.setBearing) {
+                map.setView(userPos, targetZoom, {
+                    animate: true, 
+                    duration: 1.0,
+                    easeLinearity: 0.5
+                });
+                // Conserver le bearing actuel
+                map.setBearing(currentBearing);
+            } else {
+                map.setView(userPos, targetZoom, {
+                    animate: true, 
+                    duration: 1.0,
+                    easeLinearity: 0.5
+                });
+            }
         }
         
         // Gestion des instructions vocales basées sur la position réelle
@@ -2876,14 +3144,14 @@ function calculateRouteOptions(start, end, destinationName) {
         const distance = (route.summary.totalDistance / 1000).toFixed(1);
         
         availableRoutes[0] = {
-            type: "Itinéraire le plus rapide",
+            type: "Itinéraire principal",
             duration: `${duration} min`,
             distance: `${distance} km`,
-            description: "Via les routes principales - Moins de trafic",
+            description: "Via les grandes artères - Itinéraire recommandé",
             routeData: route,
             waypoints: [L.latLng(start), L.latLng(end)],
             options: { profile: 'driving', alternative: false },
-            icon: '🚗',
+            icon: '🚙',
             color: '#4caf50'
         };
         
@@ -2917,12 +3185,12 @@ function calculateRouteOptions(start, end, destinationName) {
             type: "Itinéraire alternatif",
             duration: `${duration} min`,
             distance: `${distance} km`,
-            description: "Via routes secondaires - Évite les embouteillages",
+            description: "Via routes secondaires - Évite la congestion",
             routeData: route,
             waypoints: [L.latLng(start), L.latLng(midLat, midLng), L.latLng(end)],
             options: { profile: 'driving', alternative: true },
-            icon: '🛣️',
-            color: '#ff9800'
+            icon: '🚪',
+            color: '#2196f3'
         };
         
         routesCalculated++;
@@ -2953,15 +3221,15 @@ function calculateRouteOptions(start, end, destinationName) {
         const distance = (route.summary.totalDistance / 1000 * 0.85).toFixed(1);
         
         availableRoutes[2] = {
-            type: "Itinéraire le plus court",
+            type: "Itinéraire direct",
             duration: `${duration} min`,
             distance: `${distance} km`,
-            description: "Parcours direct - Peut avoir plus de trafic",
+            description: "Trajet le plus court - Route directe",
             routeData: route,
             waypoints: [L.latLng(start), L.latLng(end)],
             options: { profile: 'driving', shortest: true },
             icon: '🏁',
-            color: '#2196f3'
+            color: '#ff9800'
         };
         
         routesCalculated++;
@@ -3017,9 +3285,9 @@ function renderRouteOptions() {
 
 function getRouteRecommendation(index) {
     const recommendations = [
-        "Trajets urgents et livraisons prioritaires",
-        "Circulation dense, heures de pointe", 
-        "Trajets courts et connus"
+        "Livraisons quotidiennes et trajets standards",
+        "Circulation dense, éviter les embouteillages", 
+        "Trajets urgents et distances courtes"
     ];
     return recommendations[index] || "Trajets standards";
 }
@@ -3088,24 +3356,15 @@ function startRouteWithSelectedOption(lat, lng, name, selectedRoute) {
             routeCoords = route.coordinates;
             routeInstructions = route.instructions;
             
-            // Supprimer l'ancienne ligne de route par défaut du contrôle
+            // Créer notre propre ligne de route qui reste visible
             if (routeLine) map.removeLayer(routeLine);
-            if (fullRouteLine) map.removeLayer(fullRouteLine);
-            
-            // Créer la ligne complète de l'itinéraire (qui ne disparaît jamais)
-            fullRouteLine = L.polyline(routeCoords, {
-                color: '#87CEEB',  // Bleu clair pour la route complète
-                weight: 4, 
-                opacity: 0.6,
-                className: 'full-route-line'
-            }).addTo(map);
-            
-            // Créer la ligne de progression (s'étend au fur et à mesure)
-            routeLine = L.polyline([], {
+            routeLine = L.polyline(routeCoords, {
                 color: '#1e90ff', 
                 weight: 6, 
-                opacity: 0.9,
-                className: 'progress-route-line'
+                opacity: 0.8,
+                className: 'main-route-line',
+                interactive: false,
+                pane: 'overlayPane'
             }).addTo(map);
             
             // Créer les trois marqueurs uniques
@@ -3165,11 +3424,14 @@ function startRoute(lat,lng,name){
             routeInstructions=route.instructions; 
             
             // Créer notre propre ligne de route
+            if (routeLine) map.removeLayer(routeLine);
             routeLine=L.polyline(routeCoords, {
                 color:'#1e90ff', 
                 weight:6, 
                 opacity:0.8,
-                className: 'main-route-line'
+                className: 'main-route-line',
+                interactive: false,
+                pane: 'overlayPane'
             }).addTo(map);
             
             // Créer les trois marqueurs
@@ -3222,11 +3484,14 @@ function startRouteWithoutVoice(lat,lng,name){
             routeInstructions=route.instructions; 
             
             // Créer notre propre ligne de route
+            if (routeLine) map.removeLayer(routeLine);
             routeLine=L.polyline(routeCoords, {
                 color:'#1e90ff', 
                 weight:6, 
                 opacity:0.8,
-                className: 'main-route-line'
+                className: 'main-route-line',
+                interactive: false,
+                pane: 'overlayPane'
             }).addTo(map);
             
             // Créer les trois marqueurs
@@ -3440,107 +3705,72 @@ document.getElementById('toggle-invoice-send').onclick = () => {
 };
 
 document.getElementById('send-invoice').onclick = async (e) => {
-    e.preventDefault();
-    const form = document.getElementById('invoice-form');
-    const sendBtn = document.getElementById('send-invoice');
-    const successMsg = document.getElementById('invoice-success-msg');
-    const errorMsg = document.getElementById('invoice-error-msg');
+  e.preventDefault();
+  const form = document.getElementById('invoice-form');
+  const sendBtn = document.getElementById('send-invoice');
+  const successMsg = document.getElementById('invoice-success-msg');
+  const errorMsg = document.getElementById('invoice-error-msg');
 
-    // Clear previous messages
-    successMsg.style.display = "none";
-    errorMsg.style.display = "none";
+  successMsg.style.display = "none";
+  errorMsg.style.display = "none";
 
-    const fileInput = document.getElementById('invoice-file');
-    const toInput = document.getElementById('invoice-to');
+  const fileInput = document.getElementById('invoice-file');
+  const toInput   = document.getElementById('invoice-to');
 
-    // Validation
-    if (!fileInput.files.length) {
-        errorMsg.textContent = "❌ Veuillez choisir un fichier facture.";
-        errorMsg.style.display = "block";
-        return;
-    }
-    if (!toInput.value.trim()) {
-        errorMsg.textContent = "❌ Adresse e-mail destinataire requise.";
-        errorMsg.style.display = "block";
-        return;
-    }
+  if (!fileInput.files.length) {
+    errorMsg.textContent = "❌ Veuillez choisir un fichier facture.";
+    errorMsg.style.display = "block";
+    return;
+  }
+  if (!toInput.value) {
+    errorMsg.textContent = "❌ Adresse e-mail destinataire requise.";
+    errorMsg.style.display = "block";
+    return;
+  }
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(toInput.value.trim())) {
-        errorMsg.textContent = "❌ Format d'email invalide.";
-        errorMsg.style.display = "block";
-        return;
-    }
+  const formData = new FormData(form);
 
-    // Prepare form data
-    const formData = new FormData();
-    formData.append('attachment', fileInput.files[0]);
-    formData.append('to_email', toInput.value.trim());
-    formData.append('invoice_ref', document.getElementById('invoice-ref').value.trim());
-    formData.append('message', document.getElementById('invoice-message').value.trim());
-    formData.append('from_name', document.getElementById('invoice-from-name').value.trim() || 'Service des Impôts');
-    formData.append('agent_contact', document.getElementById('invoice-from-contact').value.trim());
-    formData.append('subject', document.getElementById('invoice-subject').value.trim() || 'Facture Direction Générale des Impôts');
-    formData.append('company_name', document.getElementById('invoice-company-name').value.trim());
+  sendBtn.disabled = true;
+  sendBtn.textContent = '⏳ Envoi...';
 
-    // Show loading state
-    sendBtn.disabled = true;
-    sendBtn.textContent = '⏳ Envoi en cours...';
-
+  try {
+    // Essayer d'abord avec l'URL locale
+    let response;
     try {
-        const response = await fetch('/sendmail', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-        
-        if (result.status === "success") {
-            successMsg.textContent = "✅ " + result.message;
-            successMsg.style.display = "block";
-            showToast('Facture envoyée avec succès!', 'success');
-            
-            // Reset form
-            form.reset();
-            document.getElementById('invoice-from-name').value = '';
-            document.getElementById('invoice-from-contact').value = '';
-            document.getElementById('invoice-subject').value = '';
-            document.getElementById('invoice-company-name').value = '';
-            
-            // Auto-hide panel after success
-            setTimeout(() => {
-                document.getElementById('invoice-send-container').style.display = 'none';
-                invoicePanelVisible = false;
-            }, 3000);
-        } else {
-            errorMsg.textContent = "❌ " + (result.message || 'Erreur inconnue');
-            errorMsg.style.display = "block";
-            showToast('Erreur lors de l\'envoi', 'error');
-        }
-    } catch (err) {
-        console.error('Erreur détaillée:', err);
-        let errorMessage = "❌ Erreur de connexion au serveur.";
-        
-        if (err.message.includes('NetworkError') || err.message.includes('Failed to fetch')) {
-            errorMessage += " Vérifiez que le serveur est en marche et accessible.";
-        } else if (err.message.includes('500')) {
-            errorMessage += " Erreur interne du serveur. Vérifiez la configuration email.";
-        } else if (err.message.includes('400')) {
-            errorMessage += " Données invalides. Vérifiez le fichier et l'email.";
-        }
-        
-        errorMsg.textContent = errorMessage;
-        errorMsg.style.display = "block";
-        showToast('Erreur de connexion', 'error');
-    } finally {
-        sendBtn.disabled = false;
-        sendBtn.textContent = '🚀 Envoyer la facture';
+      response = await fetch("http://127.0.0.1:5000/sendmail", {
+        method: "POST",
+        body: formData
+      });
+    } catch (localErr) {
+      // Si l'URL locale échoue, essayer avec l'URL relative pour le déploiement
+      response = await fetch("/sendmail", {
+        method: "POST",
+        body: formData
+      });
     }
+
+    const result = await response.json();
+    if (result.status === "success") {
+      successMsg.textContent = "✅ " + result.message;
+      successMsg.style.display = "block";
+      form.reset();
+      // Réinitialiser les champs cachés
+      document.getElementById('invoice-from-name').value = '';
+      document.getElementById('invoice-from-contact').value = '';
+      document.getElementById('invoice-subject').value = '';
+      document.getElementById('invoice-company-name').value = '';
+    } else {
+      errorMsg.textContent = "❌ " + result.message;
+      errorMsg.style.display = "block";
+    }
+  } catch (err) {
+    console.error('Erreur détaillée:', err);
+    errorMsg.textContent = "❌ Erreur de connexion au serveur. Vérifiez que le serveur est en marche.";
+    errorMsg.style.display = "block";
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.textContent = '🚀 Envoyer la facture';
+  }
 };
 
 document.getElementById('toggleInstructions').onclick=()=>{ 
@@ -3739,7 +3969,7 @@ function initializeAdmin() {
 
     document.getElementById('export-csv').onclick = () => exportReportsCSV(loadReportsFromLS());
     
-    // Setup toggle buttons
+    // Setup toggle buttons (without agent sidebar)
     setupAdminToggleButtons();
 }
 
@@ -3779,26 +4009,6 @@ function setupAdminLayerControls() {
 }
 
 function setupAdminToggleButtons() {
-    // Toggle agent sidebar
-    document.getElementById('toggle-agent-sidebar').onclick = () => {
-        agentSidebarVisible = !agentSidebarVisible;
-        const sidebar = document.getElementById('sidebar');
-        if (agentSidebarVisible) {
-            sidebar.style.display = 'flex';
-            sidebar.style.transform = 'translateX(0)';
-            sidebar.style.position = 'fixed';
-            sidebar.style.zIndex = '10000';
-            showToast('Menu agent affiché', 'info');
-        } else {
-            sidebar.style.transform = 'translateX(-100%)';
-            setTimeout(() => {
-                if (!agentSidebarVisible) {
-                    sidebar.style.display = 'none';
-                }
-            }, 300);
-            showToast('Menu agent masqué', 'info');
-        }
-    };
     
     // Toggle admin layers
     document.getElementById('toggle-admin-layers').onclick = () => {
@@ -3980,15 +4190,27 @@ window.addEventListener('storage', (e)=>{
         initializeAdmin();
     }
 });
+</script>
 
-// Initialize zoom controls on app start
-setTimeout(() => {
-    if (document.getElementById('zoom-in')) {
-        document.getElementById('zoom-in').onclick = () => map.zoomIn();
-        document.getElementById('zoom-out').onclick = () => map.zoomOut();
+</body>
+</html>
+// Charger la liste des entreprises depuis le serveur
+fetch("/entreprises")
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-}, 1000);
-
+    return response.json();
+  })
+  .then(data => {
+    console.log("Entreprises chargées depuis le serveur:", data);
+    // Ne pas écraser allCompanies si les données du CSV sont déjà chargées
+    if (allCompanies.length === 0) {
+      allCompanies = data.filter(e => e.Nom_Entreprise && e.Latitude && e.Longitude);
+      var list = document.getElementById('companyList');
+      list.innerHTML = '';
+      allCompanies.forEach(e => {
+        var li = document.createElement('li');
         li.textContent = e.Nom_Entreprise;
         li.title = `ID: ${e.ID || ''} - Coordonnées: ${e.Latitude}, ${e.Longitude}`;
         li.onclick = () => {
