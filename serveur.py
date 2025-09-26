@@ -131,16 +131,23 @@ def sendmail():
             "message": f"Email envoyé avec succès à {destinataire}"
         })
         
-    except smtplib.SMTPAuthenticationError:
+    except smtplib.SMTPAuthenticationError as e:
+        print(f"Erreur d'authentification SMTP: {str(e)}")
         return jsonify({
             "status": "error", 
-            "message": "Erreur d'authentification email. Vérifiez les identifiants Gmail."
+            "message": "Erreur d'authentification email. Vérifiez les identifiants Gmail. Si vous utilisez la double authentification, vous devez utiliser un mot de passe d'application."
         }), 401
     except smtplib.SMTPRecipientsRefused:
         return jsonify({
             "status": "error", 
             "message": "Adresse email destinataire invalide."
         }), 400
+    except smtplib.SMTPException as e:
+        print(f"Erreur SMTP: {str(e)}")
+        return jsonify({
+            "status": "error", 
+            "message": f"Erreur SMTP lors de l'envoi: {str(e)}"
+        }), 500
     except Exception as e:
         print(f"Erreur détaillée: {str(e)}")
         return jsonify({

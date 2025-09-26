@@ -3640,20 +3640,11 @@ document.getElementById('send-invoice').onclick = async (e) => {
   sendBtn.textContent = '⏳ Envoi...';
 
   try {
-    // Essayer d'abord avec l'URL locale
-    let response;
-    try {
-      response = await fetch("http://127.0.0.1:5000/sendmail", {
-        method: "POST",
-        body: formData
-      });
-    } catch (localErr) {
-      // Si l'URL locale échoue, essayer avec l'URL relative pour le déploiement
-      response = await fetch("/sendmail", {
-        method: "POST",
-        body: formData
-      });
-    }
+    // Always use relative URL which works for both local and deployed environments
+    const response = await fetch("/sendmail", {
+      method: "POST",
+      body: formData
+    });
 
     const result = await response.json();
     if (result.status === "success") {
