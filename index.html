@@ -148,7 +148,11 @@ body {
     color: white; 
     padding: 16px 24px; 
     box-shadow: var(--shadow-2);
-    position: relative; 
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
     z-index: 1001;
     border-bottom: 1px solid rgba(255,255,255,0.1);
 }
@@ -167,55 +171,24 @@ body {
 #header .header-content {
     display: flex;
     align-items: center;
-    flex: 1;
     justify-content: center;
+    flex: 1;
+    gap: 15px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 #header img { 
     width: 40px; 
-    height: 30px;
-    margin: 0 15px; 
-    border-radius: 4px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    object-fit: cover;
+    margin-right: 15px; 
 }
 
 #header h1 { 
     margin: 0; 
-    font-size: clamp(1.1em, 2.5vw, 1.4em);
-    font-weight: 600;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    font-size: 1.4em; 
+    text-shadow: 1px 1px 2px #000;
     text-align: center;
-    letter-spacing: 0.5px;
-    line-height: 1.2;
-}
-
-/* Small sidebar toggle button */
-#sidebar-toggle-btn {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 1002;
-    background: rgba(255,255,255,0.9);
-    border: 1px solid rgba(0,0,0,0.1);
-    border-radius: 6px;
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    color: #333;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-#sidebar-toggle-btn:hover {
-    background: rgba(255,255,255,1);
-    transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 /* Bouton hamburger pour mobile */
@@ -230,10 +203,46 @@ body {
     z-index: 1002;
 }
 
+/* Bouton pour cacher/afficher la sidebar */
+#sidebar-toggle {
+    position: fixed;
+    top: 15px;
+    left: 20px;
+    width: 35px;
+    height: 35px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 1.1em;
+    cursor: pointer;
+    z-index: 1003;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#sidebar-toggle:hover {
+    background: linear-gradient(135deg, var(--primary-dark), #0d47a1);
+    transform: scale(1.05);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.2);
+}
+
+#sidebar-toggle.sidebar-hidden {
+    /* Position reste la même en haut à gauche */
+}
+
 #map { 
     height: calc(100vh - 80px);
+    margin-top: 80px;
     margin-left: 320px;
     transition: margin-left 0.3s ease;
+}
+
+#map.sidebar-hidden {
+    margin-left: 0;
 }
 
 #sidebar { 
@@ -275,12 +284,9 @@ body {
 
 #sidebar h3 { 
     margin-top: 0; 
-    margin-bottom: 16px;
     text-align: center; 
     color: #007bff;
-    font-size: clamp(1.0em, 2vw, 1.1em);
-    font-weight: 600;
-    letter-spacing: 0.3px;
+    font-size: 1.1em;
 }
 
 #sidebar input, #sidebar select { 
@@ -312,21 +318,20 @@ body {
 
 #sidebar button { 
     width: 100%; 
-    padding: 14px 20px; 
-    margin-bottom: 12px; 
+    padding: 10px 16px; 
+    margin-bottom: 8px; 
     border: none; 
     border-radius: var(--border-radius); 
     color: white; 
     cursor: pointer; 
-    font-weight: 600; 
-    font-size: clamp(0.85em, 1.8vw, 0.95em);
+    font-weight: 500; 
+    font-size: 0.9em;
     letter-spacing: 0.025em;
     transition: all var(--transition-fast); 
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
     box-shadow: var(--shadow-1);
     position: relative;
     overflow: hidden;
-    line-height: 1.3;
 }
 
 #sidebar button::before {
@@ -498,7 +503,7 @@ body {
     font-size: 0.85em;
 }
 
-/* Contrôles de zoom et rotation personnalisés pour navigation */
+/* Contrôles de zoom personnalisés pour navigation */
 #zoom-controls {
     position: absolute;
     top: 150px;
@@ -530,69 +535,6 @@ body {
     background: #007bff;
     color: white;
     transform: scale(1.1);
-}
-
-/* Contrôles de rotation de la carte */
-#rotation-controls {
-    position: absolute;
-    top: 280px;
-    right: 10px;
-    z-index: 1002;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 12px;
-    padding: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    backdrop-filter: blur(5px);
-}
-
-.rotation-btn {
-    width: 40px;
-    height: 40px;
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(0,0,0,0.1);
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1em;
-    font-weight: bold;
-    color: #333;
-    transition: all 0.3s ease;
-    user-select: none;
-}
-
-.rotation-btn:hover {
-    background: #007bff;
-    color: white;
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0,123,255,0.3);
-}
-
-.rotation-btn:active {
-    transform: scale(0.95);
-}
-
-.rotation-btn.navigation-active {
-    background: #007bff !important;
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(0,123,255,0.4) !important;
-}
-
-#bearing-indicator {
-    font-size: 0.7em;
-    text-align: center;
-    color: #666;
-    margin-top: 4px;
-    font-weight: normal;
-}
-
-/* Classe pour désactiver la rotation automatique de l'image */
-.leaflet-container .leaflet-control-zoom {
-    display: none;
 }
 
 /* Rapport de livraison */
@@ -1129,6 +1071,36 @@ body {
     margin-bottom: 20px;
     font-size: 1.3em;
 }
+.quick-action-btn {
+    padding: 6px 10px;
+    background: linear-gradient(145deg, #6c757d, #495057);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.8em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.quick-action-btn:hover {
+    background: linear-gradient(145deg, #5a6268, #343a40);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+.quick-action-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+#quick-actions-btn:hover {
+    background: linear-gradient(145deg, #218838, #1e7e34);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(40, 167, 69, 0.3);
+}
+
 #toggle-invoice-send {
     background: linear-gradient(145deg, #0069d9, #004a9f);
     color: #fff; 
@@ -1194,7 +1166,7 @@ body {
     color: #007bff; 
 }
 
-/* Suppression complète des bordures, grilles et croix sur la carte */
+/* Suppression des bordures des tuiles */
 .leaflet-tile,
 .leaflet-tile-container img,
 .leaflet-layer,
@@ -1205,42 +1177,6 @@ body {
     box-shadow: none !important;
     outline: none !important;
     background: none !important;
-}
-
-/* Supprimer les grilles de coordonnées et échelles */
-.leaflet-control-scale,
-.leaflet-control-scale-line,
-.leaflet-control-attribution {
-    display: none !important;
-}
-
-.leaflet-container {
-    background: transparent !important;
-}
-
-/* Masquer complètement les lignes de grille et croix sur les tuiles */
-.leaflet-tile {
-    filter: none !important;
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-}
-
-/* Supprimer les indicateurs de zoom et autres contrôles par défaut */
-.leaflet-control-zoom,
-.leaflet-control-layers,
-.leaflet-bar {
-    display: none !important;
-}
-
-/* S'assurer qu'aucune grille ou croix n'apparaisse */
-.leaflet-tile-loaded {
-    border: none !important;
-    outline: none !important;
-}
-
-.leaflet-zoom-hide {
-    visibility: hidden !important;
 }
 
 /* Loading States and Progress Indicators */
@@ -1343,90 +1279,15 @@ body {
 .toast.warning {
     border-left-color: var(--warning-color);
 }
-
-/* Quick Actions Container */
-#quick-actions-container {
-    position: fixed;
-    top: 90px;
-    left: 300px;
-    z-index: 1000;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    width: 300px;
-    max-width: calc(100vw - 40px);
-    display: none;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-#quick-actions-container h3 {
-    margin-top: 0;
-    color: #007bff;
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 1.2em;
-}
-
-.quick-actions-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-.quick-action-btn {
-    padding: 12px 8px;
-    background: linear-gradient(145deg, #007bff, #0056b3);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.9em;
-    transition: all 0.3s ease;
-    text-align: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.quick-action-btn:hover {
-    background: linear-gradient(145deg, #0056b3, #003f7f);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-.quick-action-btn:active {
-    transform: translateY(0);
-}
-
-.quick-action-btn.navigation-active {
-    background: linear-gradient(145deg, #28a745, #1e7e34) !important;
-}
 .main-route-line {
     border-radius: 3px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    z-index: 400 !important;
 }
 
 .route-progress-line {
     border-radius: 3px;
-    box-shadow: 0 2px 6px rgba(40,167,69,0.4);
-    z-index: 500 !important;
-}
-
-.route-completed-line {
-    border-radius: 3px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-    z-index: 300 !important;
-}
-
-/* Assurer que les lignes de route restent visibles */
-.leaflet-overlay-pane svg {
-    pointer-events: auto !important;
-}
-
-.leaflet-overlay-pane path {
-    pointer-events: auto !important;
+    box-shadow: 0 2px 6px rgba(0,123,255,0.3);
+    z-index: 1000;
 }
 
 /* Amélioration des contrôles de navigation */
@@ -1465,22 +1326,9 @@ body {
     display: none !important;
 }
 
-/* Amélioration de la carte pendant la navigation avec rotation */
+/* Amélioration de la carte pendant la navigation */
 .leaflet-container.navigation-mode {
     cursor: crosshair;
-}
-
-.leaflet-container.rotation-enabled {
-    transition: transform 0.3s ease;
-}
-
-/* Maintenir les contrôles et marqueurs droits pendant la rotation */
-.leaflet-control {
-    transition: transform 0.3s ease;
-}
-
-.leaflet-marker-icon {
-    transition: transform 0.3s ease;
 }
 
 /* Styles pour les marqueurs personnalisés */
@@ -1502,15 +1350,6 @@ body {
 }
 
 /* ====================== MEDIA QUERIES RESPONSIVE ====================== */
-
-/* Responsive improvements for all screen sizes */
-@media screen and (max-width: 1200px) {
-    #quick-actions-container {
-        left: 50%;
-        transform: translateX(-50%);
-        width: 280px;
-    }
-}
 
 /* Tablettes */
 @media screen and (max-width: 1024px) {
@@ -1585,15 +1424,6 @@ body {
         border-radius: 0;
     }
     
-    #sidebar h3 {
-        font-size: 1.0em;
-    }
-    
-    #sidebar button {
-        font-size: 0.85em;
-        padding: 10px 16px;
-    }
-    
     #sidebar.show {
         transform: translateX(0);
     }
@@ -1619,27 +1449,6 @@ body {
         margin-left: 0;
     }
     
-    /* Quick actions responsive */
-    #quick-actions-container {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 90%;
-        max-width: 320px;
-        z-index: 1200;
-    }
-    
-    .quick-actions-grid {
-        grid-template-columns: 1fr;
-        gap: 8px;
-    }
-    
-    .quick-action-btn {
-        padding: 10px;
-        font-size: 0.85em;
-    }
-    
     /* Repositionnement des containers de rapport et facture */
     #delivery-report-container,
     #invoice-send-container,
@@ -1654,8 +1463,20 @@ body {
         z-index: 1200;
     }
     
-    #route-options-container {
-        max-width: 400px;
+    /* Adaptations pour Actions Rapides sur mobile */
+    #quick-actions-panel {
+        margin-top: 8px !important;
+        padding: 10px !important;
+    }
+    
+    .quick-action-btn {
+        padding: 8px 6px !important;
+        font-size: 0.75em !important;
+    }
+    
+    #quick-actions-btn {
+        padding: 10px !important;
+        font-size: 0.85em !important;
     }
     
     /* Layer container adapté */
@@ -1792,18 +1613,12 @@ body {
     }
     
     #sidebar h3 {
-        font-size: 0.95em;
+        font-size: 1em;
     }
     
     #sidebar button {
-        padding: 8px 12px;
-        font-size: 0.8em;
-        margin-bottom: 8px;
-    }
-    
-    .quick-action-btn {
         padding: 8px;
-        font-size: 0.8em;
+        font-size: 0.85em;
     }
     
     #delivery-report-container,
@@ -1887,14 +1702,15 @@ body {
 
 <!-- Application principale (Agent) -->
 <div id="app-container">
+    <!-- Bouton pour cacher/afficher la sidebar -->
+    <button id="sidebar-toggle">☰</button>
+    
     <div id="header">
-        <!-- Small toggle button for sidebar -->
-        <button id="sidebar-toggle-btn" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 1002; background: rgba(255,255,255,0.9); border: 1px solid rgba(0,0,0,0.1); border-radius: 6px; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #333; transition: all 0.3s;">☰</button>
         <button id="menu-toggle">☰</button>
         <div class="header-content">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin" style="width: 45px; height: 30px; margin-right: 15px; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
             <h1>Système de Distribution des Factures Impôts</h1>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin" style="width: 45px; height: 30px; margin-left: 15px; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
         </div>
         <div id="top-actions" style="display:none;">
             <button id="switch-to-admin" class="top-btn dark">Admin</button>
@@ -1903,28 +1719,26 @@ body {
     </div>
     
     <div id="sidebar">
-        <div id="sidebarContent">
-            <div id="coordContainer">
-                <h3>Recherche par coordonnées</h3>
-                <input id="latInput" placeholder="Latitude / Est" type="text">
-                <input id="lngInput" placeholder="Longitude / Nord" type="text">
-                <select id="coordType">
-                    <option value="geo">Géographique (Lat/Lng)</option>
-                    <option value="utm">UTM / Métrique</option>
-                </select>
-                <button id="coordBtnSidebar">📍 Aller</button>
-            </div>
-            <div id="searchControls">
-                <h3>Rechercher une Structure</h3>
-                <input type="text" id="searchStructureInput" placeholder="Nom de la structure">
-                <button id="searchStructureBtn">🔍 Rechercher</button>
-                <button id="locateBtn">📍 Me localiser</button>
-                <button id="toggleVoice">🔊 Voix ON/OFF</button>
-            </div>
-            <div id="companySection">
-                <button id="toggleCompanies">📂 Afficher/Cacher entreprises</button>
-                <ul id="companyList"></ul>
-            </div>
+        <div id="coordContainer">
+            <h3>Recherche par coordonnées</h3>
+            <input id="latInput" placeholder="Latitude / Est" type="text">
+            <input id="lngInput" placeholder="Longitude / Nord" type="text">
+            <select id="coordType">
+                <option value="geo">Géographique (Lat/Lng)</option>
+                <option value="utm">UTM / Métrique</option>
+            </select>
+            <button id="coordBtnSidebar">📍 Aller</button>
+        </div>
+        <div id="searchControls">
+            <h3>Rechercher une Structure</h3>
+            <input type="text" id="searchStructureInput" placeholder="Nom de la structure">
+            <button id="searchStructureBtn">🔍 Rechercher</button>
+            <button id="locateBtn">📍 Me localiser</button>
+            <button id="toggleVoice">🔊 Voix ON/OFF</button>
+        </div>
+        <div id="companySection">
+            <button id="toggleCompanies">📂 Afficher/Cacher entreprises</button>
+            <ul id="companyList"></ul>
         </div>
         <div id="routeControls">
             <h3>Navigation</h3>
@@ -1948,7 +1762,20 @@ body {
             <button id="stopRoute">🛑 Arrêter</button>
             <button id="toggle-delivery-report">📋 Rapport Livraison</button>
             <button id="toggle-invoice-send">✉️ Envoi Facture</button>
-            <button id="toggle-quick-actions">⚡ Actions Rapides</button>
+            <button id="quick-actions-btn">🧭 Actions Rapides</button>
+        </div>
+        
+        <!-- Panneau Actions Rapides -->
+        <div id="quick-actions-panel" style="display: none; margin-top: 15px; padding: 15px; background: rgba(248, 249, 250, 0.95); border-radius: 8px; border: 1px solid #dee2e6;">
+          <h4 style="margin: 0 0 12px 0; color: #495057; font-size: 1em;">🎯 Contrôles de Navigation</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+            <button id="rotate-left" class="quick-action-btn">↺ Gauche</button>
+            <button id="rotate-right" class="quick-action-btn">↻ Droite</button>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <button id="reset-rotation" class="quick-action-btn">🧭 Normal</button>
+            <button id="toggle-3d" class="quick-action-btn">🌍 Vue 3D</button>
+          </div>
         </div>
     </div>
     
@@ -2062,17 +1889,6 @@ body {
       <div class="small-muted">Astuce: le nom et le contact de l'agent (du Rapport de Livraison) sont repris comme expéditeur.</div>
     </div>
     
-    <!-- Container pour les actions rapides -->
-    <div id="quick-actions-container">
-        <h3>⚡ Actions Rapides</h3>
-        <div class="quick-actions-grid">
-            <button class="quick-action-btn" id="rotate-left-quick" title="Tourner à gauche">↻ Gauche</button>
-            <button class="quick-action-btn" id="rotate-right-quick" title="Tourner à droite">↺ Droite</button>
-            <button class="quick-action-btn" id="reset-bearing-quick" title="Remettre le nord">⬆ Nord</button>
-            <button class="quick-action-btn" id="toggle-navigation-mode-quick" title="Mode navigation libre">🗺️ Navigation</button>
-        </div>
-    </div>
-    
     <!-- Container pour les options de route -->
     <div id="route-options-container">
         <h3>🛣️ Choisir votre itinéraire</h3>
@@ -2107,15 +1923,6 @@ body {
         <button class="zoom-btn" id="zoom-follow" title="Suivre position">📍</button>
     </div>
     
-    <!-- Contrôles de rotation de la carte -->
-    <div id="rotation-controls">
-        <button class="rotation-btn" id="rotate-left" title="Tourner à gauche">↻</button>
-        <button class="rotation-btn" id="rotate-right" title="Tourner à droite">↺</button>
-        <button class="rotation-btn" id="reset-bearing" title="Remettre le nord">⬆</button>
-        <button class="rotation-btn" id="toggle-navigation-mode" title="Mode navigation libre">🗺️</button>
-        <div id="bearing-indicator">0°</div>
-    </div>
-    
     <div id="instructions-container">
         <button id="toggleInstructions">Instructions</button>
         <ul id="instructionsList" style="display:none;"></ul>
@@ -2129,11 +1936,10 @@ body {
 <div id="admin-container">
     <div id="admin-header">
         <div class="title">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="BJ">
             <strong>Interface Administrateur — Suivi des Rapports</strong>
         </div>
         <div id="admin-actions">
-
             <button id="toggle-admin-layers" class="admin-btn">🗺️ Fonds de Carte</button>
             <button id="switch-to-agent" class="admin-btn secondary">Mode Agent</button>
             <button id="export-csv" class="admin-btn">Exporter CSV</button>
@@ -2218,60 +2024,6 @@ body {
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 <script src="https://unpkg.com/leaflet-minimap/dist/Control.MiniMap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.8.0/proj4.js"></script>
-<!-- Plugin pour la rotation de la carte -->
-<script>
-// Extension pour ajouter la rotation à Leaflet
-L.Map.include({
-    setBearing: function(bearing) {
-        this._bearing = bearing || 0;
-        if (this._loaded) {
-            this._rotatePanes(this._bearing);
-        }
-        return this;
-    },
-    
-    getBearing: function() {
-        return this._bearing || 0;
-    },
-    
-    _rotatePanes: function(bearing) {
-        const angle = bearing;
-        const transform = 'rotate(' + angle + 'deg)';
-        
-        if (this._mapPane) {
-            this._mapPane.style.transform = transform;
-            this._mapPane.style.transformOrigin = '50% 50%';
-        }
-        
-        // Ajuster les controles pour qu'ils restent droits
-        const controls = this.getContainer().querySelectorAll('.leaflet-control');
-        controls.forEach(control => {
-            control.style.transform = 'rotate(' + (-angle) + 'deg)';
-        });
-        
-        // Conserver les marqueurs droits aussi
-        const markers = this.getContainer().querySelectorAll('.leaflet-marker-icon');
-        markers.forEach(marker => {
-            marker.style.transform = marker.style.transform + ' rotate(' + (-angle) + 'deg)';
-        });
-    },
-    
-    _onResize: function() {
-        L.Map.prototype._onResize.call(this);
-        if (this._bearing) {
-            this._rotatePanes(this._bearing);
-        }
-    }
-});
-
-// Hook into the map initialization
-const originalOnAdd = L.Map.prototype.onAdd;
-L.Map.prototype.onAdd = function(layer) {
-    const result = originalOnAdd.call(this, layer);
-    this._bearing = 0;
-    return result;
-};
-</script>
 <script>
 // ====================== PROFESSIONAL TOAST NOTIFICATIONS ======================
 function showToast(message, type = 'info', duration = 5000) {
@@ -2332,6 +2084,24 @@ function updateProgress(percentage) {
     if (progressBar) {
         progressBar.style.width = `${Math.min(100, Math.max(0, percentage))}%`;
     }
+}
+
+// ====================== SIGNATURE VIEWING FUNCTIONS ======================
+function viewSignature(signatureData) {
+  document.getElementById('signature-view-image').src = signatureData;
+  document.getElementById('signature-view-modal').style.display = 'flex';
+  
+  // Set up download functionality
+  document.getElementById('download-signature').onclick = () => {
+    const link = document.createElement('a');
+    link.href = signatureData;
+    link.download = 'signature_' + Date.now() + '.png';
+    link.click();
+  };
+}
+
+function closeSignatureViewModal() {
+  document.getElementById('signature-view-modal').style.display = 'none';
 }
 
 // ====================== AUTH / MODE ======================
@@ -2470,145 +2240,6 @@ function globalLogout() {
     document.getElementById('login-overlay').style.display = 'flex';
 }
 
-// ====================== QUICK ACTIONS FUNCTIONALITY ======================
-let quickActionsVisible = false;
-
-document.getElementById('toggle-quick-actions').onclick = () => {
-    quickActionsVisible = !quickActionsVisible;
-    const container = document.getElementById('quick-actions-container');
-    const btn = document.getElementById('toggle-quick-actions');
-    
-    container.style.display = quickActionsVisible ? 'block' : 'none';
-    btn.style.background = quickActionsVisible 
-        ? 'linear-gradient(145deg, #28a745, #1e7e34)' 
-        : 'linear-gradient(145deg, #007bff, #0056b3)';
-    
-    // Close other panels when opening quick actions
-    if (quickActionsVisible) {
-        document.getElementById('delivery-report-container').style.display = 'none';
-        document.getElementById('invoice-send-container').style.display = 'none';
-        document.getElementById('route-options-container').style.display = 'none';
-    }
-};
-
-// Initialize quick action button handlers
-function initializeQuickActions() {
-    // Rotate left
-    document.getElementById('rotate-left-quick').onclick = () => {
-        currentBearing = (currentBearing - 15) % 360;
-        if (currentBearing < 0) currentBearing += 360;
-        if (window.map && window.map.setBearing) {
-            window.map.setBearing(currentBearing);
-        }
-        updateBearingIndicator();
-        rotationEnabled = true;
-    };
-    
-    // Rotate right
-    document.getElementById('rotate-right-quick').onclick = () => {
-        currentBearing = (currentBearing + 15) % 360;
-        if (window.map && window.map.setBearing) {
-            window.map.setBearing(currentBearing);
-        }
-        updateBearingIndicator();
-        rotationEnabled = true;
-    };
-    
-    // Reset bearing
-    document.getElementById('reset-bearing-quick').onclick = () => {
-        currentBearing = 0;
-        if (window.map && window.map.setBearing) {
-            window.map.setBearing(0);
-        }
-        updateBearingIndicator();
-        rotationEnabled = false;
-        
-        // Reset navigation mode button
-        const navBtn = document.getElementById('toggle-navigation-mode-quick');
-        navBtn.classList.remove('navigation-active');
-    };
-    
-    // Toggle navigation mode
-    document.getElementById('toggle-navigation-mode-quick').onclick = () => {
-        const navBtn = document.getElementById('toggle-navigation-mode-quick');
-        const isNavigationMode = navBtn.classList.contains('navigation-active');
-        
-        if (isNavigationMode) {
-            navBtn.classList.remove('navigation-active');
-            navBtn.textContent = '🗺️ Navigation';
-            if (window.map) {
-                window.map.getContainer().style.cursor = 'grab';
-            }
-        } else {
-            navBtn.classList.add('navigation-active');
-            navBtn.textContent = '🗺️ Navigation';
-            if (window.map) {
-                window.map.getContainer().style.cursor = 'move';
-            }
-        }
-    };
-}
-
-// ====================== SIDEBAR CONTENT TOGGLE (SIMPLIFIED) ======================
-// Small sidebar toggle button functionality
-document.getElementById('sidebar-toggle-btn').onclick = () => {
-    const sidebar = document.getElementById('sidebar');
-    const isHidden = sidebar.classList.contains('hidden');
-    
-    sidebar.classList.toggle('hidden');
-    const btn = document.getElementById('sidebar-toggle-btn');
-    btn.innerHTML = isHidden ? '☰' : '×';
-    btn.style.background = isHidden ? 'rgba(255,255,255,0.9)' : 'rgba(255,100,100,0.9)';
-    btn.title = isHidden ? 'Masquer le menu' : 'Afficher le menu';
-    
-    // Adjust map margin
-    const map = document.getElementById('map');
-    if (isHidden) {
-        map.style.marginLeft = '320px';
-    } else {
-        map.style.marginLeft = '0';
-    }
-    
-    // Trigger map resize if map exists
-    if (typeof window.map !== 'undefined' && window.map && window.map.invalidateSize) {
-        setTimeout(() => window.map.invalidateSize(), 300);
-    }
-};
-
-// Function to load companies from server
-function loadCompaniesFromServer() {
-    fetch("/entreprises")
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Entreprises chargées depuis le serveur:", data);
-            if (allCompanies.length === 0) {
-                allCompanies = data.filter(e => e.Nom_Entreprise && e.Latitude && e.Longitude);
-                var list = document.getElementById('companyList');
-                list.innerHTML = '';
-                allCompanies.forEach(e => {
-                    var li = document.createElement('li');
-                    li.textContent = e.Nom_Entreprise;
-                    li.title = `ID: ${e.ID || ''} - Coordonnées: ${e.Latitude}, ${e.Longitude}`;
-                    li.onclick = () => {
-                        selectedCompany = e;
-                        showRouteOptions(parseFloat(e.Latitude), parseFloat(e.Longitude), e.Nom_Entreprise);
-                    };
-                    list.appendChild(li);
-                });
-                console.log(`${allCompanies.length} entreprises chargées depuis le serveur`);
-            }
-        })
-        .catch(err => {
-            console.error("Erreur lors du chargement depuis le serveur:", err);
-            console.log("Aucune entreprise chargée - seules les données CSV seront utilisées");
-        });
-}
-
 // ====================== CODE APPLICATION AGENT ======================
 function initializeApp() {
 var speech = window.speechSynthesis;
@@ -2629,7 +2260,6 @@ var isDrawing = false;
 var currentSignature = null;
 
 var map = L.map('map').setView([9.3077,2.3158],7);
-window.map = map; // Make it globally accessible
 var allCompanies = [];
 var selectedCompany = null;
 var routingControl=null, movingMarkerStart=null, movingMarkerEnd=null, movingCursor=null, routeLine=null;
@@ -2657,6 +2287,41 @@ var infraAlertDistance = 25;
 var progressLine = null;
 var totalRouteDistance = 0;
 var currentRouteProgress = 0;
+
+// Variables pour la rotation de la carte
+var currentMapRotation = 0;
+var is3DMode = false;
+var sidebarVisible = true;
+
+// ====================== ZOOM CONTROLS IN SIDEBAR ======================
+// Removed - zoom controls moved to Actions Rapides
+
+// ====================== TOGGLE SIDEBAR ======================
+document.getElementById('sidebar-toggle').onclick = () => {
+    sidebarVisible = !sidebarVisible;
+    const sidebar = document.getElementById('sidebar');
+    const map = document.getElementById('map');
+    const toggleBtn = document.getElementById('sidebar-toggle');
+    
+    if (sidebarVisible) {
+        sidebar.classList.remove('hidden');
+        map.classList.remove('sidebar-hidden');
+        toggleBtn.classList.remove('sidebar-hidden');
+        toggleBtn.innerHTML = '☰';
+    } else {
+        sidebar.classList.add('hidden');
+        map.classList.add('sidebar-hidden');
+        toggleBtn.classList.add('sidebar-hidden');
+        toggleBtn.innerHTML = '✕';
+    }
+    
+    // Redimensionner la carte après animation
+    setTimeout(() => {
+        if (typeof map !== 'undefined' && map.invalidateSize) {
+            map.invalidateSize();
+        }
+    }, 300);
+};
 
 // Icônes personnalisés pour départ, arrivée et position
 var departIcon = new L.Icon({ 
@@ -2711,20 +2376,12 @@ document.getElementById('toggleLayersBtn').onclick = () => {
     layerContainer.style.display = layerContainerVisible ? 'flex' : 'none';
 };
 
-// ====================== CONTRÔLES DE ZOOM ET ROTATION POUR NAVIGATION ======================
-let currentBearing = 0;
-let rotationEnabled = false;
-
+// ====================== CONTRÔLES DE ZOOM POUR NAVIGATION ======================
 function initZoomControls() {
     const zoomControls = document.getElementById('zoom-controls');
-    const rotationControls = document.getElementById('rotation-controls');
     const zoomInBtn = document.getElementById('zoom-in');
     const zoomOutBtn = document.getElementById('zoom-out');
     const zoomFollowBtn = document.getElementById('zoom-follow');
-    const rotateLeftBtn = document.getElementById('rotate-left');
-    const rotateRightBtn = document.getElementById('rotate-right');
-    const resetBearingBtn = document.getElementById('reset-bearing');
-    const bearingIndicator = document.getElementById('bearing-indicator');
     
     // Permettre le zoom libre pendant la navigation
     zoomInBtn.onclick = () => {
@@ -2774,150 +2431,24 @@ function initZoomControls() {
         }
     });
     
-    // Contrôles de rotation de la carte
-    rotateLeftBtn.onclick = () => {
-        currentBearing = (currentBearing - 15) % 360;
-        if (currentBearing < 0) currentBearing += 360;
-        map.setBearing(currentBearing);
-        bearingIndicator.textContent = `${Math.round(currentBearing)}°`;
-        rotationEnabled = true;
-    };
-    
-    rotateRightBtn.onclick = () => {
-        currentBearing = (currentBearing + 15) % 360;
-        map.setBearing(currentBearing);
-        bearingIndicator.textContent = `${Math.round(currentBearing)}°`;
-        rotationEnabled = true;
-    };
-    
-    resetBearingBtn.onclick = () => {
-        currentBearing = 0;
-        map.setBearing(0);
-        bearingIndicator.textContent = '0°';
-        rotationEnabled = false;
-    };
-    
-    // New navigation mode toggle button (keep existing functionality)
-    const toggleNavigationBtn = document.getElementById('toggle-navigation-mode');
-    if (toggleNavigationBtn) {
-        toggleNavigationBtn.onclick = () => {
-            const isNavigationMode = toggleNavigationBtn.classList.contains('navigation-active');
-            
-            if (isNavigationMode) {
-                // Disable navigation mode
-                toggleNavigationBtn.classList.remove('navigation-active');
-                toggleNavigationBtn.style.background = 'rgba(255, 255, 255, 0.95)';
-                toggleNavigationBtn.style.color = '#333';
-                toggleNavigationBtn.title = 'Mode navigation libre';
-                map.getContainer().style.cursor = 'grab';
-            } else {
-                // Enable navigation mode
-                toggleNavigationBtn.classList.add('navigation-active');
-                toggleNavigationBtn.style.background = '#007bff';
-                toggleNavigationBtn.style.color = 'white';
-                toggleNavigationBtn.title = 'Mode normal';
-                map.getContainer().style.cursor = 'move';
-            }
-        };
-    }
-    
-    // Mettre à jour l'indicateur de bearing
-    function updateBearingIndicator() {
-        if (map.getBearing) {
-            const bearing = map.getBearing() || 0;
-            bearingIndicator.textContent = `${Math.round(bearing)}°`;
-        }
-    }
-    
-    // Permettre la rotation manuelle avec la souris (toucher et glisser)
-    let isDraggingForRotation = false;
-    let startRotationY = 0;
-    
-    map.on('mousedown', (e) => {
-        if (e.originalEvent.shiftKey) {
-            isDraggingForRotation = true;
-            startRotationY = e.originalEvent.clientY;
-            map.dragging.disable();
-            e.originalEvent.preventDefault();
-        }
-    });
-    
-    map.on('mousemove', (e) => {
-        if (isDraggingForRotation && e.originalEvent.shiftKey) {
-            const deltaY = e.originalEvent.clientY - startRotationY;
-            const rotationDelta = deltaY * 0.5; // Sensibilité de rotation
-            currentBearing = (currentBearing + rotationDelta) % 360;
-            if (currentBearing < 0) currentBearing += 360;
-            map.setBearing(currentBearing);
-            updateBearingIndicator();
-            startRotationY = e.originalEvent.clientY;
-            rotationEnabled = true;
-        }
-    });
-    
-    map.on('mouseup', (e) => {
-        if (isDraggingForRotation) {
-            isDraggingForRotation = false;
-            map.dragging.enable();
-        }
-    });
-    
-    // Support tactile pour la rotation
-    let isTouchRotating = false;
-    let startTouchY = 0;
-    
-    map.on('touchstart', (e) => {
-        if (e.originalEvent.touches.length === 2) {
-            isTouchRotating = true;
-            startTouchY = e.originalEvent.touches[0].clientY;
-            e.originalEvent.preventDefault();
-        }
-    });
-    
-    map.on('touchmove', (e) => {
-        if (isTouchRotating && e.originalEvent.touches.length === 2) {
-            const deltaY = e.originalEvent.touches[0].clientY - startTouchY;
-            const rotationDelta = deltaY * 0.3;
-            currentBearing = (currentBearing + rotationDelta) % 360;
-            if (currentBearing < 0) currentBearing += 360;
-            map.setBearing(currentBearing);
-            updateBearingIndicator();
-            startTouchY = e.originalEvent.touches[0].clientY;
-            rotationEnabled = true;
-        }
-    });
-    
-    map.on('touchend', (e) => {
-        if (isTouchRotating) {
-            isTouchRotating = false;
-        }
-    });
-    
     // Afficher les contrôles seulement pendant la navigation
     function showZoomControls() {
         zoomControls.style.display = 'flex';
-        rotationControls.style.display = 'flex';
         // Activer le suivi par défaut au début de la navigation
         followUserPosition = true;
         zoomFollowBtn.style.background = '#007bff';
         zoomFollowBtn.style.color = 'white';
-        updateBearingIndicator();
     }
     
     function hideZoomControls() {
         zoomControls.style.display = 'none';
-        rotationControls.style.display = 'none';
         followUserPosition = true;
-        // Réinitialiser la rotation quand on quitte la navigation
-        currentBearing = 0;
-        if (map.setBearing) map.setBearing(0);
-        rotationEnabled = false;
     }
     
-    return { showZoomControls, hideZoomControls, updateBearingIndicator };
+    return { showZoomControls, hideZoomControls };
 }
 
-const { showZoomControls, hideZoomControls, updateBearingIndicator } = initZoomControls();
+const { showZoomControls, hideZoomControls } = initZoomControls();
 
 function speak(text){
     if(!voiceEnabled) return;
@@ -2967,7 +2498,7 @@ map.on('locationfound', e => {
 map.on('locationerror',()=>{ alert("Impossible de vous localiser."); });
 
 // ====================== CHARGEMENT DES ENTREPRISES DEPUIS LE CSV ======================
-Papa.parse("entreprises_geocodes.csv", {
+Papa.parse("public/entreprises_geocodes.csv", {
     download: true,
     header: true,
     complete: function(results) {
@@ -2985,12 +2516,32 @@ Papa.parse("entreprises_geocodes.csv", {
             };
             list.appendChild(li);
         });
-        console.log(`${allCompanies.length} entreprises chargées depuis le CSV`);
+        console.log(`${allCompanies.length} entreprises chargées`);
     },
     error: function(error) {
         console.error("Erreur lors du chargement du CSV:", error);
-        // Essayer de charger depuis le serveur en cas d'erreur CSV
-        loadCompaniesFromServer();
+        // Fallback avec les données intégrées si le CSV ne se charge pas
+        allCompanies = [
+            {ID: "1", Nom_Entreprise: "EREVAN", Latitude: "6.348958", Longitude: "2.386909"},
+            {ID: "2", Nom_Entreprise: "Le Plasma Bar", Latitude: "6.381497", Longitude: "2.334261"},
+            {ID: "3", Nom_Entreprise: "Poulet Piquet", Latitude: "6.382206", Longitude: "2.336388"},
+            {ID: "4", Nom_Entreprise: "Sofitel Hôtel", Latitude: "6.350114", Longitude: "2.393706"},
+            {ID: "5", Nom_Entreprise: "Séminaire St Jean Eudes", Latitude: "6.38906", Longitude: "2.321026"},
+            {ID: "6", Nom_Entreprise: "Eglise de Jésus-Christ des Saints des derniers Jours", Latitude: "6.392349", Longitude: "2.317976"}
+        ];
+        var list = document.getElementById('companyList');
+        list.innerHTML = ''; 
+        allCompanies.forEach(e => {
+            var li = document.createElement('li');
+            li.textContent = e.Nom_Entreprise;
+            li.title = `ID: ${e.ID} - Coordonnées: ${e.Latitude}, ${e.Longitude}`;
+            li.onclick = () => { 
+                selectedCompany = e; 
+                showRouteOptions(parseFloat(e.Latitude), parseFloat(e.Longitude), e.Nom_Entreprise); 
+            };
+            list.appendChild(li);
+        });
+        console.log("Utilisation des données de fallback");
     }
 });
 
@@ -3168,47 +2719,23 @@ function updateProgressiveLine(userPos) {
         movingCursor.setLatLng(projectedPos);
     }
     
-    // Maintenir la ligne de route principale visible
-    if (!routeLine && routeCoords && routeCoords.length > 0) {
-        routeLine = L.polyline(routeCoords.map(c => [c.lat, c.lng]), {
-            color: '#1e90ff', 
-            weight: 4, 
-            opacity: 0.6,
-            className: 'main-route-line'
-        }).addTo(map);
-    }
-    
     // Supprimer l'ancienne ligne de progression
     if (progressLine) {
         map.removeLayer(progressLine);
     }
     
-    // Créer une ligne progressive qui montre le trajet restant
+    // Créer une ligne progressive qui diminue au fur et à mesure de l'avancement
     const remainingCoords = routeCoords.slice(closestIndex);
     if (remainingCoords.length > 1) {
         // Ajouter la position projetée au début des coordonnées restantes
         const progressCoords = [projectedPos, ...remainingCoords.map(c => [c.lat, c.lng])];
         
         progressLine = L.polyline(progressCoords, { 
-            color: '#28a745', 
-            weight: 8, 
+            color: '#007bff', 
+            weight: 6, 
             opacity: 0.9,
-            className: 'route-progress-line',
-            dashArray: '10, 5'
+            className: 'route-progress-line'
         }).addTo(map);
-    }
-    
-    // Créer une ligne pour le trajet déjà parcouru
-    if (closestIndex > 0) {
-        const completedCoords = routeCoords.slice(0, closestIndex + 1).map(c => [c.lat, c.lng]);
-        if (completedCoords.length > 1) {
-            L.polyline(completedCoords, {
-                color: '#6c757d',
-                weight: 6,
-                opacity: 0.5,
-                className: 'route-completed-line'
-            }).addTo(map);
-        }
     }
     
     // Calculer le progrès
@@ -3266,23 +2793,11 @@ function startRealTimeGPSTracking(){
         if (followUserPosition) {
             const currentZoom = map.getZoom();
             const targetZoom = Math.max(currentZoom, 16); // Zoom optimisé pour navigation
-            
-            // Maintenir la rotation actuelle pendant le suivi
-            if (rotationEnabled && map.setBearing) {
-                map.setView(userPos, targetZoom, {
-                    animate: true, 
-                    duration: 1.0,
-                    easeLinearity: 0.5
-                });
-                // Conserver le bearing actuel
-                map.setBearing(currentBearing);
-            } else {
-                map.setView(userPos, targetZoom, {
-                    animate: true, 
-                    duration: 1.0,
-                    easeLinearity: 0.5
-                });
-            }
+            map.setView(userPos, targetZoom, {
+                animate: true, 
+                duration: 1.0,
+                easeLinearity: 0.5
+            });
         }
         
         // Gestion des instructions vocales basées sur la position réelle
@@ -3341,21 +2856,21 @@ function startRealTimeGPSTracking(){
         switch(error.code) {
             case error.PERMISSION_DENIED:
                 errorMessage += "Accès à la localisation refusé";
-                showToast(errorMessage, 'error');
+
                 break;
             case error.POSITION_UNAVAILABLE:
                 errorMessage += "Position indisponible";
-                showToast(errorMessage, 'warning');
+
                 break;
             case error.TIMEOUT:
                 errorMessage += "Timeout de localisation";
-                showToast(errorMessage, 'warning');
+
                 break;
         }
         
         // En cas d'erreur GPS, continuer avec l'animation simulée
         if (!isPaused && isNavigating) {
-            showToast('Passage en mode simulation', 'info');
+
             resumeRouteAnimation();
         }
     }, {
@@ -3424,7 +2939,7 @@ function calculateRouteOptions(start, end, destinationName) {
     const routesList = document.getElementById('routes-list');
     routesList.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-secondary);"><span class="loading-spinner"></span>Calcul des itinéraires...</div>';
     
-    showToast('Calcul des itinéraires en cours...', 'info', 3000);
+    console.log('Calcul des itinéraires en cours...');
     
     availableRoutes = [];
     let routesCalculated = 0;
@@ -3480,14 +2995,14 @@ function calculateRouteOptions(start, end, destinationName) {
         const distance = (route.summary.totalDistance / 1000).toFixed(1);
         
         availableRoutes[0] = {
-            type: "Itinéraire principal",
+            type: "Itinéraire le plus rapide",
             duration: `${duration} min`,
             distance: `${distance} km`,
-            description: "Via les grandes artères - Itinéraire recommandé",
+            description: "Via les routes principales - Moins de trafic",
             routeData: route,
             waypoints: [L.latLng(start), L.latLng(end)],
             options: { profile: 'driving', alternative: false },
-            icon: '🚙',
+            icon: '🚗',
             color: '#4caf50'
         };
         
@@ -3495,7 +3010,7 @@ function calculateRouteOptions(start, end, destinationName) {
         updateProgress((routesCalculated / totalRoutes) * 100);
         if (routesCalculated === totalRoutes) {
             renderRouteOptions();
-            showToast('Itinéraires calculés avec succès!', 'success');
+
         }
     });
     
@@ -3521,19 +3036,19 @@ function calculateRouteOptions(start, end, destinationName) {
             type: "Itinéraire alternatif",
             duration: `${duration} min`,
             distance: `${distance} km`,
-            description: "Via routes secondaires - Évite la congestion",
+            description: "Via routes secondaires - Évite les embouteillages",
             routeData: route,
             waypoints: [L.latLng(start), L.latLng(midLat, midLng), L.latLng(end)],
             options: { profile: 'driving', alternative: true },
-            icon: '🚪',
-            color: '#2196f3'
+            icon: '🛣️',
+            color: '#ff9800'
         };
         
         routesCalculated++;
         updateProgress((routesCalculated / totalRoutes) * 100);
         if (routesCalculated === totalRoutes) {
             renderRouteOptions();
-            showToast('Itinéraires calculés avec succès!', 'success');
+
         }
     });
     
@@ -3557,22 +3072,22 @@ function calculateRouteOptions(start, end, destinationName) {
         const distance = (route.summary.totalDistance / 1000 * 0.85).toFixed(1);
         
         availableRoutes[2] = {
-            type: "Itinéraire direct",
+            type: "Itinéraire le plus court",
             duration: `${duration} min`,
             distance: `${distance} km`,
-            description: "Trajet le plus court - Route directe",
+            description: "Parcours direct - Peut avoir plus de trafic",
             routeData: route,
             waypoints: [L.latLng(start), L.latLng(end)],
             options: { profile: 'driving', shortest: true },
             icon: '🏁',
-            color: '#ff9800'
+            color: '#2196f3'
         };
         
         routesCalculated++;
         updateProgress((routesCalculated / totalRoutes) * 100);
         if (routesCalculated === totalRoutes) {
             renderRouteOptions();
-            showToast('Itinéraires calculés avec succès!', 'success');
+
         }
     });
     
@@ -3587,7 +3102,7 @@ function calculateRouteOptions(start, end, destinationName) {
         map.addControl(route3Profile);
         setTimeout(() => map.removeControl(route3Profile), 100);
     } catch (error) {
-        showToast('Erreur lors du calcul des itinéraires', 'error');
+        console.log('Erreur lors du calcul des itinéraires');
         console.error('Route calculation error:', error);
     }
 }
@@ -3621,9 +3136,9 @@ function renderRouteOptions() {
 
 function getRouteRecommendation(index) {
     const recommendations = [
-        "Livraisons quotidiennes et trajets standards",
-        "Circulation dense, éviter les embouteillages", 
-        "Trajets urgents et distances courtes"
+        "Trajets urgents et livraisons prioritaires",
+        "Circulation dense, heures de pointe", 
+        "Trajets courts et connus"
     ];
     return recommendations[index] || "Trajets standards";
 }
@@ -3692,15 +3207,15 @@ function startRouteWithSelectedOption(lat, lng, name, selectedRoute) {
             routeCoords = route.coordinates;
             routeInstructions = route.instructions;
             
-            // Créer notre propre ligne de route qui reste visible
+            // Supprimer l'ancienne ligne de route par défaut du contrôle
             if (routeLine) map.removeLayer(routeLine);
+            
+            // Créer notre propre ligne de route complète
             routeLine = L.polyline(routeCoords, {
-                color: '#0000ff', 
+                color: '#1e90ff', 
                 weight: 6, 
                 opacity: 0.8,
-                className: 'main-route-line',
-                interactive: false,
-                pane: 'overlayPane'
+                className: 'main-route-line'
             }).addTo(map);
             
             // Créer les trois marqueurs uniques
@@ -3760,14 +3275,11 @@ function startRoute(lat,lng,name){
             routeInstructions=route.instructions; 
             
             // Créer notre propre ligne de route
-            if (routeLine) map.removeLayer(routeLine);
             routeLine=L.polyline(routeCoords, {
-                color:'#0000ff', 
+                color:'#1e90ff', 
                 weight:6, 
                 opacity:0.8,
-                className: 'main-route-line',
-                interactive: false,
-                pane: 'overlayPane'
+                className: 'main-route-line'
             }).addTo(map);
             
             // Créer les trois marqueurs
@@ -3820,14 +3332,11 @@ function startRouteWithoutVoice(lat,lng,name){
             routeInstructions=route.instructions; 
             
             // Créer notre propre ligne de route
-            if (routeLine) map.removeLayer(routeLine);
             routeLine=L.polyline(routeCoords, {
-                color:'#0000ff', 
+                color:'#1e90ff', 
                 weight:6, 
                 opacity:0.8,
-                className: 'main-route-line',
-                interactive: false,
-                pane: 'overlayPane'
+                className: 'main-route-line'
             }).addTo(map);
             
             // Créer les trois marqueurs
@@ -4008,13 +3517,74 @@ document.getElementById('submit-report').onclick = () => {
         
         const statusText = deliveryStatus === 'delivered' ? 'livrée' : 'non livrée';
         showMessage('success', `Rapport de facture ${statusText} envoyé avec succès !`);
-        showToast(`Rapport de livraison enregistré!`, 'success');
 
         setTimeout(() => { resetForm(); }, 2000);
     }, 1500);
 };
 
 initializeDateTime();
+
+// ====================== ACTIONS RAPIDES ======================
+document.getElementById('quick-actions-btn').onclick = () => {
+    const panel = document.getElementById('quick-actions-panel');
+    const isVisible = panel.style.display !== 'none';
+    panel.style.display = isVisible ? 'none' : 'block';
+};
+
+// Rotation vers la gauche
+document.getElementById('rotate-left').onclick = () => {
+    currentMapRotation -= 15;
+    if (currentMapRotation < 0) currentMapRotation = 345;
+    
+    // Utiliser transform CSS pour la rotation
+    const mapContainer = document.getElementById('map');
+    mapContainer.style.transform = `rotate(${currentMapRotation}deg)`;
+    mapContainer.style.transformOrigin = 'center';
+};
+
+// Rotation vers la droite
+document.getElementById('rotate-right').onclick = () => {
+    currentMapRotation += 15;
+    if (currentMapRotation >= 360) currentMapRotation = 0;
+    
+    // Utiliser transform CSS pour la rotation
+    const mapContainer = document.getElementById('map');
+    mapContainer.style.transform = `rotate(${currentMapRotation}deg)`;
+    mapContainer.style.transformOrigin = 'center';
+};
+
+// Retour à la normale
+document.getElementById('reset-rotation').onclick = () => {
+    currentMapRotation = 0;
+    
+    // Réinitialiser la transformation CSS
+    const mapContainer = document.getElementById('map');
+    mapContainer.style.transform = 'rotate(0deg)';
+    
+    if (is3DMode) {
+        mapContainer.style.perspective = 'none';
+        is3DMode = false;
+        document.getElementById('toggle-3d').textContent = '🌍 Vue 3D';
+    }
+};
+
+// Toggle Vue 3D
+document.getElementById('toggle-3d').onclick = () => {
+    is3DMode = !is3DMode;
+    const mapContainer = document.getElementById('map');
+    const btn = document.getElementById('toggle-3d');
+    
+    if (is3DMode) {
+        mapContainer.style.perspective = '1000px';
+        mapContainer.style.transformStyle = 'preserve-3d';
+        mapContainer.style.transform = `rotate(${currentMapRotation}deg) rotateX(45deg)`;
+        btn.textContent = '🗺️ Vue 2D';
+    } else {
+        mapContainer.style.perspective = 'none';
+        mapContainer.style.transform = `rotate(${currentMapRotation}deg)`;
+        btn.textContent = '🌍 Vue 3D';
+    }
+};
 
 // ====================== ENVOI DE FACTURE ======================
 let invoicePanelVisible = false;
@@ -4247,17 +3817,6 @@ document.getElementById('not-delivered-radio').addEventListener('change', functi
 
 setupTopActionsForRole();
 initializeSignature();
-initializeQuickActions();
-
-// Add signature modal event listeners
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('view-signature')) {
-        const signatureData = e.target.getAttribute('data-signature');
-        if (signatureData) {
-            viewSignature(signatureData);
-        }
-    }
-});
 }
 
 // ====================== INTERFACE ADMIN ======================
@@ -4316,7 +3875,7 @@ function initializeAdmin() {
 
     document.getElementById('export-csv').onclick = () => exportReportsCSV(loadReportsFromLS());
     
-    // Setup toggle buttons (without agent sidebar)
+    // Setup toggle buttons
     setupAdminToggleButtons();
 }
 
@@ -4356,14 +3915,13 @@ function setupAdminLayerControls() {
 }
 
 function setupAdminToggleButtons() {
-    
     // Toggle admin layers
     document.getElementById('toggle-admin-layers').onclick = () => {
         adminLayerContainerVisible = !adminLayerContainerVisible;
         adminLayerContainer.style.display = adminLayerContainerVisible ? 'flex' : 'none';
         const btn = document.getElementById('toggle-admin-layers');
         btn.style.background = adminLayerContainerVisible ? 'var(--primary-dark)' : 'var(--primary-color)';
-        showToast(adminLayerContainerVisible ? 'Fonds de carte affichés' : 'Fonds de carte masqués', 'info');
+        console.log(adminLayerContainerVisible ? 'Fonds de carte affichés' : 'Fonds de carte masqués');
     };
 }
 
@@ -4394,7 +3952,7 @@ function renderAdminTable(reports) {
             <td>${escapeHtml(r.deliveryTime||'')}</td>
             <td style="max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(r.reason||'')}">${escapeHtml(r.reason||'')}</td>
             <td style="max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(r.structure||'')}">${escapeHtml(r.structure||'')}</td>
-            <td>${r.signature ? '<button class="view-signature" onclick="viewSignature(\"' + r.signature + '\")" style="background:#007bff;color:white;border:none;border-radius:4px;padding:3px 6px;cursor:pointer;font-size:0.7em;">📷 Voir</button>' : '<span style="color:#6c757d;">⭕ Non signée</span>'}</td>
+            <td>${r.signature ? '<button class="view-signature" data-signature="' + r.signature + '" style="background:#007bff;color:white;border:none;border-radius:4px;padding:3px 6px;cursor:pointer;font-size:0.7em;">📷 Voir</button>' : '<span style="color:#6c757d;">⭕ Non signée</span>'}</td>
             <td>${posTxt}</td>
             <td style="font-size:0.7em;">${created}</td>
             <td class="row-actions">
@@ -4411,6 +3969,15 @@ function renderAdminTable(reports) {
         delBtn.onclick = () => deleteReport(r.id);
 
         tbody.appendChild(tr);
+        
+        // Add signature viewing event listeners
+        const signatureBtn = tr.querySelector('.view-signature');
+        if (signatureBtn) {
+            signatureBtn.onclick = () => {
+                const signatureData = signatureBtn.getAttribute('data-signature');
+                viewSignature(signatureData);
+            };
+        }
       });
 }
 
@@ -4541,43 +4108,3 @@ window.addEventListener('storage', (e)=>{
 
 </body>
 </html>
-
-```
-
-// Add signature modal for viewing
-<div id="signature-view-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:15000;padding:20px;">
-  <div style="background:#fff;padding:20px;border-radius:8px;width:100%;max-width:500px;box-shadow:0 6px 18px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto;">
-    <h3 style="margin-top:0;color:#007bff;text-align:center;">📷 Signature de réception</h3>
-    <div style="text-align:center;margin:20px 0;">
-      <img id="signature-view-image" style="max-width:100%;max-height:300px;border:1px solid #ddd;border-radius:8px;" />
-    </div>
-    <div style="text-align:center;">
-      <button onclick="closeSignatureViewModal()" style="background:#6c757d;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;">Fermer</button>
-      <button id="download-signature" style="background:#28a745;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;margin-left:10px;">💾 Télécharger</button>
-    </div>
-  </div>
-</div>
-
-// Add signature viewing functions
-function viewSignature(signatureData) {
-  document.getElementById('signature-view-image').src = signatureData;
-  document.getElementById('signature-view-modal').style.display = 'flex';
-  
-  // Set up download functionality
-  document.getElementById('download-signature').onclick = () => {
-    const link = document.createElement('a');
-    link.href = signatureData;
-    link.download = 'signature_' + Date.now() + '.png';
-    link.click();
-  };
-}
-
-function closeSignatureViewModal() {
-  document.getElementById('signature-view-modal').style.display = 'none';
-}
-</script>
-
-</body>
-</html>
-
-}
