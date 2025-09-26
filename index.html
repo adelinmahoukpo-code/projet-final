@@ -41,6 +41,7 @@
     width: 100%;
     max-width: 350px;
     text-align: center;
+    box-sizing: border-box;
 }
 
 #login-container h2 {
@@ -264,6 +265,7 @@ body {
     border-right: 1px solid var(--divider-color);
     transform: translateX(0);
     transition: transform var(--transition-medium);
+    box-sizing: border-box;
 }
 
 #sidebar::before {
@@ -554,6 +556,7 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     max-height: calc(100vh - 120px);
     overflow-y: auto;
+    box-sizing: border-box;
 }
 
 #delivery-report-container h3 {
@@ -862,6 +865,7 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     max-height: calc(100vh - 120px);
     overflow-y: auto;
+    box-sizing: border-box;
 }
 
 #route-options-container h3 {
@@ -967,6 +971,7 @@ body {
     max-width: 500px;
     display: none;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-sizing: border-box;
 }
 
 #signature-container h3 {
@@ -1351,332 +1356,415 @@ body {
 
 /* ====================== MEDIA QUERIES RESPONSIVE ====================== */
 
-/* Tablettes */
-@media screen and (max-width: 1024px) {
-    #admin-main {
-        grid-template-columns: 1fr;
+    /* Desktop large */
+    @media screen and (max-width: 1200px) {
+        #sidebar {
+            width: 280px;
+        }
+        
+        #map {
+            margin-left: 280px;
+        }
+        
+        #delivery-report-container,
+        #invoice-send-container {
+            left: 280px;
+        }
     }
-    
-    #layer-container {
-        right: 5px;
-        top: 85px;
-    }
-    
-    .layer-preview {
-        width: 40px;
-        height: 40px;
-    }
-    
-    #instructions-container {
-        max-width: 250px;
-        bottom: 5px;
-        right: 5px;
-    }
-}
 
-/* Smartphones et petites tablettes */
-@media screen and (max-width: 768px) {
-    /* Header responsive */
-    #header {
-        padding: 10px 15px;
-        flex-direction: row;
-        justify-content: space-between;
+    /* Tablettes */
+    @media screen and (max-width: 1024px) {
+        #admin-main {
+            grid-template-columns: 1fr;
+        }
+        
+        #layer-container {
+            right: 5px;
+            top: 85px;
+        }
+        
+        .layer-preview {
+            width: 40px;
+            height: 40px;
+        }
+        
+        #instructions-container {
+            max-width: 250px;
+            bottom: 5px;
+            right: 5px;
+        }
+        
+        #sidebar {
+            width: 250px;
+        }
+        
+        #map {
+            margin-left: 250px;
+        }
+        
+        #delivery-report-container,
+        #invoice-send-container,
+        #route-options-container {
+            left: 250px;
+            width: 320px;
+        }
     }
-    
-    #header .header-content {
-        justify-content: flex-start;
-        flex: 1;
-    }
-    
-    #header h1 {
-        font-size: 1.2em;
-        text-align: left;
-    }
-    
-    #header img {
-        width: 35px;
-        margin-right: 10px;
-    }
-    
-    /* Bouton hamburger visible */
-    #menu-toggle {
-        display: block;
-        order: 3;
-    }
-    
-    #top-actions {
-        order: 2;
-        margin-right: 10px;
-    }
-    
-    .top-btn {
-        padding: 4px 8px;
-        font-size: 0.75em;
-    }
-    
-    /* Sidebar devient overlay sur mobile */
-    #sidebar {
-        width: 100%;
-        max-width: 320px;
-        transform: translateX(-100%);
-        z-index: 1100;
-        box-shadow: 4px 0 20px rgba(0,0,0,0.3);
-        border-radius: 0;
-    }
-    
-    #sidebar.show {
-        transform: translateX(0);
-    }
-    
-    /* Overlay pour fermer la sidebar */
-    #sidebar-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.5);
-        z-index: 1050;
-        display: none;
-    }
-    
-    #sidebar-overlay.show {
-        display: block;
-    }
-    
-    /* Map prend toute la largeur sur mobile */
-    #map {
-        margin-left: 0;
-    }
-    
-    /* Repositionnement des containers de rapport et facture */
-    #delivery-report-container,
-    #invoice-send-container,
-    #route-options-container {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 90%;
-        max-width: 350px;
-        max-height: 80vh;
-        z-index: 1200;
-    }
-    
-    /* Adaptations pour Actions Rapides sur mobile */
-    #quick-actions-panel {
-        margin-top: 8px !important;
-        padding: 10px !important;
-    }
-    
-    .quick-action-btn {
-        padding: 8px 6px !important;
-        font-size: 0.75em !important;
-    }
-    
-    #quick-actions-btn {
-        padding: 10px !important;
-        font-size: 0.85em !important;
-    }
-    
-    /* Layer container adapté */
-    #layer-container {
-        top: 85px;
-        right: 5px;
-        padding: 5px;
-    }
-    
-    .layer-preview {
-        width: 35px;
-        height: 35px;
-        margin: 3px;
-    }
-    
-    /* Instructions container */
-    #instructions-container {
-        bottom: 5px;
-        right: 5px;
-        left: 5px;
-        max-width: none;
-        font-size: 0.8em;
-        padding: 10px;
-    }
-    
-    #toggleInstructions {
-        font-size: 0.75em;
-    }
-    
-    #instructionsList {
-        max-height: 150px;
-    }
-    
-    /* Toggle layers button */
-    #toggleLayersBtn {
-        top: 85px;
-        right: 50px;
-        padding: 6px 8px;
-        font-size: 0.75em;
-    }
-    
-    /* Zoom controls */
-    #zoom-controls {
-        top: 130px;
-        right: 5px;
-    }
-    
-    .zoom-btn {
-        width: 35px;
-        height: 35px;
-        font-size: 1em;
-    }
-    
-    /* Interface Admin responsive */
-    #admin-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-    }
-    
-    #admin-header .title {
-        justify-content: center;
-        text-align: center;
-    }
-    
-    #admin-actions {
-        justify-content: center;
-    }
-    
-    #admin-main {
-        padding: 8px;
-        gap: 8px;
-    }
-    
-    #admin-panel {
-        padding: 8px;
-    }
-    
-    #reports-table {
-        font-size: 0.75em;
-    }
-    
-    #reports-table th,
-    #reports-table td {
-        padding: 4px 2px;
-    }
-    
-    .status-badge {
-        font-size: 0.65em;
-        padding: 1px 4px;
-    }
-    
-    .row-actions button {
-        padding: 2px 4px;
-        font-size: 0.65em;
-        margin-right: 1px;
-    }
-    
-    #admin-map {
-        height: 300px;
-    }
-    
-    /* Form groups responsive */
-    .datetime-group {
-        flex-direction: column;
-        gap: 5px;
-    }
-    
-    /* Login responsive */
-    #login-container {
-        padding: 20px;
-        margin: 10px;
-    }
-    
-    #login-container h2 {
-        font-size: 1.5em;
-    }
-}
 
-/* Très petits écrans */
-@media screen and (max-width: 480px) {
-    #header h1 {
-        font-size: 1em;
+    /* Smartphones et petites tablettes */
+    @media screen and (max-width: 768px) {
+        /* Header responsive */
+        #header {
+            padding: 10px 15px;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+        
+        #header .header-content {
+            justify-content: flex-start;
+            flex: 1;
+        }
+        
+        #header h1 {
+            font-size: 1.2em;
+            text-align: left;
+        }
+        
+        #header img {
+            width: 35px;
+            margin-right: 10px;
+        }
+        
+        /* Bouton hamburger visible */
+        #menu-toggle {
+            display: block;
+            order: 3;
+        }
+        
+        #top-actions {
+            order: 2;
+            margin-right: 10px;
+        }
+        
+        .top-btn {
+            padding: 4px 8px;
+            font-size: 0.75em;
+        }
+        
+        /* Sidebar devient overlay sur mobile */
+        #sidebar {
+            width: 100%;
+            max-width: 320px;
+            transform: translateX(-100%);
+            z-index: 1100;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+            border-radius: 0;
+            box-sizing: border-box;
+        }
+        
+        #sidebar.show {
+            transform: translateX(0);
+        }
+        
+        /* Overlay pour fermer la sidebar */
+        #sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1050;
+            display: none;
+        }
+        
+        #sidebar-overlay.show {
+            display: block;
+        }
+        
+        /* Map prend toute la largeur sur mobile */
+        #map {
+            margin-left: 0;
+        }
+        
+        /* Repositionnement des containers de rapport et facture */
+        #delivery-report-container,
+        #invoice-send-container,
+        #route-options-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 350px;
+            max-height: 80vh;
+            z-index: 1200;
+        }
+        
+        /* Adaptations pour Actions Rapides sur mobile */
+        #quick-actions-panel {
+            margin-top: 8px !important;
+            padding: 10px !important;
+        }
+        
+        .quick-action-btn {
+            padding: 8px 6px !important;
+            font-size: 0.75em !important;
+        }
+        
+        #quick-actions-btn {
+            padding: 10px !important;
+            font-size: 0.85em !important;
+        }
+        
+        /* Layer container adapté */
+        #layer-container {
+            top: 85px;
+            right: 5px;
+            padding: 5px;
+        }
+        
+        .layer-preview {
+            width: 35px;
+            height: 35px;
+            margin: 3px;
+        }
+        
+        /* Instructions container */
+        #instructions-container {
+            bottom: 5px;
+            right: 5px;
+            left: 5px;
+            max-width: none;
+            font-size: 0.8em;
+            padding: 10px;
+        }
+        
+        #toggleInstructions {
+            font-size: 0.75em;
+        }
+        
+        #instructionsList {
+            max-height: 150px;
+        }
+        
+        /* Toggle layers button */
+        #toggleLayersBtn {
+            top: 85px;
+            right: 50px;
+            padding: 6px 8px;
+            font-size: 0.75em;
+        }
+        
+        /* Zoom controls */
+        #zoom-controls {
+            top: 130px;
+            right: 5px;
+        }
+        
+        .zoom-btn {
+            width: 35px;
+            height: 35px;
+            font-size: 1em;
+        }
+        
+        /* Interface Admin responsive */
+        #admin-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+        
+        #admin-header .title {
+            justify-content: center;
+            text-align: center;
+        }
+        
+        #admin-actions {
+            justify-content: center;
+        }
+        
+        #admin-main {
+            padding: 8px;
+            gap: 8px;
+        }
+        
+        #admin-panel {
+            padding: 8px;
+        }
+        
+        #reports-table {
+            font-size: 0.75em;
+        }
+        
+        #reports-table th,
+        #reports-table td {
+            padding: 4px 2px;
+        }
+        
+        .status-badge {
+            font-size: 0.65em;
+            padding: 1px 4px;
+        }
+        
+        .row-actions button {
+            padding: 2px 4px;
+            font-size: 0.65em;
+            margin-right: 1px;
+        }
+        
+        #admin-map {
+            height: 300px;
+        }
+        
+        /* Form groups responsive */
+        .datetime-group {
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        /* Login responsive */
+        #login-container {
+            padding: 20px;
+            margin: 10px;
+            width: calc(100% - 20px);
+            max-width: none;
+        }
+        
+        #login-container h2 {
+            font-size: 1.5em;
+        }
+        
+        .login-input {
+            padding: 10px;
+            font-size: 1em;
+        }
+        
+        #login-btn {
+            padding: 10px;
+            font-size: 1em;
+        }
     }
-    
-    #header img {
-        width: 30px;
-        margin-right: 8px;
-    }
-    
-    #sidebar {
-        max-width: 280px;
-        padding: 10px;
-    }
-    
-    #sidebar h3 {
-        font-size: 1em;
-    }
-    
-    #sidebar button {
-        padding: 8px;
-        font-size: 0.85em;
-    }
-    
-    #delivery-report-container,
-    #invoice-send-container,
-    #route-options-container {
-        width: 95%;
-        padding: 15px;
-        max-height: 85vh;
-    }
-    
-    .layer-preview {
-        width: 30px;
-        height: 30px;
-        margin: 2px;
-    }
-    
-    #instructions-container {
-        font-size: 0.75em;
-        padding: 8px;
-    }
-    
-    #reports-table {
-        font-size: 0.7em;
-    }
-    
-    .status-badge {
-        font-size: 0.6em;
-    }
-    
-    .row-actions button {
-        font-size: 0.6em;
-        padding: 1px 3px;
-    }
-    
-    .zoom-btn {
-        width: 30px;
-        height: 30px;
-        font-size: 0.9em;
-    }
-}
 
-/* Paysage mobile */
-@media screen and (max-height: 500px) and (orientation: landscape) {
-    #delivery-report-container,
-    #invoice-send-container {
-        max-height: 90vh;
-        top: 5%;
-        transform: translate(-50%, 0);
+    /* Très petits écrans */
+    @media screen and (max-width: 480px) {
+        #header h1 {
+            font-size: 1em;
+        }
+        
+        #header img {
+            width: 30px;
+            margin-right: 8px;
+        }
+        
+        #sidebar {
+            max-width: 280px;
+            padding: 10px;
+        }
+        
+        #sidebar h3 {
+            font-size: 1em;
+        }
+        
+        #sidebar button {
+            padding: 8px;
+            font-size: 0.85em;
+        }
+        
+        #delivery-report-container,
+        #invoice-send-container,
+        #route-options-container {
+            width: 95%;
+            padding: 15px;
+            max-height: 85vh;
+        }
+        
+        .layer-preview {
+            width: 30px;
+            height: 30px;
+            margin: 2px;
+        }
+        
+        #instructions-container {
+            font-size: 0.75em;
+            padding: 8px;
+        }
+        
+        #reports-table {
+            font-size: 0.7em;
+        }
+        
+        .status-badge {
+            font-size: 0.6em;
+        }
+        
+        .row-actions button {
+            font-size: 0.6em;
+            padding: 1px 3px;
+        }
+        
+        .zoom-btn {
+            width: 30px;
+            height: 30px;
+            font-size: 0.9em;
+        }
+        
+        /* Signature container */
+        #signature-container {
+            padding: 15px;
+            width: 95%;
+        }
+        
+        #signature-pad {
+            width: 100%;
+            height: 150px;
+        }
+    }
+
+    /* Paysage mobile */
+    @media screen and (max-height: 500px) and (orientation: landscape) {
+        #delivery-report-container,
+        #invoice-send-container {
+            max-height: 90vh;
+            top: 5%;
+            transform: translate(-50%, 0);
+        }
+        
+        #instructions-container {
+            max-height: 120px;
+        }
+        
+        #instructionsList {
+            max-height: 100px;
+        }
+        
+        #signature-container {
+            padding: 15px;
+            width: 95%;
+            max-height: 90vh;
+        }
+        
+        #signature-pad {
+            height: 120px;
+        }
     }
     
-    #instructions-container {
-        max-height: 120px;
+    /* Améliorations pour les très grands écrans */
+    @media screen and (min-width: 1400px) {
+        #sidebar {
+            width: 350px;
+        }
+        
+        #map {
+            margin-left: 350px;
+        }
+        
+        #delivery-report-container,
+        #invoice-send-container,
+        #route-options-container {
+            left: 350px;
+            width: 400px;
+        }
     }
-    
-    #instructionsList {
-        max-height: 100px;
-    }
-}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 </head>
@@ -1862,6 +1950,7 @@ body {
           <input type="file" id="invoice-file" name="attachment" accept=".pdf,.jpg,.jpeg,.png" required>
           <div class="small-muted">Taille max recommandée: 7 Mo</div>
         </div>
+    <form action="#" id="invoice-form">
 
         <div class="form-group">
           <label for="invoice-to">Adresse e‑mail destinataire :</label>
