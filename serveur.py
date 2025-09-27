@@ -16,28 +16,24 @@ EMAIL = os.getenv("GMAIL_USERNAME")
 PASSWORD = os.getenv("GMAIL_PASSWORD")
 
 app = Flask(__name__)
-CORS(app)  # Autoriser toutes les origines (évite Failed to fetch)
+CORS(app)  # Autoriser toutes les origines
 
 # 📌 Route principale : sert index.html
 @app.route("/")
 def home():
     return send_from_directory(os.path.dirname(__file__), "index.html")
 
+
 # 📌 Route pour envoyer un mail
 @app.route("/sendmail", methods=["POST"])
 def sendmail():
     try:
-        # Support JSON ou form-data
-        if request.is_json:
-            data = request.get_json()
-        else:
-            data = request.form
-        
-        # Vérifications des variables d'environnement
+        data = request.get_json() if request.is_json else request.form
+
         if not EMAIL or not PASSWORD:
             return jsonify({
-                "status": "error", 
-                "message": "Configuration email manquante. Vérifiez les variables d'environnement GMAIL_USERNAME et GMAIL_PASSWORD."
+                "status": "error",
+                "message": "Configuration email manquante. Vérifiez GMAIL_USERNAME et GMAIL_PASSWORD."
             }), 500
 
         destinataire = data.get("to_email")
@@ -56,7 +52,6 @@ def sendmail():
         msg["To"] = destinataire
         msg["Subject"] = sujet
 
-        # Corps du message amélioré
         corps = f"""
         <html>
         <body style="font-family: Arial, sans-serif; color: #333;">
@@ -88,129 +83,92 @@ def sendmail():
         </body>
         </html>
         """
-        
         msg.attach(MIMEText(corps, "html"))
 
-        # Gestion des fichiers joints
         if 'attachment' in request.files:
             file = request.files['attachment']
             if file and file.filename:
-                # Vérifier la taille du fichier (max 10MB)
-                file.seek(0, 2)  # Aller à la fin du fichier
+                file.seek(0, 2)
                 file_size = file.tell()
-                file.seek(0)  # Revenir au début
-                
-                if file_size > 10 * 1024 * 1024:  # 10MB
+                file.seek(0)
+
+                if file_size > 10 * 1024 * 1024:
                     return jsonify({"status": "error", "message": "Fichier trop volumineux (max 10MB)"}), 400
-                
-                # Vérifier l'extension
+
                 allowed_extensions = ['.pdf', '.jpg', '.jpeg', '.png']
                 file_ext = os.path.splitext(file.filename)[1].lower()
                 if file_ext not in allowed_extensions:
                     return jsonify({"status": "error", "message": "Type de fichier non autorisé. Utilisez: PDF, JPG, PNG"}), 400
-                
-                # Attacher le fichier
+
                 part = MIMEBase('application', 'octet-stream')
                 part.set_payload(file.read())
                 encoders.encode_base64(part)
-                part.add_header(
-                    'Content-Disposition',
-                    f'attachment; filename= {file.filename}'
-                )
+                part.add_header('Content-Disposition', f'attachment; filename= {file.filename}')
                 msg.attach(part)
 
-        # Envoi de l'email
-        server = smtplib.SMTP("smtp.gmail.com", 587)
-        server.starttls()
-        server.login(EMAIL, PASSWORD)
-        server.sendmail(EMAIL, destinataire, msg.as_string())
-        server.quit()
-        
-        return jsonify({
-            "status": "success", 
-            "message": f"Email envoyé avec succès à {destinataire}"
-        })
-        
-    except smtplib.SMTPAuthenticationError as e:
-        print(f"Erreur d'authentification SMTP: {str(e)}")
-        return jsonify({
-            "status": "error", 
-            "message": "Erreur d'authentification email. Vérifiez les identifiants Gmail. Si vous utilisez la double authentification, vous devez utiliser un mot de passe d'application."
-        }), 401
-    except smtplib.SMTPRecipientsRefused:
-        return jsonify({
-            "status": "error", 
-            "message": "Adresse email destinataire invalide."
-        }), 400
-    except smtplib.SMTPException as e:
-        print(f"Erreur SMTP: {str(e)}")
-        return jsonify({
-            "status": "error", 
-            "message": f"Erreur SMTP lors de l'envoi: {str(e)}"
-        }), 500
+        try:
+            server = smtplib.SMTP("smtp.gmail.com", 587)
+            server.starttls()
+            server.login(EMAIL, PASSWORD)
+            server.sendmail(EMAIL, destinataire, msg.as_string())
+            server.quit()
+        except smtplib.SMTPAuthenticationError as e:
+            print(f"[ERREUR] Authentification SMTP: {e}")
+            return jsonify({"status": "error", "message": "Identifiants Gmail invalides. Utilisez un mot de passe d'application si 2FA est activée."}), 401
+        except smtplib.SMTPRecipientsRefused:
+            return jsonify({"status": "error", "message": "Adresse email destinataire invalide."}), 400
+        except smtplib.SMTPException as e:
+            print(f"[AVERTISSEMENT] Exception SMTP: {e}")
+            return jsonify({"status": "error", "message": "Problème SMTP lors de l'envoi. Vérifiez la connexion."}), 500
+
+        return jsonify({"status": "success", "message": f"Email envoyé avec succès à {destinataire}"})
+
     except Exception as e:
-        print(f"Erreur détaillée: {str(e)}")
-        return jsonify({
-            "status": "error", 
-            "message": f"Erreur lors de l'envoi: {str(e)}"
-        }), 500
+        print(f"Erreur générale: {e}")
+        return jsonify({"status": "error", "message": f"Erreur serveur: {e}"}), 500
+
 
 # 📌 Route pour renvoyer la liste des entreprises
 @app.route("/entreprises")
 def get_entreprises():
     entreprises = []
     csv_path = os.path.join(os.path.dirname(__file__), "entreprises_geocodes.csv")
-    
-    # Essayer aussi le chemin public/
+
     if not os.path.exists(csv_path):
         csv_path = os.path.join(os.path.dirname(__file__), "public", "entreprises_geocodes.csv")
-    
-    # Vérifie si le fichier existe
+
     if not os.path.exists(csv_path):
         return jsonify({"error": "Fichier CSV non trouvé", "path_checked": csv_path}), 404
 
     try:
-        # Essayer différents encodages
-        encodings = ['utf-8', 'latin-1', 'cp1252', 'iso-8859-1']
-        
-        for encoding in encodings:
+        for encoding in ['utf-8', 'latin-1', 'cp1252', 'iso-8859-1']:
             try:
                 with open(csv_path, newline="", encoding=encoding) as csvfile:
                     reader = csv.DictReader(csvfile)
                     for row in reader:
                         if row.get('Nom_Entreprise') and row.get('Latitude') and row.get('Longitude'):
                             entreprises.append(row)
-                break  # Si succès, sortir de la boucle
+                break
             except UnicodeDecodeError:
-                continue  # Essayer l'encodage suivant
-                
+                continue
         if not entreprises:
             return jsonify({"error": "Aucune entreprise trouvée ou problème d'encodage"}), 404
-            
     except Exception as e:
-        return jsonify({"error": f"Erreur lors de la lecture: {str(e)}"}), 500
+        return jsonify({"error": f"Erreur lecture CSV: {str(e)}"}), 500
 
     return jsonify(entreprises)
 
-# 📌 Route pour servir les fichiers statiques (CSS, CSV, etc.)
+
+# 📌 Route pour servir les fichiers statiques
 @app.route("/public/<path:filename>")
 def serve_static(filename):
     return send_from_directory("public", filename)
 
+
 if __name__ == "__main__":
-    # Afficher les informations de configuration au démarrage
     print("=" * 50)
     print("🚀 Démarrage du serveur Flask")
     print(f"📧 Email configuré: {'✅' if EMAIL else '❌'} {EMAIL if EMAIL else 'Non configuré'}")
     print(f"🔑 Mot de passe configuré: {'✅' if PASSWORD else '❌'}")
-    
-    # Vérifier la présence du fichier CSV
-    csv_path = os.path.join(os.path.dirname(__file__), "entreprises_geocodes.csv")
-    if not os.path.exists(csv_path):
-        csv_path = os.path.join(os.path.dirname(__file__), "public", "entreprises_geocodes.csv")
-    print(f"📊 Fichier CSV: {'✅' if os.path.exists(csv_path) else '❌'} {csv_path}")
-    print("=" * 50)
-    
-    # Récupérer le port fourni par Render ou utiliser 5000 par défaut
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)

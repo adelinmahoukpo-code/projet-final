@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Système de Distribution des Factures Impôts</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -136,6 +136,8 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
 }
 
 #header { 
@@ -201,6 +203,8 @@ body {
     cursor: pointer;
     padding: 8px;
     z-index: 1002;
+    min-height: 44px;
+    min-width: 44px;
 }
 
 /* Bouton pour cacher/afficher la sidebar */
@@ -222,6 +226,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
 }
 
 #sidebar-toggle:hover {
@@ -302,6 +308,7 @@ body {
     transition: all var(--transition-fast);
     box-sizing: border-box;
     position: relative;
+    min-height: 44px;
 }
 
 #sidebar input:focus, #sidebar select:focus { 
@@ -318,7 +325,7 @@ body {
 
 #sidebar button { 
     width: 100%; 
-    padding: 10px 16px; 
+    padding: 12px 16px; 
     margin-bottom: 8px; 
     border: none; 
     border-radius: var(--border-radius); 
@@ -332,6 +339,7 @@ body {
     box-shadow: var(--shadow-1);
     position: relative;
     overflow: hidden;
+    min-height: 44px;
 }
 
 #sidebar button::before {
@@ -372,12 +380,15 @@ body {
 }
 
 #companyList li { 
-    padding: 8px 10px; 
+    padding: 12px 10px; 
     cursor: pointer; 
     border-bottom: 1px solid #eee; 
     transition: 0.2s; 
     border-radius: 3px;
     font-size: 0.9em;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
 }
 
 #companyList li:hover, #companyList li.active { 
@@ -424,6 +435,8 @@ body {
     background-position: center; 
     border-radius: 8px; 
     transition: 0.3s all; 
+    min-height: 44px;
+    min-width: 44px;
 }
 
 .layer-preview.active, .layer-preview:hover { 
@@ -458,11 +471,12 @@ body {
     background: #007bff; 
     border: none; 
     color: white; 
-    padding: 5px 10px; 
+    padding: 8px 12px; 
     border-radius: 5px; 
     cursor: pointer; 
     font-size: 0.85em; 
     margin-bottom: 5px; 
+    min-height: 44px;
 }
 
 #instructionsList { 
@@ -472,10 +486,13 @@ body {
 }
 
 #instructionsList li { 
-    padding: 6px 8px; 
+    padding: 8px; 
     margin-bottom: 4px; 
     border-radius: 6px; 
     transition: 0.2s; 
+    min-height: 44px;
+    display: flex;
+    align-items: center;
 }
 
 #instructionsList li.current { 
@@ -494,13 +511,14 @@ body {
     top: 50px; 
     right: 10px; 
     z-index: 1002; 
-    padding: 8px 12px; 
+    padding: 12px 16px; 
     border: none; 
     background: #007bff; 
     color: white; 
     border-radius: 8px; 
     cursor: pointer;
     font-size: 0.85em;
+    min-height: 44px;
 }
 
 /* Contrôles de zoom personnalisés pour navigation */
@@ -515,8 +533,8 @@ body {
 }
 
 .zoom-btn {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -529,6 +547,8 @@ body {
     color: #333;
     transition: all 0.2s;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    min-height: 44px;
+    min-width: 44px;
 }
 
 .zoom-btn:hover {
@@ -570,7 +590,9 @@ body {
 
 .delivery-option input[type="radio"] {
     margin-right: 10px;
-    transform: scale(1.2);
+    transform: scale(1.5);
+    min-height: 20px;
+    min-width: 20px;
 }
 
 .delivery-option label {
@@ -579,6 +601,8 @@ body {
     cursor: pointer;
     display: flex;
     align-items: center;
+    padding: 8px;
+    min-height: 44px;
 }
 
 .delivery-option label.delivered {
@@ -596,7 +620,7 @@ body {
 
 #reason-text {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     border: 1px solid #ddd;
     border-radius: 8px;
     resize: vertical;
@@ -625,11 +649,12 @@ body {
 
 .form-group input, .form-group textarea {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     border: 1px solid #ddd;
     border-radius: 8px;
     font-size: 0.9em;
     box-sizing: border-box;
+    min-height: 44px;
 }
 
 .form-group input:focus, .form-group textarea:focus {
@@ -649,7 +674,7 @@ body {
 
 #submit-report {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     background: linear-gradient(145deg, #28a745, #1e7e34);
     color: white;
     border: none;
@@ -659,6 +684,7 @@ body {
     cursor: pointer;
     transition: all 0.3s;
     margin-top: 10px;
+    min-height: 48px;
 }
 
 #submit-report:hover {
@@ -683,9 +709,10 @@ body {
     transition: all 0.3s;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     margin-bottom: 8px;
     border: none;
+    min-height: 48px;
 }
 
 #toggle-delivery-report:hover {
@@ -737,7 +764,7 @@ body {
     flex-wrap: wrap;
 }
 .admin-btn {
-    padding: 8px 12px; 
+    padding: 12px 16px; 
     border: none; 
     border-radius: 8px; 
     cursor: pointer; 
@@ -745,6 +772,7 @@ body {
     background: #007bff; 
     font-weight: 600;
     font-size: 0.9em;
+    min-height: 44px;
 }
 .admin-btn.secondary { background: #6c757d; }
 .admin-btn.danger { background: #dc3545; }
@@ -768,11 +796,12 @@ body {
 }
 #admin-search { 
     width: 100%; 
-    padding: 10px; 
+    padding: 12px; 
     border: 1px solid #ddd; 
     border-radius: 8px; 
     margin-bottom: 8px;
     box-sizing: border-box;
+    min-height: 44px;
 }
 #reports-table { 
     width: 100%; 
@@ -782,7 +811,7 @@ body {
 }
 #reports-table th, #reports-table td { 
     border-bottom: 1px solid #eee; 
-    padding: 6px 4px; 
+    padding: 8px 6px; 
     text-align: left;
     word-wrap: break-word;
 }
@@ -794,7 +823,7 @@ body {
     font-size: 0.8em;
 }
 .status-badge { 
-    padding: 2px 6px; 
+    padding: 4px 8px; 
     border-radius: 999px; 
     font-weight: 700; 
     font-size: 0.7em;
@@ -805,10 +834,12 @@ body {
 .row-actions button { 
     border: none; 
     border-radius: 6px; 
-    padding: 3px 6px; 
+    padding: 6px 8px; 
     margin-right: 2px; 
     cursor: pointer;
     font-size: 0.7em;
+    min-height: 32px;
+    min-width: 32px;
 }
 .row-actions .focus { background: #17a2b8; color: #fff; }
 .row-actions .edit { background: #28a745; color: #fff; }
@@ -832,7 +863,7 @@ body {
     flex-wrap: wrap;
 }
 .top-btn {
-    padding: 6px 10px;
+    padding: 8px 12px;
     border: none;
     border-radius: 999px;
     cursor: pointer;
@@ -841,6 +872,7 @@ body {
     color: #007bff;
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     font-size: 0.85em;
+    min-height: 36px;
 }
 .top-btn.danger { color: #fff; background: #dc3545; }
 .top-btn.dark { color: #fff; background: #343a40; }
@@ -880,6 +912,7 @@ body {
     cursor: pointer;
     transition: all 0.3s;
     background: #f8f9fa;
+    min-height: 44px;
 }
 
 .route-option:hover {
@@ -928,7 +961,7 @@ body {
 
 #select-route-btn {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     background: linear-gradient(145deg, #007bff, #0056b3);
     color: white;
     border: none;
@@ -938,6 +971,7 @@ body {
     cursor: pointer;
     transition: all 0.3s;
     margin-top: 15px;
+    min-height: 48px;
 }
 
 #select-route-btn:hover {
@@ -984,6 +1018,8 @@ body {
     margin: 0 auto 20px;
     background: white;
     touch-action: none;
+    max-width: 100%;
+    height: auto;
 }
 
 .signature-controls {
@@ -991,15 +1027,19 @@ body {
     gap: 10px;
     justify-content: center;
     margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
 .signature-btn {
-    padding: 8px 16px;
+    padding: 12px 16px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     font-weight: 600;
     transition: all 0.3s;
+    min-height: 44px;
+    flex: 1;
+    min-width: 120px;
 }
 
 .signature-btn.clear {
@@ -1072,7 +1112,7 @@ body {
     font-size: 1.3em;
 }
 .quick-action-btn {
-    padding: 6px 10px;
+    padding: 8px 10px;
     background: linear-gradient(145deg, #6c757d, #495057);
     color: white;
     border: none;
@@ -1082,6 +1122,7 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    min-height: 44px;
 }
 
 .quick-action-btn:hover {
@@ -1110,9 +1151,10 @@ body {
     transition: all .3s; 
     box-shadow: 0 2px 6px rgba(0,0,0,.2);
     width: 100%; 
-    padding: 10px; 
+    padding: 12px; 
     margin-bottom: 8px; 
     border: none;
+    min-height: 48px;
 }
 #toggle-invoice-send:hover {
     background: linear-gradient(145deg, #004a9f, #003a80);
@@ -1120,7 +1162,7 @@ body {
 }
 #send-invoice {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     background: linear-gradient(145deg, #0069d9, #004a9f);
     color: white;
     border: none;
@@ -1130,6 +1172,7 @@ body {
     cursor: pointer;
     transition: all 0.3s;
     margin-top: 8px;
+    min-height: 48px;
 }
 #send-invoice:hover { 
     background: linear-gradient(145deg, #004a9f, #003a80); 
@@ -1351,7 +1394,7 @@ body {
 
 /* ====================== MEDIA QUERIES RESPONSIVE ====================== */
 
-/* Tablettes */
+/* Petites tablettes */
 @media screen and (max-width: 1024px) {
     #admin-main {
         grid-template-columns: 1fr;
@@ -1363,14 +1406,23 @@ body {
     }
     
     .layer-preview {
-        width: 40px;
-        height: 40px;
+        width: 44px;
+        height: 44px;
     }
     
     #instructions-container {
-        max-width: 250px;
+        max-width: 280px;
         bottom: 5px;
         right: 5px;
+        font-size: 0.85em;
+    }
+    
+    #delivery-report-container,
+    #invoice-send-container,
+    #route-options-container {
+        left: 20px;
+        width: calc(100% - 40px);
+        max-width: 400px;
     }
 }
 
@@ -1378,54 +1430,77 @@ body {
 @media screen and (max-width: 768px) {
     /* Header responsive */
     #header {
-        padding: 10px 15px;
+        padding: 12px 15px;
+        height: 70px;
         flex-direction: row;
         justify-content: space-between;
     }
     
     #header .header-content {
+        position: static;
+        transform: none;
         justify-content: flex-start;
         flex: 1;
+        order: 2;
     }
     
     #header h1 {
-        font-size: 1.2em;
+        font-size: 1.1em;
         text-align: left;
+        line-height: 1.2;
     }
     
     #header img {
-        width: 35px;
-        margin-right: 10px;
+        width: 32px;
+        height: auto;
+        margin-right: 8px;
     }
     
     /* Bouton hamburger visible */
     #menu-toggle {
-        display: block;
-        order: 3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        order: 1;
     }
     
     #top-actions {
-        order: 2;
-        margin-right: 10px;
+        order: 3;
+        margin-right: 0;
     }
     
     .top-btn {
-        padding: 4px 8px;
+        padding: 6px 8px;
         font-size: 0.75em;
+        min-height: 36px;
+    }
+    
+    /* Map adaptation */
+    #map {
+        height: calc(100vh - 70px);
+        margin-top: 70px;
+        margin-left: 0;
     }
     
     /* Sidebar devient overlay sur mobile */
     #sidebar {
         width: 100%;
-        max-width: 320px;
+        max-width: 340px;
         transform: translateX(-100%);
         z-index: 1100;
-        box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+        box-shadow: 4px 0 20px rgba(0,0,0,0.4);
         border-radius: 0;
+        top: 70px;
+        padding: 20px;
     }
     
     #sidebar.show {
         transform: translateX(0);
+    }
+    
+    /* Sidebar toggle adaptattion */
+    #sidebar-toggle {
+        display: none;
     }
     
     /* Overlay pour fermer la sidebar */
@@ -1444,12 +1519,7 @@ body {
         display: block;
     }
     
-    /* Map prend toute la largeur sur mobile */
-    #map {
-        margin-left: 0;
-    }
-    
-    /* Repositionnement des containers de rapport et facture */
+    /* Containers repositionnement */
     #delivery-report-container,
     #invoice-send-container,
     #route-options-container {
@@ -1458,52 +1528,79 @@ body {
         left: 50%;
         transform: translate(-50%, -50%);
         width: 90%;
-        max-width: 350px;
-        max-height: 80vh;
+        max-width: 380px;
+        max-height: 85vh;
         z-index: 1200;
+        overflow-y: auto;
     }
     
-    /* Adaptations pour Actions Rapides sur mobile */
+    /* Signature container mobile */
+    #signature-container {
+        width: 95%;
+        max-width: 450px;
+        padding: 20px;
+    }
+    
+    #signature-pad {
+        width: 100%;
+        height: 150px;
+    }
+    
+    .signature-controls {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .signature-btn {
+        min-width: auto;
+        flex: none;
+    }
+    
+    /* Actions Rapides mobile */
     #quick-actions-panel {
-        margin-top: 8px !important;
-        padding: 10px !important;
+        margin-top: 10px !important;
+        padding: 12px !important;
     }
     
     .quick-action-btn {
-        padding: 8px 6px !important;
+        padding: 10px 6px !important;
         font-size: 0.75em !important;
     }
     
     #quick-actions-btn {
-        padding: 10px !important;
-        font-size: 0.85em !important;
+        padding: 12px !important;
+        font-size: 0.9em !important;
     }
     
     /* Layer container adapté */
     #layer-container {
-        top: 85px;
+        top: 80px;
         right: 5px;
-        padding: 5px;
+        padding: 6px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        max-width: calc(100vw - 20px);
     }
     
     .layer-preview {
-        width: 35px;
-        height: 35px;
+        width: 40px;
+        height: 40px;
         margin: 3px;
     }
     
-    /* Instructions container */
+    /* Instructions container mobile */
     #instructions-container {
         bottom: 5px;
         right: 5px;
         left: 5px;
         max-width: none;
         font-size: 0.8em;
-        padding: 10px;
+        padding: 12px;
     }
     
     #toggleInstructions {
-        font-size: 0.75em;
+        font-size: 0.8em;
+        padding: 10px 12px;
     }
     
     #instructionsList {
@@ -1512,29 +1609,30 @@ body {
     
     /* Toggle layers button */
     #toggleLayersBtn {
-        top: 85px;
+        top: 80px;
         right: 50px;
-        padding: 6px 8px;
-        font-size: 0.75em;
+        padding: 8px 10px;
+        font-size: 0.8em;
     }
     
     /* Zoom controls */
     #zoom-controls {
         top: 130px;
-        right: 5px;
+        right: 8px;
     }
     
     .zoom-btn {
-        width: 35px;
-        height: 35px;
-        font-size: 1em;
+        width: 40px;
+        height: 40px;
+        font-size: 1.1em;
     }
     
     /* Interface Admin responsive */
     #admin-header {
         flex-direction: column;
         align-items: stretch;
-        gap: 10px;
+        gap: 12px;
+        padding: 15px;
     }
     
     #admin-header .title {
@@ -1544,35 +1642,47 @@ body {
     
     #admin-actions {
         justify-content: center;
+        flex-wrap: wrap;
     }
     
     #admin-main {
-        padding: 8px;
-        gap: 8px;
+        padding: 10px;
+        gap: 10px;
     }
     
     #admin-panel {
-        padding: 8px;
+        padding: 12px;
     }
     
     #reports-table {
         font-size: 0.75em;
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
     }
     
     #reports-table th,
     #reports-table td {
-        padding: 4px 2px;
+        padding: 6px 4px;
+        min-width: 80px;
     }
     
     .status-badge {
         font-size: 0.65em;
-        padding: 1px 4px;
+        padding: 2px 6px;
+    }
+    
+    .row-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
     }
     
     .row-actions button {
-        padding: 2px 4px;
+        padding: 4px 6px;
         font-size: 0.65em;
-        margin-right: 1px;
+        margin-right: 0;
+        min-height: 28px;
     }
     
     #admin-map {
@@ -1582,42 +1692,69 @@ body {
     /* Form groups responsive */
     .datetime-group {
         flex-direction: column;
-        gap: 5px;
+        gap: 8px;
     }
     
     /* Login responsive */
     #login-container {
-        padding: 20px;
-        margin: 10px;
+        padding: 25px;
+        margin: 15px;
     }
     
     #login-container h2 {
-        font-size: 1.5em;
+        font-size: 1.6em;
+    }
+    
+    /* Modal edit responsive */
+    #edit-modal > div {
+        width: 95%;
+        max-width: 400px;
+        padding: 20px;
+    }
+    
+    /* View signature modal responsive */
+    #signature-view-modal > div {
+        width: 95%;
+        max-width: 450px;
+        padding: 18px;
     }
 }
 
 /* Très petits écrans */
 @media screen and (max-width: 480px) {
+    #header {
+        height: 65px;
+        padding: 10px 12px;
+    }
+    
     #header h1 {
         font-size: 1em;
+        line-height: 1.1;
     }
     
     #header img {
-        width: 30px;
-        margin-right: 8px;
+        width: 28px;
+        margin-right: 6px;
+    }
+    
+    #map {
+        height: calc(100vh - 65px);
+        margin-top: 65px;
     }
     
     #sidebar {
-        max-width: 280px;
-        padding: 10px;
+        max-width: 300px;
+        padding: 16px;
+        top: 65px;
     }
     
     #sidebar h3 {
         font-size: 1em;
+        margin-bottom: 12px;
     }
     
     #sidebar button {
-        padding: 8px;
+        padding: 12px;
         font-size: 0.85em;
     }
     
@@ -1625,19 +1762,19 @@ body {
     #invoice-send-container,
     #route-options-container {
         width: 95%;
-        padding: 15px;
-        max-height: 85vh;
+        padding: 16px;
+        max-height: 90vh;
     }
     
     .layer-preview {
-        width: 30px;
-        height: 30px;
+        width: 36px;
+        height: 36px;
         margin: 2px;
     }
     
     #instructions-container {
         font-size: 0.75em;
-        padding: 8px;
+        padding: 10px;
     }
     
     #reports-table {
@@ -1646,35 +1783,193 @@ body {
     
     .status-badge {
         font-size: 0.6em;
+        padding: 1px 4px;
     }
     
     .row-actions button {
         font-size: 0.6em;
-        padding: 1px 3px;
+        padding: 2px 4px;
+        min-height: 26px;
     }
     
     .zoom-btn {
-        width: 30px;
-        height: 30px;
+        width: 36px;
+        height: 36px;
+        font-size: 1em;
+    }
+    
+    #toggleLayersBtn {
+        padding: 6px 8px;
+        font-size: 0.75em;
+    }
+    
+    #signature-container {
+        width: 98%;
+        padding: 15px;
+    }
+    
+    #signature-pad {
+        height: 120px;
+    }
+    
+    .signature-btn {
+        padding: 10px;
         font-size: 0.9em;
+    }
+    
+    /* Form elements plus grands sur très petits écrans */
+    .form-group input, 
+    .form-group textarea,
+    .form-group select {
+        padding: 14px 12px;
+        font-size: 16px; /* Évite le zoom sur iOS */
+    }
+    
+    .delivery-option input[type="radio"] {
+        transform: scale(1.8);
+        margin-right: 12px;
+    }
+    
+    .delivery-option label {
+        padding: 12px 8px;
+        font-size: 0.95em;
     }
 }
 
 /* Paysage mobile */
 @media screen and (max-height: 500px) and (orientation: landscape) {
     #delivery-report-container,
-    #invoice-send-container {
-        max-height: 90vh;
-        top: 5%;
+    #invoice-send-container,
+    #route-options-container {
+        max-height: 95vh;
+        top: 2.5%;
         transform: translate(-50%, 0);
     }
     
     #instructions-container {
         max-height: 120px;
+        font-size: 0.7em;
     }
     
     #instructionsList {
-        max-height: 100px;
+        max-height: 80px;
+    }
+    
+    #signature-container {
+        max-height: 95vh;
+        overflow-y: auto;
+    }
+    
+    #admin-map {
+        height: 250px;
+    }
+}
+
+/* Très petite hauteur d'écran */
+@media screen and (max-height: 600px) {
+    #delivery-report-container,
+    #invoice-send-container,
+    #route-options-container {
+        max-height: 85vh;
+        padding: 15px;
+    }
+    
+    .form-group {
+        margin-bottom: 12px;
+    }
+    
+    #signature-container {
+        padding: 15px;
+    }
+    
+    #signature-pad {
+        height: 120px;
+    }
+}
+
+/* Interface tactile améliorée */
+@media (hover: none) and (pointer: coarse) {
+    /* Augmenter les zones de touch sur les appareils tactiles */
+    button, 
+    .layer-preview, 
+    #companyList li,
+    .route-option,
+    .zoom-btn,
+    input[type="radio"],
+    input[type="checkbox"] {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Réduire les effets hover sur tactile */
+    .layer-preview:hover,
+    .route-option:hover,
+    .zoom-btn:hover {
+        transform: none;
+    }
+    
+    /* Améliorer le feedback tactile */
+    button:active,
+    .layer-preview:active,
+    .zoom-btn:active {
+        opacity: 0.7;
+        transform: scale(0.95);
+    }
+}
+
+/* Mode sombre automatique */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-color: #121212;
+        --surface-color: #1e1e1e;
+        --text-primary: #ffffff;
+        --text-secondary: #b3b3b3;
+        --divider-color: #333333;
+    }
+    
+    body {
+        background: var(--background-color);
+        color: var(--text-primary);
+    }
+    
+    #sidebar {
+        background: var(--surface-color);
+    }
+    
+    .form-group input, 
+    .form-group textarea,
+    .form-group select,
+    #sidebar input,
+    #sidebar select {
+        background: var(--surface-color);
+        color: var(--text-primary);
+        border-color: var(--divider-color);
+    }
+    
+    #instructions-container,
+    #delivery-report-container,
+    #invoice-send-container,
+    #route-options-container,
+    #signature-container {
+        background: rgba(30, 30, 30, 0.95);
+        color: var(--text-primary);
+    }
+}
+
+/* Préférences d'animation réduites */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .loading-spinner {
+        animation: none;
+    }
+    
+    .pulse-marker {
+        animation: none;
     }
 }
 </style>
@@ -2121,7 +2416,9 @@ function initMobileMenu() {
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
     
-    menuToggle.addEventListener('click', function() {
+    menuToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
         sidebar.classList.toggle('show');
         sidebarOverlay.classList.toggle('show');
     });
@@ -2142,6 +2439,29 @@ function initMobileMenu() {
             }
         }
     });
+    
+    // Fermer la sidebar si on redimensionne vers desktop
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            sidebar.classList.remove('show');
+            sidebarOverlay.classList.remove('show');
+        }
+    });
+    
+    // Empêcher le défilement du body quand la sidebar est ouverte sur mobile
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                if (sidebar.classList.contains('show') && window.innerWidth <= 768) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
+        });
+    });
+    
+    observer.observe(sidebar, { attributes: true });
 }
 
 // ====================== GESTION DE LA CONNEXION ======================
@@ -2238,6 +2558,13 @@ function globalLogout() {
     document.getElementById('app-container').style.display = 'none';
     document.getElementById('admin-container').style.display = 'none';
     document.getElementById('login-overlay').style.display = 'flex';
+    
+    // Réinitialiser l'état mobile
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    if (sidebar) sidebar.classList.remove('show');
+    if (sidebarOverlay) sidebarOverlay.classList.remove('show');
+    document.body.style.overflow = '';
 }
 
 // ====================== CODE APPLICATION AGENT ======================
@@ -2293,15 +2620,14 @@ var currentMapRotation = 0;
 var is3DMode = false;
 var sidebarVisible = true;
 
-// ====================== ZOOM CONTROLS IN SIDEBAR ======================
-// Removed - zoom controls moved to Actions Rapides
-
 // ====================== TOGGLE SIDEBAR ======================
 document.getElementById('sidebar-toggle').onclick = () => {
     sidebarVisible = !sidebarVisible;
     const sidebar = document.getElementById('sidebar');
     const map = document.getElementById('map');
     const toggleBtn = document.getElementById('sidebar-toggle');
+    
+    if (window.innerWidth <= 768) return; // Ne pas utiliser ce bouton sur mobile
     
     if (sidebarVisible) {
         sidebar.classList.remove('hidden');
@@ -3689,13 +4015,31 @@ document.getElementById('toggleInstructions').onclick=()=>{
 // ====================== GESTION DE LA SIGNATURE DIGITALE ======================
 function initializeSignature() {
     signatureCanvas = document.getElementById('signature-pad');
+    if (!signatureCanvas) return; // Protection en cas d'erreur
+    
     signatureCtx = signatureCanvas.getContext('2d');
     
+    // Adapter la taille du canvas sur mobile
+    function resizeCanvas() {
+        const container = document.getElementById('signature-container');
+        const rect = container.getBoundingClientRect();
+        const width = Math.min(400, rect.width - 50);
+        const height = Math.min(200, 150);
+        
+        signatureCanvas.width = width;
+        signatureCanvas.height = height;
+        signatureCanvas.style.width = width + 'px';
+        signatureCanvas.style.height = height + 'px';
+        
+        // Reconfigurer le contexte après redimensionnement
+        signatureCtx.strokeStyle = '#000000';
+        signatureCtx.lineWidth = 2;
+        signatureCtx.lineCap = 'round';
+        signatureCtx.lineJoin = 'round';
+    }
+    
     // Configuration du canvas
-    signatureCtx.strokeStyle = '#000000';
-    signatureCtx.lineWidth = 2;
-    signatureCtx.lineCap = 'round';
-    signatureCtx.lineJoin = 'round';
+    resizeCanvas();
     
     // Events pour desktop
     signatureCanvas.addEventListener('mousedown', startDrawing);
@@ -3703,10 +4047,16 @@ function initializeSignature() {
     signatureCanvas.addEventListener('mouseup', stopDrawing);
     signatureCanvas.addEventListener('mouseout', stopDrawing);
     
-    // Events pour mobile
+    // Events pour mobile avec prévention du scroll
     signatureCanvas.addEventListener('touchstart', handleTouch);
     signatureCanvas.addEventListener('touchmove', handleTouch);
     signatureCanvas.addEventListener('touchend', stopDrawing);
+    
+    // Redimensionner le canvas lors du changement d'orientation
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('orientationchange', () => {
+        setTimeout(resizeCanvas, 100);
+    });
     
     // Boutons de contrôle
     document.getElementById('clear-signature').onclick = clearSignature;
@@ -3722,15 +4072,28 @@ function initializeSignature() {
 function handleTouch(e) {
     e.preventDefault();
     const touch = e.touches[0];
+    if (!touch) return;
+    
+    const rect = signatureCanvas.getBoundingClientRect();
     const mouseEvent = new MouseEvent({
         touchstart: 'mousedown',
         touchmove: 'mousemove',
         touchend: 'mouseup'
     }[e.type], {
         clientX: touch.clientX,
-        clientY: touch.clientY
+        clientY: touch.clientY,
+        bubbles: true
     });
-    signatureCanvas.dispatchEvent(mouseEvent);
+    
+    // Calculer les coordonnées relatives au canvas
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+    
+    if (e.type === 'touchstart') {
+        startDrawing({ clientX: touch.clientX, clientY: touch.clientY });
+    } else if (e.type === 'touchmove') {
+        draw({ clientX: touch.clientX, clientY: touch.clientY });
+    }
 }
 
 function startDrawing(e) {
@@ -3770,6 +4133,9 @@ function openSignatureModal() {
     document.getElementById('signature-overlay').style.display = 'block';
     document.getElementById('signature-container').style.display = 'block';
     
+    // Empêcher le défilement du body
+    document.body.style.overflow = 'hidden';
+    
     // Effacer la signature précédente
     clearSignature();
 }
@@ -3800,6 +4166,9 @@ function saveSignature() {
 function cancelSignature() {
     document.getElementById('signature-overlay').style.display = 'none';
     document.getElementById('signature-container').style.display = 'none';
+    
+    // Rétablir le défilement du body
+    document.body.style.overflow = '';
 }
 
 document.getElementById('delivered-radio').addEventListener('change', function(){
@@ -3825,7 +4194,6 @@ let adminMarkersLayer = null;
 let adminLayerContainer = null;
 let adminBaseLayers = {};
 let adminLayerContainerVisible = false;
-let agentSidebarVisible = false;
 
 function initializeAdmin() {
     setupTopActionsForRole();
@@ -3903,6 +4271,8 @@ function setupAdminLayerControls() {
         div.style.backgroundPosition = 'center';
         div.style.borderRadius = '8px';
         div.style.transition = '0.3s all';
+        div.style.minHeight = '44px';
+        div.style.minWidth = '44px';
         div.title=key;
         div.onclick=()=>{
             adminMap.eachLayer(l=>{ if(l instanceof L.TileLayer) adminMap.removeLayer(l); });
