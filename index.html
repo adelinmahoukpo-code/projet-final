@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Système de Distribution des Factures Impôts</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,7 +41,6 @@
     width: 100%;
     max-width: 350px;
     text-align: center;
-    box-sizing: border-box;
 }
 
 #login-container h2 {
@@ -126,7 +125,6 @@
 /* Global Styles with Modern Typography */
 * {
     box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
 }
 
 body { 
@@ -138,10 +136,6 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
 }
 
 #header { 
@@ -152,13 +146,13 @@ body {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     color: white; 
-    padding: 12px 20px; 
+    padding: 16px 24px; 
     box-shadow: var(--shadow-2);
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    height: 70px;
+    height: 80px;
     z-index: 1001;
     border-bottom: 1px solid rgba(255,255,255,0.1);
 }
@@ -192,10 +186,9 @@ body {
 
 #header h1 { 
     margin: 0; 
-    font-size: 1.3em; 
+    font-size: 1.4em; 
     text-shadow: 1px 1px 2px #000;
     text-align: center;
-    font-weight: 600;
 }
 
 /* Bouton hamburger pour mobile */
@@ -204,16 +197,10 @@ body {
     background: transparent;
     border: none;
     color: white;
-    font-size: 1.8em;
+    font-size: 1.5em;
     cursor: pointer;
     padding: 8px;
     z-index: 1002;
-    border-radius: 6px;
-    transition: background 0.3s;
-}
-
-#menu-toggle:active {
-    background: rgba(255,255,255,0.2);
 }
 
 /* Bouton pour cacher/afficher la sidebar */
@@ -243,20 +230,15 @@ body {
     box-shadow: 0 3px 12px rgba(0,0,0,0.2);
 }
 
-#sidebar-toggle:active {
-    transform: scale(0.95);
-}
-
 #sidebar-toggle.sidebar-hidden {
     /* Position reste la même en haut à gauche */
 }
 
 #map { 
-    height: calc(100vh - 70px);
-    margin-top: 70px;
+    height: calc(100vh - 80px);
+    margin-top: 80px;
     margin-left: 320px;
     transition: margin-left 0.3s ease;
-    touch-action: pan-x pan-y;
 }
 
 #map.sidebar-hidden {
@@ -265,7 +247,7 @@ body {
 
 #sidebar { 
     position: fixed;
-    top: 70px; 
+    top: 80px; 
     left: 0; 
     bottom: 0; 
     width: 320px; 
@@ -273,7 +255,7 @@ body {
     background: var(--surface-color);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    padding: 20px; 
+    padding: 24px; 
     overflow-y: auto; 
     display: flex; 
     flex-direction: column; 
@@ -282,7 +264,6 @@ body {
     border-right: 1px solid var(--divider-color);
     transform: translateX(0);
     transition: transform var(--transition-medium);
-    box-sizing: border-box;
 }
 
 #sidebar::before {
@@ -309,9 +290,9 @@ body {
 }
 
 #sidebar input, #sidebar select { 
-    width: 100%; 
-    padding: 12px 10px; 
-    margin-bottom: 14px; 
+    width: calc(100% - 24px); 
+    padding: 14px 12px; 
+    margin-bottom: 16px; 
     border-radius: var(--border-radius); 
     border: 2px solid var(--divider-color); 
     font-size: 0.95em; 
@@ -337,21 +318,20 @@ body {
 
 #sidebar button { 
     width: 100%; 
-    padding: 12px 16px; 
-    margin-bottom: 10px; 
+    padding: 10px 16px; 
+    margin-bottom: 8px; 
     border: none; 
     border-radius: var(--border-radius); 
     color: white; 
     cursor: pointer; 
     font-weight: 500; 
-    font-size: 0.95em;
+    font-size: 0.9em;
     letter-spacing: 0.025em;
     transition: all var(--transition-fast); 
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
     box-shadow: var(--shadow-1);
     position: relative;
     overflow: hidden;
-    min-height: 44px;
 }
 
 #sidebar button::before {
@@ -388,29 +368,21 @@ body {
     max-height: 200px; 
     overflow-y: auto; 
     border: 1px solid #ddd; 
-    border-radius: 8px; 
-    background: white;
+    border-radius: 5px; 
 }
 
 #companyList li { 
-    padding: 12px 14px; 
+    padding: 8px 10px; 
     cursor: pointer; 
     border-bottom: 1px solid #eee; 
     transition: 0.2s; 
     border-radius: 3px;
     font-size: 0.9em;
-    min-height: 44px;
-    display: flex;
-    align-items: center;
 }
 
 #companyList li:hover, #companyList li.active { 
     background: #007bff; 
     color: white; 
-}
-
-#companyList li:active {
-    background: #0056b3;
 }
 
 #routeControls { 
@@ -430,7 +402,7 @@ body {
 
 #layer-container { 
     position: absolute; 
-    top: 80px; 
+    top: 90px; 
     right: 10px; 
     z-index: 1000; 
     background: rgba(255,255,255,0.95); 
@@ -451,8 +423,7 @@ body {
     background-size: cover; 
     background-position: center; 
     border-radius: 8px; 
-    transition: 0.3s all;
-    min-height: 44px;
+    transition: 0.3s all; 
 }
 
 .layer-preview.active, .layer-preview:hover { 
@@ -463,15 +434,15 @@ body {
 
 #instructions-container { 
     position: absolute; 
-    bottom: 20px; 
-    right: 20px; 
+    bottom: 10px; 
+    right: 10px; 
     z-index: 1001; 
-    max-width: 320px; 
-    background: rgba(255,255,255,0.95); 
+    max-width: 300px; 
+    background: rgba(255,255,255,0.9); 
     backdrop-filter: blur(10px); 
-    border-radius: 12px; 
+    border-radius: 10px; 
     box-shadow: 0 4px 14px rgba(0,0,0,0.25); 
-    padding: 16px; 
+    padding: 15px; 
     font-size: 0.9em; 
     transition: transform 0.3s ease, opacity 0.3s ease; 
     transform: translateY(20px); 
@@ -487,13 +458,11 @@ body {
     background: #007bff; 
     border: none; 
     color: white; 
-    padding: 8px 16px; 
-    border-radius: 8px; 
+    padding: 5px 10px; 
+    border-radius: 5px; 
     cursor: pointer; 
-    font-size: 0.9em; 
-    margin-bottom: 8px;
-    min-height: 44px;
-    width: 100%;
+    font-size: 0.85em; 
+    margin-bottom: 5px; 
 }
 
 #instructionsList { 
@@ -503,12 +472,10 @@ body {
 }
 
 #instructionsList li { 
-    padding: 8px 10px; 
-    margin-bottom: 6px; 
-    border-radius: 8px; 
+    padding: 6px 8px; 
+    margin-bottom: 4px; 
+    border-radius: 6px; 
     transition: 0.2s; 
-    background: rgba(255,255,255,0.8);
-    border: 1px solid #eee;
 }
 
 #instructionsList li.current { 
@@ -520,69 +487,61 @@ body {
 
 .leaflet-container { 
     cursor: url('https://maps.gstatic.com/mapfiles/openhand_8_8.cur'), move; 
-    font-family: inherit;
 }
 
 #toggleLayersBtn { 
     position: absolute; 
-    top: 80px; 
-    right: 70px; 
+    top: 50px; 
+    right: 10px; 
     z-index: 1002; 
-    padding: 10px 16px; 
+    padding: 8px 12px; 
     border: none; 
     background: #007bff; 
     color: white; 
-    border-radius: 10px; 
+    border-radius: 8px; 
     cursor: pointer;
-    font-size: 0.9em;
-    min-height: 44px;
-    box-shadow: var(--shadow-1);
+    font-size: 0.85em;
 }
 
 /* Contrôles de zoom personnalisés pour navigation */
 #zoom-controls {
     position: absolute;
     top: 150px;
-    right: 20px;
+    right: 10px;
     z-index: 1002;
     display: none;
     flex-direction: column;
-    gap: 8px;
+    gap: 5px;
 }
 
 .zoom-btn {
-    width: 48px;
-    height: 48px;
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid #ddd;
-    border-radius: 12px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ccc;
+    border-radius: 8px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.4em;
+    font-size: 1.2em;
     font-weight: bold;
     color: #333;
     transition: all 0.2s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    min-height: 44px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .zoom-btn:hover {
     background: #007bff;
     color: white;
-    transform: scale(1.05);
-}
-
-.zoom-btn:active {
-    transform: scale(0.95);
+    transform: scale(1.1);
 }
 
 /* Rapport de livraison */
 #delivery-report-container {
     position: fixed;
     top: 90px;
-    left: 340px;
+    left: 300px;
     z-index: 1000;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
@@ -595,7 +554,6 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     max-height: calc(100vh - 120px);
     overflow-y: auto;
-    box-sizing: border-box;
 }
 
 #delivery-report-container h3 {
@@ -612,7 +570,7 @@ body {
 
 .delivery-option input[type="radio"] {
     margin-right: 10px;
-    transform: scale(1.3);
+    transform: scale(1.2);
 }
 
 .delivery-option label {
@@ -621,14 +579,6 @@ body {
     cursor: pointer;
     display: flex;
     align-items: center;
-    padding: 12px;
-    border-radius: 8px;
-    transition: background 0.2s;
-    min-height: 44px;
-}
-
-.delivery-option label:hover {
-    background: rgba(0,123,255,0.1);
 }
 
 .delivery-option label.delivered {
@@ -646,7 +596,7 @@ body {
 
 #reason-text {
     width: 100%;
-    padding: 12px;
+    padding: 10px;
     border: 1px solid #ddd;
     border-radius: 8px;
     resize: vertical;
@@ -675,12 +625,11 @@ body {
 
 .form-group input, .form-group textarea {
     width: 100%;
-    padding: 12px;
+    padding: 10px;
     border: 1px solid #ddd;
     border-radius: 8px;
     font-size: 0.9em;
     box-sizing: border-box;
-    min-height: 44px;
 }
 
 .form-group input:focus, .form-group textarea:focus {
@@ -700,7 +649,7 @@ body {
 
 #submit-report {
     width: 100%;
-    padding: 14px;
+    padding: 12px;
     background: linear-gradient(145deg, #28a745, #1e7e34);
     color: white;
     border: none;
@@ -710,17 +659,12 @@ body {
     cursor: pointer;
     transition: all 0.3s;
     margin-top: 10px;
-    min-height: 48px;
 }
 
 #submit-report:hover {
     background: linear-gradient(145deg, #1e7e34, #155724);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-#submit-report:active {
-    transform: translateY(0);
 }
 
 #submit-report:disabled {
@@ -739,10 +683,9 @@ body {
     transition: all 0.3s;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     width: 100%;
-    padding: 12px;
+    padding: 10px;
     margin-bottom: 8px;
     border: none;
-    min-height: 44px;
 }
 
 #toggle-delivery-report:hover {
@@ -751,7 +694,7 @@ body {
 }
 
 .success-message, .error-message {
-    padding: 12px;
+    padding: 10px;
     border-radius: 8px;
     margin-bottom: 15px;
     display: none;
@@ -777,10 +720,9 @@ body {
     justify-content: space-between;
     background: #343a40; 
     color: #fff; 
-    padding: 16px 20px;
+    padding: 12px 16px;
     flex-wrap: wrap;
     gap: 10px;
-    min-height: 70px;
 }
 #admin-header .title { 
     display: flex; 
@@ -791,11 +733,11 @@ body {
 #admin-header img { width: 36px; }
 #admin-actions { 
     display: flex; 
-    gap: 10px; 
+    gap: 8px; 
     flex-wrap: wrap;
 }
 .admin-btn {
-    padding: 10px 16px; 
+    padding: 8px 12px; 
     border: none; 
     border-radius: 8px; 
     cursor: pointer; 
@@ -803,44 +745,34 @@ body {
     background: #007bff; 
     font-weight: 600;
     font-size: 0.9em;
-    min-height: 44px;
-    transition: all 0.2s;
-}
-.admin-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-.admin-btn:active {
-    transform: translateY(0);
 }
 .admin-btn.secondary { background: #6c757d; }
 .admin-btn.danger { background: #dc3545; }
 #admin-main { 
     display: grid; 
     grid-template-columns: 1fr; 
-    gap: 16px; 
-    padding: 16px; 
+    gap: 12px; 
+    padding: 12px; 
 }
 #admin-panel {
     background: #fff; 
     border-radius: 12px; 
     box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
-    padding: 16px;
+    padding: 12px;
     order: 2;
 }
 #admin-panel h2 { 
-    margin: 0 0 16px; 
+    margin: 0 0 10px; 
     color: #007bff; 
     font-size: 1.3em; 
 }
 #admin-search { 
     width: 100%; 
-    padding: 12px; 
+    padding: 10px; 
     border: 1px solid #ddd; 
     border-radius: 8px; 
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     box-sizing: border-box;
-    min-height: 44px;
 }
 #reports-table { 
     width: 100%; 
@@ -850,7 +782,7 @@ body {
 }
 #reports-table th, #reports-table td { 
     border-bottom: 1px solid #eee; 
-    padding: 8px 6px; 
+    padding: 6px 4px; 
     text-align: left;
     word-wrap: break-word;
 }
@@ -862,7 +794,7 @@ body {
     font-size: 0.8em;
 }
 .status-badge { 
-    padding: 4px 8px; 
+    padding: 2px 6px; 
     border-radius: 999px; 
     font-weight: 700; 
     font-size: 0.7em;
@@ -873,15 +805,10 @@ body {
 .row-actions button { 
     border: none; 
     border-radius: 6px; 
-    padding: 6px 8px; 
-    margin-right: 4px; 
+    padding: 3px 6px; 
+    margin-right: 2px; 
     cursor: pointer;
     font-size: 0.7em;
-    min-height: 32px;
-    transition: all 0.2s;
-}
-.row-actions button:hover {
-    transform: translateY(-1px);
 }
 .row-actions .focus { background: #17a2b8; color: #fff; }
 .row-actions .edit { background: #28a745; color: #fff; }
@@ -896,8 +823,7 @@ body {
 #empty-state { 
     font-size: 0.95em; 
     color: #555; 
-    padding: 16px 0; 
-    text-align: center;
+    padding: 8px 0 0; 
 }
 
 #top-actions {
@@ -906,7 +832,7 @@ body {
     flex-wrap: wrap;
 }
 .top-btn {
-    padding: 8px 12px;
+    padding: 6px 10px;
     border: none;
     border-radius: 999px;
     cursor: pointer;
@@ -915,14 +841,6 @@ body {
     color: #007bff;
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     font-size: 0.85em;
-    min-height: 36px;
-    transition: all 0.2s;
-}
-.top-btn:hover {
-    transform: translateY(-1px);
-}
-.top-btn:active {
-    transform: translateY(0);
 }
 .top-btn.danger { color: #fff; background: #dc3545; }
 .top-btn.dark { color: #fff; background: #343a40; }
@@ -931,7 +849,7 @@ body {
 #route-options-container {
     position: fixed;
     top: 90px;
-    left: 340px;
+    left: 300px;
     z-index: 1000;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
@@ -944,7 +862,6 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     max-height: calc(100vh - 120px);
     overflow-y: auto;
-    box-sizing: border-box;
 }
 
 #route-options-container h3 {
@@ -963,7 +880,6 @@ body {
     cursor: pointer;
     transition: all 0.3s;
     background: #f8f9fa;
-    min-height: 44px;
 }
 
 .route-option:hover {
@@ -971,10 +887,6 @@ body {
     background: #e7f3ff;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.route-option:active {
-    transform: translateY(0);
 }
 
 .route-option.selected {
@@ -1016,7 +928,7 @@ body {
 
 #select-route-btn {
     width: 100%;
-    padding: 14px;
+    padding: 12px;
     background: linear-gradient(145deg, #007bff, #0056b3);
     color: white;
     border: none;
@@ -1026,16 +938,11 @@ body {
     cursor: pointer;
     transition: all 0.3s;
     margin-top: 15px;
-    min-height: 48px;
 }
 
 #select-route-btn:hover {
     background: linear-gradient(145deg, #0056b3, #003f7f);
     transform: translateY(-2px);
-}
-
-#select-route-btn:active {
-    transform: translateY(0);
 }
 
 #select-route-btn:disabled {
@@ -1060,7 +967,6 @@ body {
     max-width: 500px;
     display: none;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    box-sizing: border-box;
 }
 
 #signature-container h3 {
@@ -1085,19 +991,15 @@ body {
     gap: 10px;
     justify-content: center;
     margin-bottom: 20px;
-    flex-wrap: wrap;
 }
 
 .signature-btn {
-    padding: 12px 20px;
+    padding: 8px 16px;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
     font-weight: 600;
     transition: all 0.3s;
-    min-height: 44px;
-    flex: 1;
-    min-width: 120px;
 }
 
 .signature-btn.clear {
@@ -1118,10 +1020,6 @@ body {
 .signature-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.signature-btn:active {
-    transform: translateY(0);
 }
 
 .signature-info {
@@ -1152,7 +1050,7 @@ body {
 #invoice-send-container {
     position: fixed;
     top: 90px;
-    left: 340px;
+    left: 300px;
     z-index: 1000;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
@@ -1174,17 +1072,16 @@ body {
     font-size: 1.3em;
 }
 .quick-action-btn {
-    padding: 10px 12px;
+    padding: 6px 10px;
     background: linear-gradient(145deg, #6c757d, #495057);
     color: white;
     border: none;
-    border-radius: 8px;
-    font-size: 0.85em;
+    border-radius: 5px;
+    font-size: 0.8em;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    min-height: 44px;
 }
 
 .quick-action-btn:hover {
@@ -1213,10 +1110,9 @@ body {
     transition: all .3s; 
     box-shadow: 0 2px 6px rgba(0,0,0,.2);
     width: 100%; 
-    padding: 12px; 
+    padding: 10px; 
     margin-bottom: 8px; 
     border: none;
-    min-height: 44px;
 }
 #toggle-invoice-send:hover {
     background: linear-gradient(145deg, #004a9f, #003a80);
@@ -1224,7 +1120,7 @@ body {
 }
 #send-invoice {
     width: 100%;
-    padding: 14px;
+    padding: 12px;
     background: linear-gradient(145deg, #0069d9, #004a9f);
     color: white;
     border: none;
@@ -1234,14 +1130,10 @@ body {
     cursor: pointer;
     transition: all 0.3s;
     margin-top: 8px;
-    min-height: 48px;
 }
 #send-invoice:hover { 
     background: linear-gradient(145deg, #004a9f, #003a80); 
     transform: translateY(-2px); 
-}
-#send-invoice:active {
-    transform: translateY(0);
 }
 #send-invoice:disabled { 
     background: #6c757d; 
@@ -1249,7 +1141,7 @@ body {
     transform: none; 
 }
 #invoice-success-msg, #invoice-error-msg {
-    padding: 12px; 
+    padding: 10px; 
     border-radius: 8px; 
     margin-bottom: 12px; 
     display: none; 
@@ -1352,7 +1244,7 @@ body {
 /* Toast Notifications */
 .toast-container {
     position: fixed;
-    top: 80px;
+    top: 100px;
     right: 20px;
     z-index: 10000;
     pointer-events: none;
@@ -1387,23 +1279,21 @@ body {
 .toast.warning {
     border-left-color: var(--warning-color);
 }
-
-/* Améliorations des marqueurs et lignes de route */
 .main-route-line {
-    border-radius: 4px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    border-radius: 3px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .route-progress-line {
-    border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0,123,255,0.4);
+    border-radius: 3px;
+    box-shadow: 0 2px 6px rgba(0,123,255,0.3);
     z-index: 1000;
 }
 
 /* Amélioration des contrôles de navigation */
 #zoom-controls {
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    border-radius: 12px;
+    border-radius: 8px;
     overflow: hidden;
     background: rgba(255,255,255,0.95);
     backdrop-filter: blur(5px);
@@ -1441,99 +1331,25 @@ body {
     cursor: crosshair;
 }
 
-/* Styles pour les marqueurs personnalisés inspirés de la photo */
+/* Styles pour les marqueurs personnalisés */
 .custom-marker {
     border-radius: 50%;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     transition: all 0.3s ease;
-    border: 3px solid white;
 }
 
 /* Animation fluide pour les marqueurs */
 @keyframes markerPulse {
-    0% { 
-        transform: scale(1); 
-        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    }
-    50% { 
-        transform: scale(1.15); 
-        box-shadow: 0 6px 20px rgba(0,123,255,0.6);
-    }
-    100% { 
-        transform: scale(1); 
-        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    }
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
 }
 
 .pulse-marker {
     animation: markerPulse 2s infinite;
 }
 
-/* Amélioration des marqueurs pour ressembler à ceux de la photo */
-.custom-start-marker {
-    background: #4CAF50;
-    border: 3px solid white;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    box-shadow: 0 3px 10px rgba(76, 175, 80, 0.5);
-}
-
-.custom-end-marker {
-    background: #f44336;
-    border: 3px solid white;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    box-shadow: 0 3px 10px rgba(244, 67, 54, 0.5);
-}
-
-.custom-current-marker {
-    background: #2196F3;
-    border: 3px solid white;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    box-shadow: 0 3px 10px rgba(33, 150, 243, 0.5);
-    animation: markerPulse 2s infinite;
-}
-
 /* ====================== MEDIA QUERIES RESPONSIVE ====================== */
-
-/* Desktop large */
-@media screen and (max-width: 1400px) {
-    #sidebar {
-        width: 300px;
-    }
-    
-    #map {
-        margin-left: 300px;
-    }
-    
-    #delivery-report-container,
-    #invoice-send-container,
-    #route-options-container {
-        left: 320px;
-    }
-}
-
-/* Desktop standard */
-@media screen and (max-width: 1200px) {
-    #sidebar {
-        width: 280px;
-    }
-    
-    #map {
-        margin-left: 280px;
-    }
-    
-    #delivery-report-container,
-    #invoice-send-container,
-    #route-options-container {
-        left: 300px;
-        width: 320px;
-    }
-}
 
 /* Tablettes */
 @media screen and (max-width: 1024px) {
@@ -1542,82 +1358,50 @@ body {
     }
     
     #layer-container {
-        right: 10px;
-        top: 75px;
-        padding: 8px;
+        right: 5px;
+        top: 85px;
     }
     
     .layer-preview {
-        width: 45px;
-        height: 45px;
-        margin: 3px;
+        width: 40px;
+        height: 40px;
     }
     
     #instructions-container {
-        max-width: 280px;
-        bottom: 15px;
-        right: 15px;
-        padding: 14px;
-    }
-    
-    #sidebar {
-        width: 260px;
-    }
-    
-    #map {
-        margin-left: 260px;
-    }
-    
-    #delivery-report-container,
-    #invoice-send-container,
-    #route-options-container {
-        left: 280px;
-        width: 300px;
-    }
-    
-    #header h1 {
-        font-size: 1.2em;
-    }
-    
-    .zoom-btn {
-        width: 44px;
-        height: 44px;
-        font-size: 1.3em;
+        max-width: 250px;
+        bottom: 5px;
+        right: 5px;
     }
 }
 
-/* Tablettes portrait et paysage mobile */
+/* Smartphones et petites tablettes */
 @media screen and (max-width: 768px) {
     /* Header responsive */
     #header {
         padding: 10px 15px;
-        height: 60px;
         flex-direction: row;
         justify-content: space-between;
     }
     
     #header .header-content {
-        position: static;
-        transform: none;
         justify-content: flex-start;
         flex: 1;
     }
     
     #header h1 {
-        font-size: 1.1em;
+        font-size: 1.2em;
         text-align: left;
     }
     
     #header img {
-        width: 32px;
-        margin-right: 8px;
+        width: 35px;
+        margin-right: 10px;
     }
     
-    /* Bouton hamburger visible sur mobile */
+    /* Bouton hamburger visible */
     #menu-toggle {
         display: block;
         order: 3;
-        font-size: 1.6em;
     }
     
     #top-actions {
@@ -1626,28 +1410,18 @@ body {
     }
     
     .top-btn {
-        padding: 6px 10px;
-        font-size: 0.8em;
-        min-height: 36px;
+        padding: 4px 8px;
+        font-size: 0.75em;
     }
     
-    /* Map ajustée */
-    #map {
-        height: calc(100vh - 60px);
-        margin-top: 60px;
-        margin-left: 0;
-    }
-    
-    /* Sidebar devient overlay complet sur mobile */
+    /* Sidebar devient overlay sur mobile */
     #sidebar {
         width: 100%;
-        max-width: 340px;
+        max-width: 320px;
         transform: translateX(-100%);
         z-index: 1100;
         box-shadow: 4px 0 20px rgba(0,0,0,0.3);
         border-radius: 0;
-        top: 60px;
-        height: calc(100vh - 60px);
     }
     
     #sidebar.show {
@@ -1670,12 +1444,12 @@ body {
         display: block;
     }
     
-    /* Cacher le toggle sidebar desktop */
-    #sidebar-toggle {
-        display: none;
+    /* Map prend toute la largeur sur mobile */
+    #map {
+        margin-left: 0;
     }
     
-    /* Repositionnement des containers modaux */
+    /* Repositionnement des containers de rapport et facture */
     #delivery-report-container,
     #invoice-send-container,
     #route-options-container {
@@ -1684,90 +1458,83 @@ body {
         left: 50%;
         transform: translate(-50%, -50%);
         width: 90%;
-        max-width: 380px;
-        max-height: 85vh;
+        max-width: 350px;
+        max-height: 80vh;
         z-index: 1200;
     }
     
-    /* Panneau Actions Rapides adapté */
+    /* Adaptations pour Actions Rapides sur mobile */
     #quick-actions-panel {
-        margin-top: 12px !important;
-        padding: 12px !important;
+        margin-top: 8px !important;
+        padding: 10px !important;
     }
     
     .quick-action-btn {
-        padding: 10px 8px !important;
-        font-size: 0.8em !important;
+        padding: 8px 6px !important;
+        font-size: 0.75em !important;
     }
     
     #quick-actions-btn {
-        padding: 12px !important;
-        font-size: 0.9em !important;
+        padding: 10px !important;
+        font-size: 0.85em !important;
     }
     
     /* Layer container adapté */
     #layer-container {
-        top: 65px;
-        right: 10px;
-        padding: 6px;
+        top: 85px;
+        right: 5px;
+        padding: 5px;
     }
     
     .layer-preview {
-        width: 40px;
-        height: 40px;
-        margin: 2px;
+        width: 35px;
+        height: 35px;
+        margin: 3px;
     }
     
-    /* Instructions container mobile */
+    /* Instructions container */
     #instructions-container {
-        bottom: 10px;
-        right: 10px;
-        left: 10px;
+        bottom: 5px;
+        right: 5px;
+        left: 5px;
         max-width: none;
-        font-size: 0.85em;
-        padding: 12px;
+        font-size: 0.8em;
+        padding: 10px;
     }
     
     #toggleInstructions {
-        font-size: 0.85em;
-        padding: 10px 14px;
+        font-size: 0.75em;
     }
     
     #instructionsList {
-        max-height: 160px;
-    }
-    
-    #instructionsList li {
-        padding: 10px;
-        font-size: 0.9em;
+        max-height: 150px;
     }
     
     /* Toggle layers button */
     #toggleLayersBtn {
-        top: 65px;
-        right: 60px;
-        padding: 8px 12px;
-        font-size: 0.8em;
+        top: 85px;
+        right: 50px;
+        padding: 6px 8px;
+        font-size: 0.75em;
     }
     
-    /* Zoom controls mobile */
+    /* Zoom controls */
     #zoom-controls {
-        top: 120px;
-        right: 10px;
+        top: 130px;
+        right: 5px;
     }
     
     .zoom-btn {
-        width: 42px;
-        height: 42px;
-        font-size: 1.2em;
+        width: 35px;
+        height: 35px;
+        font-size: 1em;
     }
     
     /* Interface Admin responsive */
     #admin-header {
         flex-direction: column;
         align-items: stretch;
-        gap: 12px;
-        padding: 12px 15px;
+        gap: 10px;
     }
     
     #admin-header .title {
@@ -1777,22 +1544,15 @@ body {
     
     #admin-actions {
         justify-content: center;
-        gap: 8px;
-    }
-    
-    .admin-btn {
-        padding: 8px 12px;
-        font-size: 0.85em;
-        min-height: 40px;
     }
     
     #admin-main {
-        padding: 12px;
-        gap: 12px;
+        padding: 8px;
+        gap: 8px;
     }
     
     #admin-panel {
-        padding: 12px;
+        padding: 8px;
     }
     
     #reports-table {
@@ -1801,19 +1561,18 @@ body {
     
     #reports-table th,
     #reports-table td {
-        padding: 6px 3px;
+        padding: 4px 2px;
     }
     
     .status-badge {
         font-size: 0.65em;
-        padding: 2px 5px;
+        padding: 1px 4px;
     }
     
     .row-actions button {
-        padding: 4px 6px;
+        padding: 2px 4px;
         font-size: 0.65em;
-        margin-right: 2px;
-        min-height: 28px;
+        margin-right: 1px;
     }
     
     #admin-map {
@@ -1823,64 +1582,34 @@ body {
     /* Form groups responsive */
     .datetime-group {
         flex-direction: column;
-        gap: 8px;
+        gap: 5px;
     }
     
     /* Login responsive */
     #login-container {
-        padding: 25px;
-        margin: 15px;
-        width: calc(100% - 30px);
-        max-width: none;
+        padding: 20px;
+        margin: 10px;
     }
     
     #login-container h2 {
-        font-size: 1.6em;
-    }
-    
-    /* Signature container mobile */
-    #signature-container {
-        padding: 20px;
-        width: 95%;
-        max-height: 90vh;
-    }
-    
-    #signature-pad {
-        width: 100%;
-        height: 180px;
-    }
-    
-    .signature-controls {
-        flex-direction: column;
-        gap: 8px;
-    }
-    
-    .signature-btn {
-        min-width: 100%;
-        padding: 14px;
+        font-size: 1.5em;
     }
 }
 
-/* Smartphones */
+/* Très petits écrans */
 @media screen and (max-width: 480px) {
     #header h1 {
         font-size: 1em;
-        margin: 0;
     }
     
     #header img {
-        width: 28px;
-        margin-right: 6px;
-    }
-    
-    #menu-toggle {
-        font-size: 1.4em;
-        padding: 6px;
+        width: 30px;
+        margin-right: 8px;
     }
     
     #sidebar {
-        max-width: 300px;
-        padding: 16px;
+        max-width: 280px;
+        padding: 10px;
     }
     
     #sidebar h3 {
@@ -1888,39 +1617,27 @@ body {
     }
     
     #sidebar button {
-        padding: 12px;
-        font-size: 0.9em;
-        margin-bottom: 8px;
-    }
-    
-    #sidebar input, #sidebar select {
-        padding: 12px 8px;
-        font-size: 0.9em;
-        margin-bottom: 12px;
+        padding: 8px;
+        font-size: 0.85em;
     }
     
     #delivery-report-container,
     #invoice-send-container,
     #route-options-container {
         width: 95%;
-        padding: 16px;
-        max-height: 90vh;
+        padding: 15px;
+        max-height: 85vh;
     }
     
     .layer-preview {
-        width: 35px;
-        height: 35px;
+        width: 30px;
+        height: 30px;
         margin: 2px;
     }
     
     #instructions-container {
-        font-size: 0.8em;
-        padding: 10px;
-    }
-    
-    #instructionsList li {
+        font-size: 0.75em;
         padding: 8px;
-        font-size: 0.85em;
     }
     
     #reports-table {
@@ -1929,182 +1646,35 @@ body {
     
     .status-badge {
         font-size: 0.6em;
-        padding: 1px 4px;
     }
     
     .row-actions button {
         font-size: 0.6em;
-        padding: 3px 5px;
-        min-height: 26px;
+        padding: 1px 3px;
     }
     
     .zoom-btn {
-        width: 38px;
-        height: 38px;
-        font-size: 1.1em;
-    }
-    
-    /* Amélioration des boutons pour touch */
-    button, input[type="button"], input[type="submit"] {
-        min-height: 44px;
-        min-width: 44px;
-    }
-    
-    .form-group input, .form-group textarea, .form-group select {
-        min-height: 44px;
-        font-size: 16px; /* Évite le zoom sur iOS */
-    }
-    
-    /* Signature mobile */
-    #signature-container {
-        padding: 16px;
-        width: 98%;
-    }
-    
-    #signature-pad {
-        height: 150px;
-    }
-}
-
-/* Très petits écrans */
-@media screen and (max-width: 360px) {
-    #header {
-        padding: 8px 12px;
-    }
-    
-    #header h1 {
+        width: 30px;
+        height: 30px;
         font-size: 0.9em;
-    }
-    
-    #header img {
-        width: 26px;
-        margin-right: 5px;
-    }
-    
-    #sidebar {
-        max-width: 280px;
-        padding: 12px;
-    }
-    
-    .zoom-btn {
-        width: 36px;
-        height: 36px;
-        font-size: 1em;
-    }
-    
-    #signature-pad {
-        height: 120px;
     }
 }
 
 /* Paysage mobile */
 @media screen and (max-height: 500px) and (orientation: landscape) {
-    #header {
-        height: 50px;
-        padding: 8px 15px;
-    }
-    
-    #map {
-        height: calc(100vh - 50px);
-        margin-top: 50px;
-    }
-    
-    #sidebar {
-        top: 50px;
-        height: calc(100vh - 50px);
-    }
-    
     #delivery-report-container,
-    #invoice-send-container,
-    #route-options-container {
-        max-height: 85vh;
+    #invoice-send-container {
+        max-height: 90vh;
         top: 5%;
         transform: translate(-50%, 0);
     }
     
     #instructions-container {
-        max-height: 140px;
+        max-height: 120px;
     }
     
     #instructionsList {
         max-height: 100px;
-    }
-    
-    #signature-container {
-        max-height: 85vh;
-        padding: 12px;
-    }
-    
-    #signature-pad {
-        height: 100px;
-    }
-    
-    .signature-controls {
-        flex-direction: row;
-        gap: 6px;
-    }
-    
-    .signature-btn {
-        padding: 8px 12px;
-        font-size: 0.9em;
-    }
-}
-
-/* Grande largeur écran */
-@media screen and (min-width: 1600px) {
-    #sidebar {
-        width: 360px;
-    }
-    
-    #map {
-        margin-left: 360px;
-    }
-    
-    #delivery-report-container,
-    #invoice-send-container,
-    #route-options-container {
-        left: 380px;
-        width: 420px;
-    }
-}
-
-/* Optimisations pour écrans tactiles */
-@media (hover: none) and (pointer: coarse) {
-    /* Améliorer la taille des zones tactiles */
-    button, .layer-preview, #companyList li {
-        min-height: 44px;
-        min-width: 44px;
-    }
-    
-    /* Supprimer les effets hover sur mobile */
-    *:hover {
-        -webkit-tap-highlight-color: transparent;
-    }
-    
-    /* Améliorer les transitions sur mobile */
-    * {
-        -webkit-transition: none !important;
-        -moz-transition: none !important;
-        -o-transition: none !important;
-        -ms-transition: none !important;
-        transition: none !important;
-    }
-    
-    /* Réactiver les transitions importantes */
-    #sidebar, .toast, .route-option {
-        transition: all 0.3s ease !important;
-    }
-}
-
-/* High DPI / Retina */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    .custom-marker, .layer-preview {
-        border-width: 1px;
-    }
-    
-    .leaflet-marker-icon {
-        image-rendering: -webkit-optimize-contrast;
-        image-rendering: crisp-edges;
     }
 }
 </style>
@@ -2138,9 +1708,9 @@ body {
     <div id="header">
         <button id="menu-toggle">☰</button>
         <div class="header-content">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin" style="width: 40px; height: 26px; margin-right: 12px; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin" style="width: 45px; height: 30px; margin-right: 15px; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
             <h1>Système de Distribution des Factures Impôts</h1>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin" style="width: 40px; height: 26px; margin-left: 12px; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg" alt="Drapeau Bénin" style="width: 45px; height: 30px; margin-left: 15px; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
         </div>
         <div id="top-actions" style="display:none;">
             <button id="switch-to-admin" class="top-btn dark">Admin</button>
@@ -2265,13 +1835,13 @@ body {
         <div id="signature-section" style="display:none;">
             <div class="form-group">
                 <label>Signature de réception :</label>
-                <button id="open-signature-btn" type="button" style="width:100%;padding:12px;background:#007bff;color:white;border:none;border-radius:8px;cursor:pointer;min-height:44px;">✍️ Obtenir la signature</button>
+                <button id="open-signature-btn" type="button" style="width:100%;padding:10px;background:#007bff;color:white;border:none;border-radius:8px;cursor:pointer;">✍️ Obtenir la signature</button>
             </div>
             <div id="signature-preview" style="display:none;margin-top:10px;">
                 <label>Signature obtenue :</label>
                 <div style="border:1px solid #ddd;border-radius:8px;padding:10px;background:#f8f9fa;text-align:center;">
                     <img id="signature-image" style="max-width:100%;max-height:100px;border:1px solid #ccc;border-radius:4px;" />
-                    <button id="change-signature-btn" type="button" style="margin-top:5px;padding:8px 12px;background:#ffc107;color:#000;border:none;border-radius:4px;cursor:pointer;font-size:0.8em;min-height:36px;">Modifier</button>
+                    <button id="change-signature-btn" type="button" style="margin-top:5px;padding:5px 10px;background:#ffc107;color:#000;border:none;border-radius:4px;cursor:pointer;font-size:0.8em;">Modifier</button>
                 </div>
             </div>
         </div>
@@ -2419,17 +1989,17 @@ body {
     <div style="display:flex;flex-direction:column;gap:8px;">
       <input id="edit-id" type="hidden" />
       <label>Statut:
-        <select id="edit-status" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;min-height:44px;"><option value="delivered">Livrée</option><option value="not-delivered">Non livrée</option></select>
+        <select id="edit-status" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;"><option value="delivered">Livrée</option><option value="not-delivered">Non livrée</option></select>
       </label>
-      <label>Agent: <input id="edit-agentName" type="text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;min-height:44px;" /></label>
-      <label>Contact: <input id="edit-agentContact" type="text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;min-height:44px;" /></label>
-      <label>Structure: <input id="edit-structure" type="text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;min-height:44px;" /></label>
-      <label>Date: <input id="edit-deliveryDate" type="date" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;min-height:44px;" /></label>
-      <label>Heure: <input id="edit-deliveryTime" type="time" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;min-height:44px;" /></label>
+      <label>Agent: <input id="edit-agentName" type="text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;" /></label>
+      <label>Contact: <input id="edit-agentContact" type="text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;" /></label>
+      <label>Structure: <input id="edit-structure" type="text" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;" /></label>
+      <label>Date: <input id="edit-deliveryDate" type="date" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;" /></label>
+      <label>Heure: <input id="edit-deliveryTime" type="time" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;" /></label>
       <label>Raison: <textarea id="edit-reason" style="min-height:60px;width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;"></textarea></label>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;">
-        <button onclick="closeEditModal()" style="background:#6c757d;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;min-height:44px;">Annuler</button>
-        <button onclick="saveEdit()" style="background:#007bff;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;min-height:44px;">Enregistrer</button>
+        <button onclick="closeEditModal()" style="background:#6c757d;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;">Annuler</button>
+        <button onclick="saveEdit()" style="background:#007bff;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;">Enregistrer</button>
       </div>
     </div>
   </div>
@@ -2443,8 +2013,8 @@ body {
       <img id="signature-view-image" style="max-width:100%;max-height:300px;border:1px solid #ddd;border-radius:8px;" />
     </div>
     <div style="text-align:center;">
-      <button onclick="closeSignatureViewModal()" style="background:#6c757d;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;min-height:44px;">Fermer</button>
-      <button id="download-signature" style="background:#28a745;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;margin-left:10px;min-height:44px;">💾 Télécharger</button>
+      <button onclick="closeSignatureViewModal()" style="background:#6c757d;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;">Fermer</button>
+      <button id="download-signature" style="background:#28a745;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;margin-left:10px;">💾 Télécharger</button>
     </div>
   </div>
 </div>
@@ -2551,56 +2121,26 @@ function initMobileMenu() {
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
     
-    // Fonction pour fermer la sidebar
-    function closeSidebar() {
+    menuToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('show');
+        sidebarOverlay.classList.toggle('show');
+    });
+    
+    sidebarOverlay.addEventListener('click', function() {
         sidebar.classList.remove('show');
         sidebarOverlay.classList.remove('show');
-    }
-    
-    // Fonction pour ouvrir la sidebar
-    function openSidebar() {
-        sidebar.classList.add('show');
-        sidebarOverlay.classList.add('show');
-    }
-    
-    // Toggle sidebar au clic du menu hamburger
-    menuToggle.addEventListener('click', function(e) {
-        e.stopPropagation();
-        if (sidebar.classList.contains('show')) {
-            closeSidebar();
-        } else {
-            openSidebar();
-        }
     });
     
-    // Fermer la sidebar au clic sur l'overlay
-    sidebarOverlay.addEventListener('click', closeSidebar);
-    
-    // Fermer la sidebar quand on clique sur certains éléments
+    // Fermer la sidebar quand on clique sur un élément de navigation
     sidebar.addEventListener('click', function(e) {
-        if (e.target.tagName === 'BUTTON' && !e.target.closest('#quick-actions-panel')) {
-            // Délai pour permettre l'action avant de fermer
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'LI') {
             if (window.innerWidth <= 768) {
-                setTimeout(closeSidebar, 300);
+                setTimeout(() => {
+                    sidebar.classList.remove('show');
+                    sidebarOverlay.classList.remove('show');
+                }, 300);
             }
         }
-        if (e.target.tagName === 'LI') {
-            if (window.innerWidth <= 768) {
-                setTimeout(closeSidebar, 300);
-            }
-        }
-    });
-    
-    // Fermer la sidebar si on redimensionne vers desktop
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 768) {
-            closeSidebar();
-        }
-    });
-    
-    // Empêcher la fermeture lors du scroll dans la sidebar
-    sidebar.addEventListener('touchmove', function(e) {
-        e.stopPropagation();
     });
 }
 
@@ -2748,14 +2288,13 @@ var progressLine = null;
 var totalRouteDistance = 0;
 var currentRouteProgress = 0;
 
-// Variables pour les segments de route parcourus
-var completedSegments = [];
-var remainingRoute = null;
-
 // Variables pour la rotation de la carte
 var currentMapRotation = 0;
 var is3DMode = false;
 var sidebarVisible = true;
+
+// ====================== ZOOM CONTROLS IN SIDEBAR ======================
+// Removed - zoom controls moved to Actions Rapides
 
 // ====================== TOGGLE SIDEBAR ======================
 document.getElementById('sidebar-toggle').onclick = () => {
@@ -2784,41 +2323,21 @@ document.getElementById('sidebar-toggle').onclick = () => {
     }, 300);
 };
 
-// Icônes personnalisés inspirés de la photo pour départ, arrivée et position
+// Icônes personnalisés pour départ, arrivée et position
 var departIcon = new L.Icon({ 
-    iconUrl: 'data:image/svg+xml;base64,' + btoa(`
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-            <circle cx="16" cy="16" r="12" fill="#4CAF50" stroke="white" stroke-width="3"/>
-            <circle cx="16" cy="16" r="6" fill="white"/>
-        </svg>
-    `), 
-    iconSize: [24, 24], 
-    iconAnchor: [12, 12],
-    className: 'custom-start-marker'
+    iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/green-dot.png', 
+    iconSize: [32,32], 
+    iconAnchor: [16,32]
 });
-
 var arriveeIcon = new L.Icon({ 
-    iconUrl: 'data:image/svg+xml;base64,' + btoa(`
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-            <circle cx="16" cy="16" r="12" fill="#f44336" stroke="white" stroke-width="3"/>
-            <circle cx="16" cy="16" r="6" fill="white"/>
-        </svg>
-    `), 
-    iconSize: [24, 24], 
-    iconAnchor: [12, 12],
-    className: 'custom-end-marker'
+    iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png', 
+    iconSize: [32,32], 
+    iconAnchor: [16,32]
 });
-
 var positionIcon = new L.Icon({ 
-    iconUrl: 'data:image/svg+xml;base64,' + btoa(`
-        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28">
-            <circle cx="14" cy="14" r="10" fill="#2196F3" stroke="white" stroke-width="3"/>
-            <circle cx="14" cy="14" r="4" fill="white"/>
-        </svg>
-    `), 
-    iconSize: [20, 20], 
-    iconAnchor: [10, 10],
-    className: 'custom-current-marker pulse-marker'
+    iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png', 
+    iconSize: [32,32], 
+    iconAnchor: [16,32]
 });
 
 var baseLayers = {
@@ -3098,10 +2617,6 @@ function clearRoute(){
         map.removeLayer(progressLine);
         progressLine = null;
     }
-    if(remainingRoute) {
-        map.removeLayer(remainingRoute);
-        remainingRoute = null;
-    }
     if(routingControl) {
         map.removeControl(routingControl);
         routingControl = null;
@@ -3114,7 +2629,6 @@ function clearRoute(){
     lastSpokenInstruction = -1;
     lastSpokenInstructionTimestamp = 0;
     currentRouteProgress = 0;
-    completedSegments = [];
 
     // Hide statistics dashboard
     document.getElementById('stats-card').style.display = 'none';
@@ -3170,7 +2684,7 @@ function updateNavigationStats() {
     }
 }
 
-// ====================== SUIVI GPS RÉEL AMÉLIORÉ AVEC DISPARITION PROGRESSIVE ======================
+// ====================== SUIVI GPS RÉEL AMÉLIORÉ ======================
 function updateProgressiveLine(userPos) {
     if (!routeCoords || routeCoords.length === 0) return;
     
@@ -3205,45 +2719,18 @@ function updateProgressiveLine(userPos) {
         movingCursor.setLatLng(projectedPos);
     }
     
-    // ======= LOGIQUE DE DISPARITION PROGRESSIVE DE L'ITINÉRAIRE =======
-    
-    // Supprimer l'ancienne ligne de route restante
-    if (remainingRoute) {
-        map.removeLayer(remainingRoute);
-        remainingRoute = null;
+    // Supprimer l'ancienne ligne de progression
+    if (progressLine) {
+        map.removeLayer(progressLine);
     }
     
-    // Créer la ligne pour les segments parcourus (grisée/transparente)
-    const completedCoords = routeCoords.slice(0, closestIndex + 1);
-    if (completedCoords.length > 1) {
-        const completedLine = L.polyline(completedCoords.map(c => [c.lat, c.lng]), { 
-            color: '#cccccc', 
-            weight: 4, 
-            opacity: 0.5,
-            className: 'completed-route-line',
-            dashArray: '10, 10'  // Ligne pointillée pour indiquer le parcours déjà fait
-        });
-        
-        // Ajouter au map seulement si il y a assez de points
-        if (!completedCoords.some(c => !c.lat || !c.lng)) {
-            completedLine.addTo(map);
-            
-            // Programmer la suppression de cette ligne après 30 secondes
-            setTimeout(() => {
-                if (map.hasLayer(completedLine)) {
-                    map.removeLayer(completedLine);
-                }
-            }, 30000);
-        }
-    }
-    
-    // Créer la ligne pour les segments restants (route active)
+    // Créer une ligne progressive qui diminue au fur et à mesure de l'avancement
     const remainingCoords = routeCoords.slice(closestIndex);
     if (remainingCoords.length > 1) {
-        // Ajouter la position projetée au début des coordonnées restantes pour continuité
-        const remainingCoordsWithProjection = [projectedPos, ...remainingCoords.map(c => [c.lat, c.lng])];
+        // Ajouter la position projetée au début des coordonnées restantes
+        const progressCoords = [projectedPos, ...remainingCoords.map(c => [c.lat, c.lng])];
         
-        remainingRoute = L.polyline(remainingCoordsWithProjection, { 
+        progressLine = L.polyline(progressCoords, { 
             color: '#007bff', 
             weight: 6, 
             opacity: 0.9,
@@ -3251,22 +2738,8 @@ function updateProgressiveLine(userPos) {
         }).addTo(map);
     }
     
-    // Calculer le progrès basé sur la distance réelle parcourue
-    const totalDistance = calculateTotalDistance(routeCoords);
-    const remainingDistance = calculateTotalDistance(routeCoords.slice(closestIndex));
-    currentRouteProgress = ((totalDistance - remainingDistance) / totalDistance) * 100;
-    
-    // Afficher le dashboard des statistiques
-    document.getElementById('stats-card').style.display = 'block';
-}
-
-// Fonction pour calculer la distance totale d'un ensemble de coordonnées
-function calculateTotalDistance(coords) {
-    let totalDist = 0;
-    for (let i = 0; i < coords.length - 1; i++) {
-        totalDist += distance([coords[i].lat, coords[i].lng], [coords[i + 1].lat, coords[i + 1].lng]);
-    }
-    return totalDist;
+    // Calculer le progrès
+    currentRouteProgress = (closestIndex / routeCoords.length) * 100;
 }
 
 // Fonction pour projeter un point sur un segment de ligne
@@ -3310,7 +2783,7 @@ function startRealTimeGPSTracking(){
         // Update speed statistics
         updateCurrentSpeed(pos);
         
-        // Mettre à jour la ligne progressive avec disparition
+        // Mettre à jour la ligne progressive et la position du curseur
         updateProgressiveLine(userPos);
         
         // Update navigation statistics
@@ -3361,7 +2834,6 @@ function startRealTimeGPSTracking(){
             
             if (distToDestination < 20) { // 20 mètres de la destination
                 if (voiceEnabled) speak("Vous êtes arrivé à destination.");
-                showToast("🎯 Destination atteinte!", "success");
                 clearRoute();
                 return;
             }
@@ -3384,18 +2856,21 @@ function startRealTimeGPSTracking(){
         switch(error.code) {
             case error.PERMISSION_DENIED:
                 errorMessage += "Accès à la localisation refusé";
+
                 break;
             case error.POSITION_UNAVAILABLE:
                 errorMessage += "Position indisponible";
+
                 break;
             case error.TIMEOUT:
                 errorMessage += "Timeout de localisation";
+
                 break;
         }
-        showToast(errorMessage, "warning");
         
         // En cas d'erreur GPS, continuer avec l'animation simulée
         if (!isPaused && isNavigating) {
+
             resumeRouteAnimation();
         }
     }, {
@@ -3432,7 +2907,6 @@ function resumeRouteAnimation(){
                 }
             }else{
                 if(voiceEnabled) speak("Vous êtes arrivé à destination.");
-                showToast("🎯 Destination atteinte!", "success");
                 clearRoute();
             }
         }
@@ -3536,6 +3010,7 @@ function calculateRouteOptions(start, end, destinationName) {
         updateProgress((routesCalculated / totalRoutes) * 100);
         if (routesCalculated === totalRoutes) {
             renderRouteOptions();
+
         }
     });
     
@@ -3573,6 +3048,7 @@ function calculateRouteOptions(start, end, destinationName) {
         updateProgress((routesCalculated / totalRoutes) * 100);
         if (routesCalculated === totalRoutes) {
             renderRouteOptions();
+
         }
     });
     
@@ -3611,6 +3087,7 @@ function calculateRouteOptions(start, end, destinationName) {
         updateProgress((routesCalculated / totalRoutes) * 100);
         if (routesCalculated === totalRoutes) {
             renderRouteOptions();
+
         }
     });
     
@@ -3713,7 +3190,7 @@ function startRouteWithSelectedOption(lat, lng, name, selectedRoute) {
             addWaypoints: false,
             routeWhileDragging: false,
             show: false,
-            lineOptions: { styles: [{ opacity: 0 }] }, // Masquer la ligne par défaut
+            lineOptions: { styles: [{ color: 'blue', weight: 5 }] },
             router: selectedRoute.options && selectedRoute.options.alternative 
                 ? L.Routing.osrmv1({
                     serviceUrl: 'https://router.project-osrm.org/route/v1',
@@ -3730,7 +3207,10 @@ function startRouteWithSelectedOption(lat, lng, name, selectedRoute) {
             routeCoords = route.coordinates;
             routeInstructions = route.instructions;
             
-            // Créer notre ligne de route complète initiale (sera progressivement effacée)
+            // Supprimer l'ancienne ligne de route par défaut du contrôle
+            if (routeLine) map.removeLayer(routeLine);
+            
+            // Créer notre propre ligne de route complète
             routeLine = L.polyline(routeCoords, {
                 color: '#1e90ff', 
                 weight: 6, 
@@ -3738,9 +3218,14 @@ function startRouteWithSelectedOption(lat, lng, name, selectedRoute) {
                 className: 'main-route-line'
             }).addTo(map);
             
-            // Créer les marqueurs avec les nouveaux icônes
+            // Créer les trois marqueurs uniques
+            // 1. Marqueur de départ (vert)
             movingMarkerStart = L.marker(routeCoords[0], { icon: departIcon }).addTo(map);
+            
+            // 2. Marqueur d'arrivée (rouge)
             movingMarkerEnd = L.marker(routeCoords[routeCoords.length - 1], { icon: arriveeIcon }).addTo(map);
+            
+            // 3. Marqueur de position actuelle (bleu) - commence au départ
             movingCursor = L.marker(start, { icon: positionIcon }).addTo(map);
             
             // Ajuster la vue pour voir tout l'itinéraire
@@ -3758,9 +3243,6 @@ function startRouteWithSelectedOption(lat, lng, name, selectedRoute) {
             currentInstructionIndex = 0;
             lastSpokenInstruction = -1;
             lastSpokenInstructionTimestamp = 0;
-            
-            // Mise à jour des statistiques
-            updateStatistics(route);
             
             startRealTimeGPSTracking();
         });
@@ -3780,11 +3262,11 @@ function startRoute(lat,lng,name){
         routingControl=L.Routing.control({
             waypoints:[L.latLng(start),L.latLng(end)],
             language:'fr',
-            createMarker:()=>null,
+            createMarker:()=>null, // Ne pas créer de marqueurs automatiques
             addWaypoints:false,
             routeWhileDragging:false,
-            show:false,
-            lineOptions:{styles:[{opacity: 0}]}
+            show:false, // Masquer l'interface par défaut
+            lineOptions:{styles:[{opacity: 0}]} // Masquer la ligne par défaut
         }).addTo(map);
 
         routingControl.on('routesfound',e=>{
@@ -3792,6 +3274,7 @@ function startRoute(lat,lng,name){
             routeCoords=route.coordinates;
             routeInstructions=route.instructions; 
             
+            // Créer notre propre ligne de route
             routeLine=L.polyline(routeCoords, {
                 color:'#1e90ff', 
                 weight:6, 
@@ -3799,6 +3282,7 @@ function startRoute(lat,lng,name){
                 className: 'main-route-line'
             }).addTo(map);
             
+            // Créer les trois marqueurs
             movingMarkerStart=L.marker(routeCoords[0],{icon:departIcon}).addTo(map);
             movingMarkerEnd=L.marker(routeCoords[routeCoords.length-1],{icon:arriveeIcon}).addTo(map);
             movingCursor=L.marker(start,{icon:positionIcon}).addTo(map);
@@ -3818,7 +3302,6 @@ function startRoute(lat,lng,name){
             lastSpokenInstruction = -1;
             lastSpokenInstructionTimestamp = 0;
             
-            updateStatistics(route);
             startRealTimeGPSTracking();
         });
     },()=>{ alert("Position introuvable"); });
@@ -3836,11 +3319,11 @@ function startRouteWithoutVoice(lat,lng,name){
         routingControl=L.Routing.control({
             waypoints:[L.latLng(start),L.latLng(end)],
             language:'fr',
-            createMarker:()=>null,
+            createMarker:()=>null, // Ne pas créer de marqueurs automatiques
             addWaypoints:false,
             routeWhileDragging:false,
-            show:false,
-            lineOptions:{styles:[{opacity: 0}]}
+            show:false, // Masquer l'interface par défaut
+            lineOptions:{styles:[{opacity: 0}]} // Masquer la ligne par défaut
         }).addTo(map);
 
         routingControl.on('routesfound',e=>{
@@ -3848,6 +3331,7 @@ function startRouteWithoutVoice(lat,lng,name){
             routeCoords=route.coordinates;
             routeInstructions=route.instructions; 
             
+            // Créer notre propre ligne de route
             routeLine=L.polyline(routeCoords, {
                 color:'#1e90ff', 
                 weight:6, 
@@ -3855,6 +3339,7 @@ function startRouteWithoutVoice(lat,lng,name){
                 className: 'main-route-line'
             }).addTo(map);
             
+            // Créer les trois marqueurs
             movingMarkerStart=L.marker(routeCoords[0],{icon:departIcon}).addTo(map);
             movingMarkerEnd=L.marker(routeCoords[routeCoords.length-1],{icon:arriveeIcon}).addTo(map);
             movingCursor=L.marker(start,{icon:positionIcon}).addTo(map);
@@ -3874,7 +3359,6 @@ function startRouteWithoutVoice(lat,lng,name){
             lastSpokenInstruction = -1;
             lastSpokenInstructionTimestamp = 0;
             
-            updateStatistics(route);
             startRealTimeGPSTracking();
         });
     },()=>{ alert("Position introuvable"); });
@@ -3887,7 +3371,6 @@ document.getElementById("pauseRoute").onclick=()=>{
         isPaused=true;
         speech.cancel();
         if(voiceEnabled) speak("Navigation en pause");
-        showToast("⏸️ Navigation en pause", "warning");
     }
 };
 
@@ -3895,14 +3378,12 @@ document.getElementById("resumeRoute").onclick=()=>{
     if(isPaused && isNavigating){
         isPaused=false;
         if(voiceEnabled) speak("Reprise navigation");
-        showToast("▶️ Navigation reprise", "success");
-        startRealTimeGPSTracking();
+        startRealTimeGPSTracking(); // Reprendre le GPS
     }
 };
 
 document.getElementById("stopRoute").onclick=()=>{ 
     if(voiceEnabled) speak("Itinéraire arrêté"); 
-    showToast("🛑 Navigation arrêtée", "info");
     clearRoute(); 
 };
 
@@ -4036,7 +3517,6 @@ document.getElementById('submit-report').onclick = () => {
         
         const statusText = deliveryStatus === 'delivered' ? 'livrée' : 'non livrée';
         showMessage('success', `Rapport de facture ${statusText} envoyé avec succès !`);
-        showToast(`📋 Rapport envoyé: facture ${statusText}`, "success");
 
         setTimeout(() => { resetForm(); }, 2000);
     }, 1500);
@@ -4156,20 +3636,29 @@ document.getElementById('send-invoice').onclick = async (e) => {
 
   const formData = new FormData(form);
 
-  showLoading(sendBtn, 'Envoi...');
+  sendBtn.disabled = true;
+  sendBtn.textContent = '⏳ Envoi...';
 
   try {
-    // Always use relative URL which works for both local and deployed environments
-    const response = await fetch("/sendmail", {
-      method: "POST",
-      body: formData
-    });
+    // Essayer d'abord avec l'URL locale
+    let response;
+    try {
+      response = await fetch("http://127.0.0.1:5000/sendmail", {
+        method: "POST",
+        body: formData
+      });
+    } catch (localErr) {
+      // Si l'URL locale échoue, essayer avec l'URL relative pour le déploiement
+      response = await fetch("/sendmail", {
+        method: "POST",
+        body: formData
+      });
+    }
 
     const result = await response.json();
     if (result.status === "success") {
       successMsg.textContent = "✅ " + result.message;
       successMsg.style.display = "block";
-      showToast("✉️ Facture envoyée avec succès", "success");
       form.reset();
       // Réinitialiser les champs cachés
       document.getElementById('invoice-from-name').value = '';
@@ -4179,15 +3668,14 @@ document.getElementById('send-invoice').onclick = async (e) => {
     } else {
       errorMsg.textContent = "❌ " + result.message;
       errorMsg.style.display = "block";
-      showToast("❌ Erreur d'envoi de facture", "error");
     }
   } catch (err) {
     console.error('Erreur détaillée:', err);
     errorMsg.textContent = "❌ Erreur de connexion au serveur. Vérifiez que le serveur est en marche.";
     errorMsg.style.display = "block";
-    showToast("❌ Erreur de connexion", "error");
   } finally {
-    hideLoading(sendBtn);
+    sendBtn.disabled = false;
+    sendBtn.textContent = '🚀 Envoyer la facture';
   }
 };
 
@@ -4203,21 +3691,11 @@ function initializeSignature() {
     signatureCanvas = document.getElementById('signature-pad');
     signatureCtx = signatureCanvas.getContext('2d');
     
-    // Configuration du canvas pour responsive
-    function resizeCanvas() {
-        const rect = signatureCanvas.getBoundingClientRect();
-        signatureCanvas.width = rect.width;
-        signatureCanvas.height = rect.height;
-        
-        // Configuration du contexte
-        signatureCtx.strokeStyle = '#000000';
-        signatureCtx.lineWidth = 2;
-        signatureCtx.lineCap = 'round';
-        signatureCtx.lineJoin = 'round';
-    }
-    
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    // Configuration du canvas
+    signatureCtx.strokeStyle = '#000000';
+    signatureCtx.lineWidth = 2;
+    signatureCtx.lineCap = 'round';
+    signatureCtx.lineJoin = 'round';
     
     // Events pour desktop
     signatureCanvas.addEventListener('mousedown', startDrawing);
@@ -4229,11 +3707,6 @@ function initializeSignature() {
     signatureCanvas.addEventListener('touchstart', handleTouch);
     signatureCanvas.addEventListener('touchmove', handleTouch);
     signatureCanvas.addEventListener('touchend', stopDrawing);
-    
-    // Empêcher le scroll sur le canvas
-    signatureCanvas.addEventListener('touchmove', function(e) {
-        e.preventDefault();
-    }, { passive: false });
     
     // Boutons de contrôle
     document.getElementById('clear-signature').onclick = clearSignature;
@@ -4249,25 +3722,22 @@ function initializeSignature() {
 function handleTouch(e) {
     e.preventDefault();
     const touch = e.touches[0];
-    if (touch) {
-        const rect = signatureCanvas.getBoundingClientRect();
-        const mouseEvent = new MouseEvent({
-            touchstart: 'mousedown',
-            touchmove: 'mousemove',
-            touchend: 'mouseup'
-        }[e.type], {
-            clientX: touch.clientX,
-            clientY: touch.clientY
-        });
-        signatureCanvas.dispatchEvent(mouseEvent);
-    }
+    const mouseEvent = new MouseEvent({
+        touchstart: 'mousedown',
+        touchmove: 'mousemove',
+        touchend: 'mouseup'
+    }[e.type], {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+    });
+    signatureCanvas.dispatchEvent(mouseEvent);
 }
 
 function startDrawing(e) {
     isDrawing = true;
     const rect = signatureCanvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (signatureCanvas.width / rect.width);
-    const y = (e.clientY - rect.top) * (signatureCanvas.height / rect.height);
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
     signatureCtx.beginPath();
     signatureCtx.moveTo(x, y);
 }
@@ -4275,8 +3745,8 @@ function startDrawing(e) {
 function draw(e) {
     if (!isDrawing) return;
     const rect = signatureCanvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (signatureCanvas.width / rect.width);
-    const y = (e.clientY - rect.top) * (signatureCanvas.height / rect.height);
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
     signatureCtx.lineTo(x, y);
     signatureCtx.stroke();
 }
@@ -4324,7 +3794,7 @@ function saveSignature() {
     // Fermer le modal
     cancelSignature();
     
-    showToast("✍️ Signature enregistrée", "success");
+    alert('Signature enregistrée avec succès!');
 }
 
 function cancelSignature() {
@@ -4482,7 +3952,7 @@ function renderAdminTable(reports) {
             <td>${escapeHtml(r.deliveryTime||'')}</td>
             <td style="max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(r.reason||'')}">${escapeHtml(r.reason||'')}</td>
             <td style="max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(r.structure||'')}">${escapeHtml(r.structure||'')}</td>
-            <td>${r.signature ? '<button class="view-signature" data-signature="' + r.signature + '" style="background:#007bff;color:white;border:none;border-radius:4px;padding:3px 6px;cursor:pointer;font-size:0.7em;min-height:32px;">📷 Voir</button>' : '<span style="color:#6c757d;">⭕ Non signée</span>'}</td>
+            <td>${r.signature ? '<button class="view-signature" data-signature="' + r.signature + '" style="background:#007bff;color:white;border:none;border-radius:4px;padding:3px 6px;cursor:pointer;font-size:0.7em;">📷 Voir</button>' : '<span style="color:#6c757d;">⭕ Non signée</span>'}</td>
             <td>${posTxt}</td>
             <td style="font-size:0.7em;">${created}</td>
             <td class="row-actions">
