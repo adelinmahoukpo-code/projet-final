@@ -2404,10 +2404,52 @@ let currentUserRole = null;
 const LS_KEY = 'deliveryReports_v1';
 
 function saveReportsToLS(reports) {
-    try { localStorage.setItem(LS_KEY, JSON.stringify(reports || [])); } catch(e){ console.warn(e); }
+    try { 
+        // Sauvegarder localement
+        localStorage.setItem(LS_KEY, JSON.stringify(reports || [])); 
+        
+        // Envoyer au serveur en temps réel
+        fetch('/submit-report', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(reports[reports.length - 1]) // Envoyer seulement le dernier rapport
+        }).catch(err => {
+            console.log('Erreur lors de l\'envoi au serveur:', err);
+            // Continuer à fonctionner localement si le serveur est indisponible
+        });
+    } catch(e){ 
+        console.warn(e); 
+    }
 }
+
 function loadReportsFromLS() {
     try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch(e){ return []; }
+}
+
+// Nouvelle fonction pour récupérer les rapports depuis le serveur
+async function fetchReportsFromServer() {
+    try {
+        const response = await fetch('/reports');
+        if (response.ok) {
+            const serverReports = await response.json();
+            // Fusionner avec les rapports locaux pour ne pas perdre de données
+            const localReports = loadReportsFromLS();
+            const allReports = [...new Map([...localReports, ...serverReports].map(item => [item.id, item])).values()];
+            
+            // Sauvegarder la fusion
+            saveReportsToLS(allReports);
+            return allReports;
+        } else {
+            // Si le serveur ne répond pas, utiliser les rapports locaux
+            return loadReportsFromLS();
+        }
+    } catch (error) {
+        console.log('Erreur lors de la récupération depuis le serveur:', error);
+        // Si le serveur ne répond pas, utiliser les rapports locaux
+        return loadReportsFromLS();
+    }
 }
 
 // ====================== MENU MOBILE ======================
@@ -2460,7 +2502,6 @@ function initMobileMenu() {
             }
         });
     });
-    
     observer.observe(sidebar, { attributes: true });
 }
 
@@ -2651,7 +2692,7 @@ document.getElementById('sidebar-toggle').onclick = () => {
 
 // Icônes personnalisés pour départ, arrivée et position
 var departIcon = new L.Icon({ 
-    iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/green-dot.png', 
+    iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png', 
     iconSize: [32,32], 
     iconAnchor: [16,32]
 });
@@ -2661,8 +2702,11 @@ var arriveeIcon = new L.Icon({
     iconAnchor: [16,32]
 });
 var positionIcon = new L.Icon({ 
-    iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png', 
+    iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/blue-pushpin.png', 
     iconSize: [32,32], 
+    iconAnchor: [16,32],
+    className: 'pulse-marker'
+});
     iconAnchor: [16,32]
 });
 
@@ -3045,23 +3089,58 @@ function updateProgressiveLine(userPos) {
         movingCursor.setLatLng(projectedPos);
     }
     
-    // Supprimer l'ancienne ligne de progression
+    // Supprimer les anciennes lignes
     if (progressLine) {
         map.removeLayer(progressLine);
     }
     
-    // Créer une ligne progressive qui diminue au fur et à mesure de l'avancement
-    const remainingCoords = routeCoords.slice(closestIndex);
-    if (remainingCoords.length > 1) {
-        // Ajouter la position projetée au début des coordonnées restantes
-        const progressCoords = [projectedPos, ...remainingCoords.map(c => [c.lat, c.lng])];
+    if (routeLine) {
+        map.removeLayer(routeLine);
+    }
+    
+    // Partie parcourue de l'itinéraire
+    const traveledCoords = routeCoords.slice(0, closestIndex);
+    if (traveledCoords.length > 0) {
+        // Ajouter la position actuelle à la fin de la partie parcourue
+        traveledCoords.push({lat: projectedPos[0], lng: projectedPos[1]});
         
-        progressLine = L.polyline(progressCoords, { 
-            color: '#007bff', 
+        // Créer la ligne pour la partie parcourue
+        L.polyline(traveledCoords, { 
+            color: '#4CAF50', 
             weight: 6, 
             opacity: 0.9,
             className: 'route-progress-line'
         }).addTo(map);
+    }
+    
+    // Partie restante de l'itinéraire
+    const remainingCoords = routeCoords.slice(closestIndex);
+    if (remainingCoords.length > 1) {
+        // Calculer la distance jusqu'à la destination
+        const distanceToDestination = distance(
+            projectedPos, 
+            [routeCoords[routeCoords.length-1].lat, routeCoords[routeCoords.length-1].lng]
+        );
+        
+        // Ajuster l'opacité en fonction de la distance à la destination
+        let opacity = 0.8;
+        if (distanceToDestination < 500) { // Si moins de 500m de la destination
+            opacity = distanceToDestination / 500 * 0.8; // Opacité diminue progressivement
+        }
+        
+        // Ne pas afficher la ligne restante si très proche de la destination
+        if (distanceToDestination > 50) {
+            // Ajouter la position projetée au début des coordonnées restantes
+            const progressCoords = [{lat: projectedPos[0], lng: projectedPos[1]}, ...remainingCoords];
+            
+            progressLine = L.polyline(progressCoords, { 
+                color: '#007bff', 
+                weight: 5, 
+                opacity: opacity,
+                dashArray: '10, 10',
+                className: 'route-progress-line'
+            }).addTo(map);
+        }
     }
     
     // Calculer le progrès
@@ -3104,6 +3183,16 @@ function startRealTimeGPSTracking(){
     
     gpsWatchId = navigator.geolocation.watchPosition(pos => {
         const userPos = [pos.coords.latitude, pos.coords.longitude];
+        
+        // Ne mettre à jour la position que si l'utilisateur se déplace réellement
+        // Vérifier si la position a changé significativement
+        if (currentUserPosition) {
+            const distMoved = distance(userPos, currentUserPosition);
+            if (distMoved < 2) { // Moins de 2 mètres de mouvement, considéré comme stationnaire
+                return; // Ne pas mettre à jour si l'utilisateur ne bouge pas
+            }
+        }
+        
         currentUserPosition = userPos;
         
         // Update speed statistics
@@ -3498,7 +3587,7 @@ document.getElementById('select-route-btn').onclick = () => {
 
 function startRouteWithSelectedOption(lat, lng, name, selectedRoute) {
     clearRoute();
-    if(voiceEnabled) speak(`Itinéraire ${selectedRoute.type} vers ${name} en cours`);
+    // Suppression de la ligne de lecture vocale ici pour éviter la répétition
     infrastructures.forEach(i => i.alerteFait = false);
 
     navigator.geolocation.getCurrentPosition(pos => {
@@ -3798,6 +3887,7 @@ function resetForm() {
     document.getElementById('error-message').style.display = 'none';
 }
 
+// Modifier la fonction submit-report pour utiliser la nouvelle approche
 document.getElementById('submit-report').onclick = () => {
     const submitBtn = document.getElementById('submit-report');
     
@@ -3835,8 +3925,9 @@ document.getElementById('submit-report').onclick = () => {
     
     // Simulate processing time for better UX
     setTimeout(() => {
-        deliveryReports.push(report);
-        saveReportsToLS(deliveryReports);
+        const reports = loadReportsFromLS();
+        reports.push(report);
+        saveReportsToLS(reports);
         console.log('Rapport de livraison:', report);
         
         hideLoading(submitBtn);
@@ -3966,19 +4057,14 @@ document.getElementById('send-invoice').onclick = async (e) => {
   sendBtn.textContent = '⏳ Envoi...';
 
   try {
-    // Essayer d'abord avec l'URL locale
-    let response;
-    try {
-      response = await fetch("http://127.0.0.1:5000/sendmail", {
-        method: "POST",
-        body: formData
-      });
-    } catch (localErr) {
-      // Si l'URL locale échoue, essayer avec l'URL relative pour le déploiement
-      response = await fetch("/sendmail", {
-        method: "POST",
-        body: formData
-      });
+    // Utiliser directement l'URL relative pour le déploiement
+    const response = await fetch("/sendmail", {
+      method: "POST",
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erreur serveur: ${response.status}`);
     }
 
     const result = await response.json();
@@ -4195,6 +4281,30 @@ let adminLayerContainer = null;
 let adminBaseLayers = {};
 let adminLayerContainerVisible = false;
 
+window.addEventListener('storage', (e)=>{
+    if (e.key === LS_KEY && document.getElementById('admin-container').style.display === 'block') {
+        // Rafraîchir l'interface admin quand le localStorage change
+        fetchReportsFromServer().then(reports => {
+            renderAdminTable(reports);
+            plotAdminMarkers(reports);
+        });
+    }
+});
+
+// Ajouter une fonction pour rafraîchir automatiquement les données de l'admin
+function startAdminAutoRefresh() {
+    // Rafraîchir toutes les 5 secondes
+    setInterval(() => {
+        if (document.getElementById('admin-container').style.display === 'block') {
+            fetchReportsFromServer().then(reports => {
+                renderAdminTable(reports);
+                plotAdminMarkers(reports);
+            });
+        }
+    }, 5000);
+}
+
+// Démarrer le rafraîchissement automatique quand l'admin est initialisé
 function initializeAdmin() {
     setupTopActionsForRole();
 
@@ -4218,33 +4328,42 @@ function initializeAdmin() {
         adminMap.invalidateSize();
     }
 
-    const reports = loadReportsFromLS();
-    renderAdminTable(reports);
-    plotAdminMarkers(reports);
+    // Utiliser les rapports du serveur au lieu des rapports locaux seulement
+    fetchReportsFromServer().then(reports => {
+        renderAdminTable(reports);
+        plotAdminMarkers(reports);
 
-    const searchInput = document.getElementById('admin-search');
-    searchInput.oninput = () => {
-        const q = (searchInput.value || '').toLowerCase();
-        const filtered = reports.filter(r => {
-            const fields = [
-                r.status,
-                r.agentName,
-                r.agentContact,
-                r.reason,
-                r.deliveryDate,
-                r.deliveryTime,
-                r.timestamp
-            ].map(x => (x || '').toString().toLowerCase()).join(' ');
-            return fields.includes(q);
+        const searchInput = document.getElementById('admin-search');
+        searchInput.oninput = () => {
+            const q = (searchInput.value || '').toLowerCase();
+            const filtered = reports.filter(r => {
+                const fields = [
+                    r.status,
+                    r.agentName,
+                    r.agentContact,
+                    r.reason,
+                    r.deliveryDate,
+                    r.deliveryTime,
+                    r.timestamp
+                ].map(x => (x || '').toString().toLowerCase()).join(' ');
+                return fields.includes(q);
+            });
+            renderAdminTable(filtered);
+            plotAdminMarkers(filtered);
+        };
+    });
+
+    document.getElementById('export-csv').onclick = () => {
+        fetchReportsFromServer().then(reports => {
+            exportReportsCSV(reports);
         });
-        renderAdminTable(filtered);
-        plotAdminMarkers(filtered);
     };
-
-    document.getElementById('export-csv').onclick = () => exportReportsCSV(loadReportsFromLS());
     
     // Setup toggle buttons
     setupAdminToggleButtons();
+    
+    // Démarrer le rafraîchissement automatique
+    startAdminAutoRefresh();
 }
 
 function setupAdminLayerControls() {

@@ -8,6 +8,8 @@ from email import encoders
 import os
 import csv
 from dotenv import load_dotenv
+import json
+from datetime import datetime
 
 # Charger les variables d'environnement depuis .env (local)
 load_dotenv()
@@ -159,7 +161,63 @@ def get_entreprises():
     return jsonify(entreprises)
 
 
-# 📌 Route pour servir les fichiers statiques
+# 📌 Nouvelles routes pour la synchronisation en temps réel
+# Route pour soumettre un rapport de livraison
+@app.route("/submit-report", methods=["POST"])
+def submit_report():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"status": "error", "message": "Données manquantes"}), 400
+
+        # Ajouter un timestamp si non présent
+        if "timestamp" not in data:
+            data["timestamp"] = datetime.now().isoformat()
+
+        # Sauvegarder le rapport dans un fichier
+        reports_file = os.path.join(os.path.dirname(__file__), "delivery_reports.json")
+        
+        # Lire les rapports existants
+        reports = []
+        if os.path.exists(reports_file):
+            try:
+                with open(reports_file, 'r', encoding='utf-8') as f:
+                    reports = json.load(f)
+            except (json.JSONDecodeError, FileNotFoundError):
+                reports = []
+
+        # Ajouter le nouveau rapport
+        reports.append(data)
+
+        # Sauvegarder tous les rapports
+        with open(reports_file, 'w', encoding='utf-8') as f:
+            json.dump(reports, f, ensure_ascii=False, indent=2)
+
+        return jsonify({"status": "success", "message": "Rapport soumis avec succès"}), 200
+    except Exception as e:
+        print(f"Erreur lors de la soumission du rapport: {e}")
+        return jsonify({"status": "error", "message": f"Erreur serveur: {e}"}), 500
+
+
+# Route pour récupérer tous les rapports de livraison
+@app.route("/reports", methods=["GET"])
+def get_reports():
+    try:
+        reports_file = os.path.join(os.path.dirname(__file__), "delivery_reports.json")
+        
+        if not os.path.exists(reports_file):
+            return jsonify([]), 200
+
+        with open(reports_file, 'r', encoding='utf-8') as f:
+            reports = json.load(f)
+        
+        return jsonify(reports), 200
+    except Exception as e:
+        print(f"Erreur lors de la récupération des rapports: {e}")
+        return jsonify({"error": f"Erreur serveur: {e}"}), 500
+
+
+# Route pour servir les fichiers statiques
 @app.route("/public/<path:filename>")
 def serve_static(filename):
     return send_from_directory("public", filename)
