@@ -7,6 +7,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#1976d2">
+<script>
+  // Forcer la base serveur quand la page est ouverte en file:// (mobile/tablette)
+  if (location.protocol === 'file:') {
+    window.SERVER_BASE_URL = 'http://192.168.1.67:5000';
+  }
+</script>
 
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
