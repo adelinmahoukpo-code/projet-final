@@ -1650,6 +1650,17 @@ body {
         z-index: 1200;
         overflow-y: auto;
     }
+
+    /* Bouton de fermeture plus grand et tactile sur mobile */
+    .panel-close {
+        top: 6px;
+        right: 6px;
+        width: 36px;
+        height: 36px;
+        line-height: 34px;
+        font-size: 18px;
+        z-index: 2;
+    }
     
     /* Signature container mobile */
     #signature-container {
@@ -2524,6 +2535,12 @@ body {
 <script src="https://unpkg.com/leaflet-minimap/dist/Control.MiniMap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.8.0/proj4.js"></script>
 <script>
+// Détection Android et ajout de classe au body pour styles/ajustements ciblés
+const IS_ANDROID = /Android/i.test(navigator.userAgent || '');
+if (IS_ANDROID) {
+  document.documentElement.classList.add('is-android');
+}
+
 // ====================== PROFESSIONAL TOAST NOTIFICATIONS ======================
 function showToast(message, type = 'info', duration = 5000) {
     const container = document.getElementById('toast-container');
@@ -2664,7 +2681,7 @@ function attachPanelCloseHandlers() {
         'route-options-container': 'routeOptionsVisible'
     };
     document.querySelectorAll('.panel-close').forEach(btn => {
-        btn.addEventListener('click', () => {
+        const handler = () => {
             const targetId = btn.getAttribute('data-target');
             if (!targetId) return;
             if (targetId === 'signature-container') { try { cancelSignature(); } catch (e) {} return; }
@@ -2672,7 +2689,10 @@ function attachPanelCloseHandlers() {
             if (panel) panel.style.display = 'none';
             const flagName = mapFlag[targetId];
             if (flagName && typeof window[flagName] !== 'undefined') window[flagName] = false;
-        });
+        };
+        btn.addEventListener('click', handler);
+        btn.addEventListener('pointerdown', (e)=>{ e.preventDefault(); handler(); });
+        btn.addEventListener('touchstart', (e)=>{ e.preventDefault(); handler(); }, {passive:false});
     });
     // Fermer via la touche Echap
     document.addEventListener('keydown', (e) => {
@@ -2706,6 +2726,11 @@ function initMobileMenu() {
         sidebar.classList.remove('show');
         sidebarOverlay.classList.remove('show');
     });
+    sidebarOverlay.addEventListener('touchstart', function(e){
+        e.preventDefault();
+        sidebar.classList.remove('show');
+        sidebarOverlay.classList.remove('show');
+    }, {passive:false});
     
     // Fermer la sidebar quand on clique sur un élément de navigation
     sidebar.addEventListener('click', function(e) {
@@ -4703,9 +4728,9 @@ function initializeSignature() {
     signatureCanvas.addEventListener('mouseout', stopDrawing);
     
     // Events pour mobile avec prévention du scroll
-    signatureCanvas.addEventListener('touchstart', handleTouch);
-    signatureCanvas.addEventListener('touchmove', handleTouch);
-    signatureCanvas.addEventListener('touchend', stopDrawing);
+    signatureCanvas.addEventListener('touchstart', handleTouch, {passive:false});
+    signatureCanvas.addEventListener('touchmove', handleTouch, {passive:false});
+    signatureCanvas.addEventListener('touchend', stopDrawing, {passive:false});
     
     // Redimensionner le canvas lors du changement d'orientation
     window.addEventListener('resize', resizeCanvas);
@@ -4722,6 +4747,7 @@ function initializeSignature() {
     
     // Overlay pour fermer
     document.getElementById('signature-overlay').onclick = cancelSignature;
+    document.getElementById('signature-overlay').addEventListener('touchstart', function(e){ e.preventDefault(); cancelSignature(); }, {passive:false});
 }
 
 function handleTouch(e) {
