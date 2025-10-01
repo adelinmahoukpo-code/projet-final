@@ -1,0 +1,316 @@
+/* ====================== STYLES RESPONSIVES AVANCÉS ====================== */
+
+/* Détection automatique du type d'appareil */
+@media (hover: hover) and (pointer: fine) {
+    /* Desktop - Optimisations pour souris et clavier */
+    button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    .layer-preview:hover {
+        transform: scale(1.1);
+    }
+}
+
+/* Appareils tactiles uniquement */
+@media (hover: none) and (pointer: coarse) {
+    /* Supprime les effets hover qui ne fonctionnent pas sur tactile */
+    button:hover,
+    .layer-preview:hover,
+    .route-option:hover {
+        transform: none;
+        box-shadow: none;
+    }
+    
+    /* Améliore le feedback tactile avec active states */
+    button:active {
+        transform: scale(0.95);
+        opacity: 0.8;
+    }
+    
+    /* Zone de touche plus large pour les petits éléments */
+    .zoom-btn,
+    .layer-preview,
+    input[type="radio"],
+    input[type="checkbox"] {
+        min-height: 48px;
+        min-width: 48px;
+    }
+}
+
+/* ====================== BREAKPOINTS SPÉCIFIQUES APPAREILS ====================== */
+
+/* iPhone SE et petits téléphones */
+@media screen and (max-width: 375px) {
+    #header h1 {
+        font-size: 0.9em;
+        line-height: 1.1;
+    }
+    
+    #sidebar {
+        padding: 15px;
+    }
+    
+    .form-group {
+        margin-bottom: 12px;
+    }
+    
+    #delivery-report-container,
+    #invoice-send-container,
+    #route-options-container {
+        padding: 15px;
+        margin: 5px;
+    }
+}
+
+/* iPhone 12/13/14 Standard */
+@media screen and (max-width: 390px) and (max-height: 844px) {
+    #header {
+        height: 75px;
+        padding-top: max(12px, env(safe-area-inset-top));
+    }
+    
+    #map {
+        height: calc(100vh - 75px - env(safe-area-inset-bottom));
+    }
+}
+
+/* iPhone 12/13/14 Pro Max */
+@media screen and (max-width: 428px) and (max-height: 926px) {
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        font-size: 17px; /* Taille optimale pour grands iPhone */
+    }
+    
+    #signature-pad {
+        height: 200px; /* Plus d'espace pour signature sur grands écrans */
+    }
+}
+
+/* iPad Mini et tablettes compactes */
+@media screen and (min-width: 768px) and (max-width: 820px) {
+    #sidebar {
+        width: 300px;
+    }
+    
+    #map {
+        margin-left: 300px;
+    }
+    
+    #delivery-report-container,
+    #invoice-send-container,
+    #route-options-container {
+        left: 320px;
+        width: 400px;
+    }
+}
+
+/* iPad Standard et Air */
+@media screen and (min-width: 820px) and (max-width: 1024px) {
+    #sidebar {
+        width: 350px;
+    }
+    
+    #map {
+        margin-left: 350px;
+    }
+    
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        padding: 14px;
+        font-size: 16px;
+    }
+    
+    button {
+        padding: 14px 18px;
+        font-size: 1em;
+    }
+}
+
+/* iPad Pro 11" */
+@media screen and (min-width: 1024px) and (max-width: 1366px) {
+    /* Interface optimisée pour productivité */
+    #admin-main {
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    
+    #reports-table {
+        font-size: 0.9em;
+    }
+    
+    .status-badge {
+        font-size: 0.8em;
+    }
+}
+
+/* Écrans ultra-larges (moniteurs gaming, ultrawide) */
+@media screen and (min-width: 2560px) {
+    #sidebar {
+        width: 450px;
+    }
+    
+    #map {
+        margin-left: 450px;
+    }
+    
+    #delivery-report-container,
+    #invoice-send-container,
+    #route-options-container {
+        left: 480px;
+        width: 500px;
+    }
+    
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        font-size: 1.1em;
+        padding: 18px 16px;
+    }
+}
+
+/* ====================== ADAPTATIONS SPÉCIALES ORIENTATIONS ====================== */
+
+/* Mode paysage sur smartphone */
+@media screen and (max-height: 500px) and (orientation: landscape) and (max-width: 896px) {
+    #header {
+        height: 55px;
+        padding: 6px 12px;
+    }
+    
+    #header h1 {
+        font-size: 0.95em;
+    }
+    
+    #sidebar {
+        top: 55px;
+        max-width: 280px;
+    }
+    
+    #map {
+        height: calc(100vh - 55px);
+        margin-top: 55px;
+    }
+    
+    #delivery-report-container,
+    #invoice-send-container,
+    #route-options-container {
+        max-height: calc(100vh - 70px);
+        padding: 12px;
+    }
+    
+    .signature-controls {
+        flex-direction: row;
+        gap: 5px;
+    }
+    
+    .signature-btn {
+        padding: 8px 12px;
+        font-size: 0.85em;
+    }
+}
+
+/* Mode portrait sur tablette */
+@media screen and (min-width: 768px) and (orientation: portrait) {
+    #sidebar {
+        width: 320px;
+    }
+    
+    #map {
+        margin-left: 320px;
+    }
+    
+    .datetime-group {
+        flex-direction: row;
+        gap: 15px;
+    }
+    
+    #signature-pad {
+        width: 100%;
+        height: 220px;
+    }
+}
+
+/* ====================== PRÉFÉRENCES UTILISATEUR ====================== */
+
+/* Mode sombre détecté */
+@media (prefers-color-scheme: dark) {
+    #delivery-report-container,
+    #invoice-send-container,
+    #route-options-container,
+    #signature-container {
+        background: rgba(30, 30, 30, 0.95);
+        border: 1px solid #444;
+    }
+    
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        background: #333;
+        color: #fff;
+        border-color: #555;
+    }
+    
+    .signature-info {
+        background: #333;
+        border-left-color: #007bff;
+    }
+}
+
+/* Réduction des animations pour utilisateurs sensibles */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    
+    button:hover,
+    .layer-preview:hover {
+        transform: none;
+    }
+}
+
+/* Contraste élevé pour accessibilité */
+@media (prefers-contrast: high) {
+    button,
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        border-width: 3px;
+    }
+    
+    #signature-pad {
+        border-width: 4px;
+        border-color: #000;
+    }
+    
+    .status-badge {
+        border: 2px solid currentColor;
+    }
+}
+
+/* ====================== OPTIMISATIONS PERFORMANCE ====================== */
+
+/* Accélération matérielle pour animations fluides */
+.leaflet-container,
+#map,
+#sidebar {
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+/* Optimisation du rendu pour les appareils avec peu de ressources */
+@media screen and (max-width: 480px) {
+    .leaflet-container {
+        image-rendering: optimizeSpeed;
+    }
+    
+    #map {
+        image-rendering: -webkit-optimize-contrast;
+    }
+}
