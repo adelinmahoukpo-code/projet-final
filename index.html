@@ -2472,13 +2472,6 @@ body {
           <textarea id="invoice-message" name="message" placeholder="Message d'accompagnement..."></textarea>
         </div>
 
-        <div class="form-group">
-          <label for="api-base">Adresse du serveur (optionnel)</label>
-          <input type="text" id="api-base" placeholder="ex: http://192.168.1.10:5000">
-          <div class="small-muted">Laissez vide pour détection automatique. Sur téléphone, entrez l'adresse IP du PC si nécessaire.</div>
-          <button type="button" id="test-server" class="quick-action-btn" style="margin-top:8px;width:100%;">🔌 Tester la connexion</button>
-        </div>
-
         <input type="hidden" name="from_name" id="invoice-from-name" value="">
         <input type="hidden" name="agent_contact" id="invoice-from-contact" value="">
         <input type="hidden" name="subject" id="invoice-subject" value="">
@@ -4676,35 +4669,6 @@ document.getElementById('toggle-invoice-send').onclick = () => {
     if (selectedCompany && selectedCompany.Nom_Entreprise) {
       document.getElementById('invoice-company-name').value = selectedCompany.Nom_Entreprise;
     }
-
-    // Pré-remplir l'adresse du serveur pour mobile/desktop
-    const apiBaseInput = document.getElementById('api-base');
-    if (apiBaseInput) {
-      const savedBase = localStorage.getItem('API_BASE') || '';
-      const defaultBase = (window.location.origin && !window.location.origin.startsWith('file:'))
-        ? window.location.origin
-        : (location.hostname ? `${location.protocol}//${location.hostname}:5000` : '');
-      apiBaseInput.value = savedBase || defaultBase;
-      apiBaseInput.onchange = () => {
-        localStorage.setItem('API_BASE', apiBaseInput.value.trim());
-      };
-      const testBtn = document.getElementById('test-server');
-      if (testBtn) {
-        testBtn.onclick = async () => {
-          const base = (apiBaseInput.value || '').trim() || defaultBase;
-          if (!base) { showToast('Veuillez renseigner une adresse serveur valide (ex: http://192.168.1.10:5000)', 'warning'); return; }
-          try {
-            await Promise.race([
-              fetch(`${base.replace(/\/$/, '')}/reports`, { method: 'GET' }),
-              new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout')), 7000))
-            ]);
-            showToast(`Connexion réussie à ${base}`, 'success');
-          } catch (e) {
-            showToast(`Connexion impossible à ${base}: ${e.message}`, 'error');
-          }
-        };
-      }
-    }
   }
 };
 
@@ -4741,9 +4705,6 @@ document.getElementById('send-invoice').onclick = async (e) => {
   }
 
   const formData = new FormData();
-  // Persister l'adresse API si saisie
-  const apiBaseInputVal = (document.getElementById('api-base')?.value || '').trim();
-  if (apiBaseInputVal) localStorage.setItem('API_BASE', apiBaseInputVal);
   // Ajouter tous les champs du formulaire manuellement
   formData.append('attachment', fileInput.files[0]);
   formData.append('to_email', document.getElementById('invoice-to').value);
@@ -4757,50 +4718,55 @@ document.getElementById('send-invoice').onclick = async (e) => {
   sendBtn.disabled = true;
   sendBtn.textContent = '⏳ Envoi...';
 
-  // Helper: fetch avec timeout (utile mobile)
-  const fetchWithTimeout = (url, options = {}, timeout = 10000) => {
-    return Promise.race([
-      fetch(url, options),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), timeout))
-    ]);
-  };
-
-  // Construire dynamiquement les URLs d'API
-  const apiBaseFromLS = (localStorage.getItem('API_BASE') || '').replace(/\/$/, '');
-  const bases = [];
-  // 1) même origine si servi depuis un serveur (pas file://)
-  if (window.location.origin && !window.location.origin.startsWith('file:')) {
-    bases.push(window.location.origin);
-  }
-  // 2) base configurée manuellement (ex: http://192.168.1.10:5000)
-  if (apiBaseFromLS) bases.push(apiBaseFromLS);
-  // 3) même hostname avec port 5000 (utile si page servie depuis http://IP:5000)
-  if (location.hostname) {
-    bases.push(`${location.protocol}//${location.hostname}:5000`);
-  }
-  // 4) localhost/127.0.0.1 en dernier recours
-  bases.push(`${location.protocol}//127.0.0.1:5000`);
-  bases.push(`${location.protocol}//localhost:5000`);
-
-  // Dédoublonner et créer la liste d'URLs
-  const uniq = Array.from(new Set(bases.filter(Boolean)));
-  const urls = [...uniq.map(b => `${b}/sendmail`), '/sendmail'];
-
   try {
+    // Essayer différentes URLs de serveur (compatibles desktop + mobile)
     let response;
-    let lastError;
 
-    for (const url of urls) {
+    // Construire dynamiquement une liste d'URL candidates
+    const candidates = [];
+
+    // 1) Priorité à une base fournie (optionnelle) via window.SERVER_BASE_URL
+    if (window.SERVER_BASE_URL && typeof window.SERVER_BASE_URL === 'string') {
+      const base = window.SERVER_BASE_URL.replace(/\/$/, '');
+      candidates.push(`${base}/sendmail`);
+    }
+
+    // 2) Utiliser l'origine de la page si disponible (ex: http://192.168.x.x:5000)
+    const origin = (window.location && window.location.origin) ? window.location.origin : '';
+    if (origin && /^https?:\/\//i.test(origin)) {
+      candidates.push(`${origin}/sendmail`);
+    }
+
+    // 3) Utiliser le hostname courant avec le port 5000 (utile si la page est servie par un autre port)
+    const host = (window.location && window.location.hostname) ? window.location.hostname : '';
+    if (host) {
+      const protocol = (window.location && window.location.protocol) ? window.location.protocol : 'http:';
+      const scheme = protocol === 'https:' ? 'https' : 'http';
+      candidates.push(`${scheme}://${host}:5000/sendmail`);
+    }
+
+    // 4) URL relative si la page est servie par le même serveur Flask
+    candidates.push('/sendmail');
+
+    // 5) Derniers recours (principalement utile en desktop local)
+    candidates.push('http://127.0.0.1:5000/sendmail', 'http://localhost:5000/sendmail');
+
+    let lastError;
+    for (const url of candidates) {
       try {
         console.log(`Tentative d'envoi vers: ${url}`);
-        response = await fetchWithTimeout(url, { method: 'POST', body: formData }, 15000);
-        if (response && response.ok) {
-          break; // Succès
+        response = await fetch(url, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (response.ok) {
+          break; // Succès, sortir de la boucle
         } else {
-          throw new Error(`HTTP ${response ? response.status : '0'}: ${response ? response.statusText : 'réponse vide'}`);
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
       } catch (fetchErr) {
-        console.log(`Échec pour ${url}:`, fetchErr.message);
+        console.log(`Échec pour ${url}:`, fetchErr && fetchErr.message ? fetchErr.message : fetchErr);
         lastError = fetchErr;
         response = null;
       }
@@ -4832,8 +4798,7 @@ document.getElementById('send-invoice').onclick = async (e) => {
     }
   } catch (err) {
     console.error('Erreur détaillée:', err);
-    const hint = `\nAstuce: assurez-vous d'ouvrir l'application depuis l'adresse du serveur (ex: http://IP_LAN:5000) et que le pare-feu autorise le port 5000.`;
-    errorMsg.textContent = "❌ Erreur: " + err.message + ". Vérifiez que le serveur est démarré." + hint;
+    errorMsg.textContent = "❌ Erreur: " + err.message + ". Vérifiez que le serveur est démarré.";
     errorMsg.style.display = "block";
   } finally {
     sendBtn.disabled = false;
