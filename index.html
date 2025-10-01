@@ -2016,8 +2016,8 @@ body {
     <div id="sidebar">
         <div id="coordContainer">
             <h3>Recherche par coordonnées</h3>
-            <input id="latInput" placeholder="Latitude / Est" type="text">
-            <input id="lngInput" placeholder="Longitude / Nord" type="text">
+            <input id="latInput" placeholder="Latitude (ex: 6.348958)" type="text">
+            <input id="lngInput" placeholder="Longitude (ex: 2.386909)" type="text">
             <select id="coordType">
                 <option value="geo">Géographique (Lat/Lng)</option>
                 <option value="utm">UTM / Métrique</option>
@@ -2926,26 +2926,329 @@ document.getElementById('searchStructureBtn').onclick = () => {
     showRouteOptions(parseFloat(match.Latitude), parseFloat(match.Longitude), match.Nom_Entreprise);
 };
 
+// ====================== FONCTIONS DE PARSING DES COORDONNÉES ======================
+// Test rapide pour déboguer
+function testCoordParsing() {
+    const testCases = [
+        "6°23'4.05\"N",
+        "2°19'21.13\"E",
+        "6°23'16.43\"N",
+        "6.348958",
+        "6°20'56.25\"",
+        "N6.348958"
+    ];
+    
+    console.log("=== TEST DE PARSING DES COORDONNÉES ===");
+    testCases.forEach(test => {
+        const result = parseCoordinate(test);
+        console.log(`Test "${test}" = ${result}`);
+    });
+    console.log("=== FIN DES TESTS ===");
+}
+// Appel du test (temporaire)
+testCoordParsing();
+
+// Vérification manuelle des calculs
+function manualCalculation() {
+    console.log("=== VÉRIFICATION MANUELLE ===");
+    
+    // 6°23'4.05"N
+    const lat_deg = 6;
+    const lat_min = 23;
+    const lat_sec = 4.05;
+    const lat_result = lat_deg + lat_min/60 + lat_sec/3600;
+    console.log(`6°23'4.05"N = ${lat_deg} + ${lat_min}/60 + ${lat_sec}/3600 = ${lat_result.toFixed(8)}`);
+    
+    // 2°19'21.13"E
+    const lng_deg = 2;
+    const lng_min = 19;
+    const lng_sec = 21.13;
+    const lng_result = lng_deg + lng_min/60 + lng_sec/3600;
+    console.log(`2°19'21.13"E = ${lng_deg} + ${lng_min}/60 + ${lng_sec}/3600 = ${lng_result.toFixed(8)}`);
+    
+    console.log(`COORDONNÉES FINALES: ${lat_result.toFixed(6)}, ${lng_result.toFixed(6)}`);
+}
+manualCalculation();
+function parseCoordinatePair(coordPairString) {
+    if (!coordPairString || typeof coordPairString !== 'string') {
+        return null;
+    }
+    
+    const cleaned = coordPairString.trim();
+    
+    // Format Google Maps: "6.348958, 2.386909" ou "6.348958,2.386909"
+    const gmapsMatch = cleaned.match(/^(-?\d+\.?\d*),\s*(-?\d+\.?\d*)$/);
+    if (gmapsMatch) {
+        return {
+            lat: parseFloat(gmapsMatch[1]),
+            lng: parseFloat(gmapsMatch[2])
+        };
+    }
+    
+    // Format avec point-virgule: "6.348958; 2.386909"
+    const semicolonMatch = cleaned.match(/^(-?\d+\.?\d*);\s*(-?\d+\.?\d*)$/);
+    if (semicolonMatch) {
+        return {
+            lat: parseFloat(semicolonMatch[1]),
+            lng: parseFloat(semicolonMatch[2])
+        };
+    }
+    
+    // Format avec espace: "6.348958 2.386909"
+    const spaceMatch = cleaned.match(/^(-?\d+\.?\d*)\s+(-?\d+\.?\d*)$/);
+    if (spaceMatch) {
+        return {
+            lat: parseFloat(spaceMatch[1]),
+            lng: parseFloat(spaceMatch[2])
+        };
+    }
+    
+    // Format avec virgules décimales: "6,348958 2,386909"
+    const commaMatch = cleaned.match(/^(-?\d+,\d+)\s+(-?\d+,\d+)$/);
+    if (commaMatch) {
+        return {
+            lat: parseFloat(commaMatch[1].replace(',', '.')),
+            lng: parseFloat(commaMatch[2].replace(',', '.'))
+        };
+    }
+    
+    return null;
+}
+
+function parseCoordinate(coordString) {
+    if (!coordString || typeof coordString !== 'string') {
+        return null;
+    }
+    
+    // Nettoyer la chaîne
+    const cleanCoord = coordString.trim().replace(/,/g, '.');
+    
+    // Format décimal simple (ex: 6.348958 ou -6.348958)
+    if (/^-?\d+\.?\d*$/.test(cleanCoord)) {
+        return parseFloat(cleanCoord);
+    }
+    
+    // Format degrés décimaux avec symboles (ex: 6.348958° ou 6.348958N ou N6.348958)
+    const decimalMatch = cleanCoord.match(/([NSEW]?)-?(\d+\.?\d*)°?([NSEW]?)/i);
+    if (decimalMatch) {
+        let value = parseFloat(decimalMatch[2]);
+        const prefix = decimalMatch[1].toUpperCase();
+        const suffix = decimalMatch[3].toUpperCase();
+        
+        // Appliquer le signe selon la direction
+        if (prefix === 'S' || prefix === 'W' || suffix === 'S' || suffix === 'W') {
+            value = -Math.abs(value);
+        }
+        return value;
+    }
+    
+    // Format degrés minutes (ex: 6°20.937' ou 6° 20.937' ou 6 20.937)
+    const dmMatch = cleanCoord.match(/([NSEW]?)-?(\d+)[°\s]+(\d+\.?\d*)[''′]?([NSEW]?)/i);
+    if (dmMatch) {
+        const degrees = parseInt(dmMatch[2]);
+        const minutes = parseFloat(dmMatch[3]);
+        let value = degrees + minutes / 60;
+        
+        const prefix = dmMatch[1].toUpperCase();
+        const suffix = dmMatch[4].toUpperCase();
+        
+        if (prefix === 'S' || prefix === 'W' || suffix === 'S' || suffix === 'W') {
+            value = -Math.abs(value);
+        }
+        return value;
+    }
+    
+    // Format degrés minutes secondes - Version ultra-robuste avec débogage
+    // Test spécifique pour 6°23'4.05"N et variantes
+    let dmsResult = null;
+    let matchInfo = null;
+    
+    // Pattern 1: Format exact comme 6°23'4.05"N (nombre de secondes variable)
+    let match = cleanCoord.match(/^([NSEW]?)(-?\d+)°(\d+)'([\d.]+)"([NSEW]?)$/i);
+    if (match) {
+        matchInfo = "Pattern 1 (format exact)";
+        const degrees = parseInt(match[2]);
+        const minutes = parseInt(match[3]);
+        const seconds = parseFloat(match[4]);
+        dmsResult = degrees + minutes / 60 + seconds / 3600;
+        
+        console.log(`Débogage DMS: ${cleanCoord} -> D:${degrees}, M:${minutes}, S:${seconds} = ${dmsResult}`);
+        
+        const prefix = match[1].toUpperCase();
+        const suffix = match[5].toUpperCase();
+        if (prefix === 'S' || prefix === 'W' || suffix === 'S' || suffix === 'W') {
+            dmsResult = -Math.abs(dmsResult);
+            console.log(`Direction ${prefix || suffix} détectée, application du signe négatif: ${dmsResult}`);
+        }
+    }
+    
+    // Pattern 2: Avec espaces: 6° 23' 4.05" N
+    if (!dmsResult) {
+        match = cleanCoord.match(/^([NSEW]?)\s*(-?\d+)\s*°\s*(\d+)\s*'\s*([\d.]+)\s*"\s*([NSEW]?)$/i);
+        if (match) {
+            matchInfo = "Pattern 2 (avec espaces)";
+            const degrees = parseInt(match[2]);
+            const minutes = parseInt(match[3]);
+            const seconds = parseFloat(match[4]);
+            dmsResult = degrees + minutes / 60 + seconds / 3600;
+            
+            console.log(`Débogage DMS (espaces): ${cleanCoord} -> D:${degrees}, M:${minutes}, S:${seconds} = ${dmsResult}`);
+            
+            const prefix = match[1].toUpperCase();
+            const suffix = match[5].toUpperCase();
+            if (prefix === 'S' || prefix === 'W' || suffix === 'S' || suffix === 'W') {
+                dmsResult = -Math.abs(dmsResult);
+                console.log(`Direction ${prefix || suffix} détectée (espaces), application du signe négatif: ${dmsResult}`);
+            }
+        }
+    }
+    
+    // Pattern 3: Sans guillemets finaux: 6°23'4.05N
+    if (!dmsResult) {
+        match = cleanCoord.match(/^([NSEW]?)(-?\d+)°(\d+)'([\d.]+)([NSEW]?)$/i);
+        if (match) {
+            matchInfo = "Pattern 3 (sans guillemets)";
+            const degrees = parseInt(match[2]);
+            const minutes = parseInt(match[3]);
+            const seconds = parseFloat(match[4]);
+            dmsResult = degrees + minutes / 60 + seconds / 3600;
+            
+            console.log(`Débogage DMS (sans guillemets): ${cleanCoord} -> D:${degrees}, M:${minutes}, S:${seconds} = ${dmsResult}`);
+            
+            const prefix = match[1].toUpperCase();
+            const suffix = match[5].toUpperCase();
+            if (prefix === 'S' || prefix === 'W' || suffix === 'S' || suffix === 'W') {
+                dmsResult = -Math.abs(dmsResult);
+                console.log(`Direction ${prefix || suffix} détectée (sans guillemets), application du signe négatif: ${dmsResult}`);
+            }
+        }
+    }
+    
+    if (dmsResult !== null) {
+        console.log(`Résultat DMS final pour "${coordString}": ${dmsResult} (via ${matchInfo})`);
+        return dmsResult;
+    }
+    
+    
+    // Format avec virgule comme séparateur décimal
+    const commaDecimal = cleanCoord.replace(',', '.');
+    if (/^-?\d+\.\d*$/.test(commaDecimal)) {
+        return parseFloat(commaDecimal);
+    }
+    
+    return null;
+}
+
+function detectUTMCoordinates(latStr, lngStr) {
+    // Détecter si les coordonnées ressemblent à des coordonnées UTM
+    const lat = parseFloat(latStr.replace(/,/g, '.'));
+    const lng = parseFloat(lngStr.replace(/,/g, '.'));
+    
+    // Les coordonnées UTM ont généralement:
+    // - Easting (longitude): 100,000 à 800,000 mètres
+    // - Northing (latitude): 1,000,000 à 10,000,000 mètres
+    if (!isNaN(lat) && !isNaN(lng)) {
+        if ((lng >= 100000 && lng <= 800000) && (lat >= 1000000 && lat <= 10000000)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 document.getElementById('coordBtnSidebar').onclick = () => {
-    const lat = parseFloat(document.getElementById('latInput').value);
-    const lng = parseFloat(document.getElementById('lngInput').value);
-    const coordType = document.getElementById('coordType').value;
-    if (isNaN(lat) || isNaN(lng)) {
-        alert("Veuillez entrer des coordonnées valides !");
+    const latStr = document.getElementById('latInput').value.trim();
+    const lngStr = document.getElementById('lngInput').value.trim();
+    
+    if (!latStr && !lngStr) {
+        alert("Veuillez entrer des coordonnées !");
         return;
     }
+    
+    let lat, lng;
+    
+    // Vérifier si une paire de coordonnées a été collée dans un seul champ
+    if (latStr && !lngStr) {
+        const coordPair = parseCoordinatePair(latStr);
+        if (coordPair) {
+            lat = coordPair.lat;
+            lng = coordPair.lng;
+        } else {
+            alert("Veuillez entrer aussi la longitude, ou coller les coordonnées au format 'lat, lng' !");
+            return;
+        }
+    } else if (!latStr && lngStr) {
+        const coordPair = parseCoordinatePair(lngStr);
+        if (coordPair) {
+            lat = coordPair.lat;
+            lng = coordPair.lng;
+        } else {
+            alert("Veuillez entrer aussi la latitude, ou coller les coordonnées au format 'lat, lng' !");
+            return;
+        }
+    } else {
+        // Essayer de parser les coordonnées séparément
+        lat = parseCoordinate(latStr);
+        lng = parseCoordinate(lngStr);
+    }
+    
+    if (lat === null || lng === null) {
+        alert("Format de coordonnées non reconnu. Formats supportés:\n\n" +
+              "🌍 FORMATS GÉOGRAPHIQUES:\n" +
+              "• Décimales: 6.348958, 2.386909\n" +
+              "• Google Maps: 6.348958, 2.386909 (dans un seul champ)\n" +
+              "• Avec direction: N6.348958, E2.386909\n" +
+              "• Degrés minutes: 6°20.937', 2°23.215'\n" +
+              "• Degrés minutes secondes: 6°20'56.25\", 2°23'12.9\"\n" +
+              "• Avec virgules: 6,348958 2,386909\n\n" +
+              "🗺️ FORMATS UTM:\n" +
+              "• Métrique: 123456.78, 1234567.89\n\n" +
+              "📝 Astuce: Vous pouvez coller des coordonnées Google Maps directement !");
+        return;
+    }
+    
+    // Détecter automatiquement si c'est de l'UTM
+    const coordType = document.getElementById('coordType').value;
+    const isUTM = (coordType === "utm") || detectUTMCoordinates(latStr, lngStr);
+    
     let destLat = lat, destLng = lng;
-    if (coordType === "utm") {
+    
+    if (isUTM) {
         try {
+            // Conversion UTM vers géographique
             const utmProj = "+proj=utm +zone=31 +datum=WGS84 +units=m +no_defs";
             const geoProj = "+proj=longlat +datum=WGS84 +no_defs";
             const res = proj4(utmProj, geoProj, [lng, lat]);
             destLng = res[0];
             destLat = res[1];
-        } catch(e){ alert("Erreur de conversion UTM: " + e); return; }
+            
+            console.log(`Conversion UTM: (${lat}, ${lng}) → (${destLat.toFixed(6)}, ${destLng.toFixed(6)})`);
+        } catch(e) { 
+            alert("Erreur de conversion UTM: " + e.message); 
+            return; 
+        }
     }
+    
+    // Valider que les coordonnées sont dans des plages raisonnables
+    if (destLat < -90 || destLat > 90) {
+        alert("Latitude invalide. Doit être entre -90° et +90°");
+        return;
+    }
+    if (destLng < -180 || destLng > 180) {
+        alert("Longitude invalide. Doit être entre -180° et +180°");
+        return;
+    }
+    
     selectedCompany = null;
-    showRouteOptions(destLat, destLng, `Destination (${destLat.toFixed(5)}, ${destLng.toFixed(5)})`);
+    const formatStr = isUTM ? "UTM" : "Géographique";
+    
+    // Debug: afficher les coordonnées parsées
+    console.log(`Coordonnées entrées: Lat="${latStr}", Lng="${lngStr}"`);
+    console.log(`Coordonnées parsées: ${formatStr} - Lat: ${destLat.toFixed(6)}, Lng: ${destLng.toFixed(6)}`);
+    
+    showRouteOptions(destLat, destLng, `Destination ${formatStr} (${destLat.toFixed(5)}, ${destLng.toFixed(5)})`);
+    
+    // Message de confirmation pour l'utilisateur (temporairement désactivé pour les tests)
+    // alert(`Coordonnées trouvées:\nLatitude: ${destLat.toFixed(6)}\nLongitude: ${destLng.toFixed(6)}`);
 };
 
 function clearRoute(){
@@ -3091,16 +3394,17 @@ function updateProgressiveLine(userPos) {
         map.removeLayer(progressLine);
     }
     
-    // Créer une ligne progressive qui diminue au fur et à mesure de l'avancement
+    // Garder la ligne complète visible et mettre à jour seulement la ligne de progrès
     const remainingCoords = routeCoords.slice(closestIndex);
     if (remainingCoords.length > 1) {
         // Ajouter la position projetée au début des coordonnées restantes
         const progressCoords = [projectedPos, ...remainingCoords.map(c => [c.lat, c.lng])];
         
+        // Ligne de progression en vert pour montrer le parcours restant
         progressLine = L.polyline(progressCoords, { 
-            color: '#007bff', 
-            weight: 6, 
-            opacity: 0.9,
+            color: '#28a745', 
+            weight: 4, 
+            opacity: 0.7,
             className: 'route-progress-line'
         }).addTo(map);
     }
@@ -3143,6 +3447,12 @@ function startRealTimeGPSTracking(){
     isNavigating = true;
     showZoomControls();
     
+    // Variables pour détecter le mouvement réel
+    let lastPosition = null;
+    let lastMoveTime = 0;
+    const MOVEMENT_THRESHOLD = 2; // mètres minimum pour considérer un mouvement
+    const TIME_THRESHOLD = 3000; // 3 secondes minimum entre les mouvements
+    
     gpsWatchId = navigator.geolocation.watchPosition(pos => {
         const userPos = [pos.coords.latitude, pos.coords.longitude];
         currentUserPosition = userPos;
@@ -3150,8 +3460,28 @@ function startRealTimeGPSTracking(){
         // Update speed statistics
         updateCurrentSpeed(pos);
         
-        // Mettre à jour la ligne progressive et la position du curseur
-        updateProgressiveLine(userPos);
+        // Détecter si l'utilisateur s'est réellement déplacé
+        const now = Date.now();
+        let hasReallyMoved = false;
+        
+        if (lastPosition) {
+            const distanceMoved = distance(lastPosition, userPos);
+            if (distanceMoved > MOVEMENT_THRESHOLD && (now - lastMoveTime) > TIME_THRESHOLD) {
+                hasReallyMoved = true;
+                lastPosition = userPos;
+                lastMoveTime = now;
+            }
+        } else {
+            // Première position
+            lastPosition = userPos;
+            lastMoveTime = now;
+            hasReallyMoved = true;
+        }
+        
+        // Mettre à jour seulement si mouvement réel détecté
+        if (hasReallyMoved) {
+            updateProgressiveLine(userPos);
+        }
         
         // Update navigation statistics
         updateNavigationStats();
@@ -3531,15 +3861,13 @@ document.getElementById('select-route-btn').onclick = () => {
         const selectedRoute = availableRoutes[selectedRouteIndex];
         startRouteWithSelectedOption(currentDestination.lat, currentDestination.lng, currentDestination.name, selectedRoute);
         
-        if (voiceEnabled) {
-            speak(`Itinéraire sélectionné: ${selectedRoute.type}. Durée estimée: ${selectedRoute.duration}`);
-        }
+        // L'annonce se fera dans la fonction startRouteWithSelectedOption après calcul
     }
 };
 
 function startRouteWithSelectedOption(lat, lng, name, selectedRoute) {
     clearRoute();
-    if(voiceEnabled) speak(`Itinéraire ${selectedRoute.type} vers ${name} en cours`);
+    // Éviter la double lecture en supprimant cette première instruction vocale
     infrastructures.forEach(i => i.alerteFait = false);
 
     navigator.geolocation.getCurrentPosition(pos => {
@@ -3577,7 +3905,7 @@ function startRouteWithSelectedOption(lat, lng, name, selectedRoute) {
             // Supprimer l'ancienne ligne de route par défaut du contrôle
             if (routeLine) map.removeLayer(routeLine);
             
-            // Créer notre propre ligne de route complète
+            // Créer notre propre ligne de route complète qui reste visible
             routeLine = L.polyline(routeCoords, {
                 color: '#1e90ff', 
                 weight: 6, 
@@ -3611,6 +3939,8 @@ function startRouteWithSelectedOption(lat, lng, name, selectedRoute) {
             lastSpokenInstruction = -1;
             lastSpokenInstructionTimestamp = 0;
             
+            // Une seule annonce vocale ici après que l'itinéraire soit calculé
+            if(voiceEnabled) speak(`Navigation vers ${name} démarrée`);
             startRealTimeGPSTracking();
         });
     }, () => { alert("Position introuvable"); });
@@ -3618,7 +3948,7 @@ function startRouteWithSelectedOption(lat, lng, name, selectedRoute) {
 
 function startRoute(lat,lng,name){
     clearRoute();
-    if(voiceEnabled) speak(`Itinéraire vers ${name} en cours`);
+    // Éviter la double lecture en supprimant cette première instruction vocale
     infrastructures.forEach(i => i.alerteFait = false);
 
     navigator.geolocation.getCurrentPosition(pos=>{
@@ -3669,6 +3999,8 @@ function startRoute(lat,lng,name){
             lastSpokenInstruction = -1;
             lastSpokenInstructionTimestamp = 0;
             
+            // Une seule annonce vocale ici après que l'itinéraire soit calculé
+            if(voiceEnabled) speak(`Navigation vers ${name} démarrée`);
             startRealTimeGPSTracking();
         });
     },()=>{ alert("Position introuvable"); });
@@ -4003,25 +4335,60 @@ document.getElementById('send-invoice').onclick = async (e) => {
     return;
   }
 
-  const formData = new FormData(form);
+  // Vérification de la taille du fichier (limite à 7MB)
+  const maxSize = 7 * 1024 * 1024; // 7MB en bytes
+  if (fileInput.files[0].size > maxSize) {
+    errorMsg.textContent = "❌ Le fichier est trop volumineux. Taille maximum: 7MB";
+    errorMsg.style.display = "block";
+    return;
+  }
+
+  const formData = new FormData();
+  // Ajouter tous les champs du formulaire manuellement
+  formData.append('attachment', fileInput.files[0]);
+  formData.append('to_email', document.getElementById('invoice-to').value);
+  formData.append('invoice_ref', document.getElementById('invoice-ref').value || '');
+  formData.append('message', document.getElementById('invoice-message').value || '');
+  formData.append('from_name', document.getElementById('invoice-from-name').value || 'Agent DGI');
+  formData.append('agent_contact', document.getElementById('invoice-from-contact').value || '');
+  formData.append('subject', document.getElementById('invoice-subject').value || 'Facture Direction Générale des Impôts');
+  formData.append('company_name', document.getElementById('invoice-company-name').value || '');
 
   sendBtn.disabled = true;
   sendBtn.textContent = '⏳ Envoi...';
 
   try {
-    // Essayer d'abord avec l'URL locale
+    // Essayer différentes URLs de serveur
     let response;
-    try {
-      response = await fetch("http://127.0.0.1:5000/sendmail", {
-        method: "POST",
-        body: formData
-      });
-    } catch (localErr) {
-      // Si l'URL locale échoue, essayer avec l'URL relative pour le déploiement
-      response = await fetch("/sendmail", {
-        method: "POST",
-        body: formData
-      });
+    const urls = [
+      "http://127.0.0.1:5000/sendmail",
+      "http://localhost:5000/sendmail",
+      "/sendmail"
+    ];
+    
+    let lastError;
+    for (const url of urls) {
+      try {
+        console.log(`Tentative d'envoi vers: ${url}`);
+        response = await fetch(url, {
+          method: "POST",
+          body: formData
+        });
+        
+        if (response.ok) {
+          break; // Succès, sortir de la boucle
+        } else {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+      } catch (fetchErr) {
+        console.log(`Échec pour ${url}:`, fetchErr.message);
+        lastError = fetchErr;
+        response = null;
+      }
+    }
+    
+    if (!response || !response.ok) {
+      throw lastError || new Error('Toutes les tentatives de connexion ont échoué');
     }
 
     const result = await response.json();
@@ -4034,13 +4401,19 @@ document.getElementById('send-invoice').onclick = async (e) => {
       document.getElementById('invoice-from-contact').value = '';
       document.getElementById('invoice-subject').value = '';
       document.getElementById('invoice-company-name').value = '';
+      
+      // Fermer le panneau après succès
+      setTimeout(() => {
+        document.getElementById('invoice-send-container').style.display = 'none';
+        invoicePanelVisible = false;
+      }, 2000);
     } else {
-      errorMsg.textContent = "❌ " + result.message;
+      errorMsg.textContent = "❌ " + (result.message || 'Erreur inconnue du serveur');
       errorMsg.style.display = "block";
     }
   } catch (err) {
     console.error('Erreur détaillée:', err);
-    errorMsg.textContent = "❌ Erreur de connexion au serveur. Vérifiez que le serveur est en marche.";
+    errorMsg.textContent = "❌ Erreur: " + err.message + ". Vérifiez que le serveur est démarré.";
     errorMsg.style.display = "block";
   } finally {
     sendBtn.disabled = false;
