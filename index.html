@@ -2183,6 +2183,92 @@ body {
         animation: none;
     }
 }
+/* ====================== ANDROID: STYLES SPÉCIFIQUES ====================== */
+.is-android button,
+.is-mobile button,
+.is-android #sidebar button,
+.is-mobile #sidebar button,
+.is-android .signature-btn,
+.is-mobile .signature-btn,
+.is-android .admin-btn,
+.is-mobile .admin-btn,
+.is-android .top-btn,
+.is-mobile .top-btn,
+.is-android .quick-action-btn,
+.is-mobile .quick-action-btn {
+    min-height: 52px;
+    padding: 14px 16px;
+    font-size: 1rem;
+}
+
+.is-android .form-group input,
+.is-mobile .form-group input,
+.is-android .form-group textarea,
+.is-mobile .form-group textarea,
+.is-android .form-group select,
+.is-mobile .form-group select,
+.is-android #sidebar input,
+.is-mobile #sidebar input,
+.is-android #sidebar select,
+.is-mobile #sidebar select {
+    min-height: 48px;
+    padding: 14px 12px;
+    font-size: 16px; /* évite le zoom auto iOS/Android */
+    margin-bottom: 14px;
+}
+
+.is-android .form-group, .is-mobile .form-group { margin-bottom: 16px; }
+
+/* Panneaux plein écran sur petits écrans Android */
+@media screen and (max-width: 480px), screen and (max-height: 600px) {
+.is-android #delivery-report-container,
+    .is-mobile #delivery-report-container,
+    .is-android #invoice-send-container,
+    .is-mobile #invoice-send-container,
+    .is-android #route-options-container,
+    .is-mobile #route-options-container {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        transform: none;
+        width: 100%; max-width: none;
+        height: calc(var(--vh, 1vh) * 100);
+        max-height: none;
+        border-radius: 0;
+        padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+        z-index: 2000;
+    }
+
+    .is-android .panel-close, .is-mobile .panel-close {
+        top: max(8px, env(safe-area-inset-top));
+        right: max(8px, env(safe-area-inset-right));
+    }
+}
+
+/* Carte: corriger 100vh sur Android (barres du navigateur) */
+@media screen and (max-width: 768px) {
+    .is-android #map, .is-mobile #map {
+        height: calc(var(--vh, 1vh) * 100 - 70px);
+    }
+}
+
+/* Cibles tactiles plus larges pour Android */
+.is-android .layer-preview,
+.is-mobile .layer-preview,
+.is-android .zoom-btn,
+.is-mobile .zoom-btn {
+    min-width: 48px;
+    min-height: 48px;
+}
+
+/* Réduire le rebond de scroll sur Android pour les panneaux */
+.is-android #delivery-report-container,
+.is-mobile #delivery-report-container,
+.is-android #invoice-send-container,
+.is-mobile #invoice-send-container,
+.is-android #route-options-container,
+.is-mobile #route-options-container {
+    overscroll-behavior: contain;
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 </head>
@@ -2535,10 +2621,21 @@ body {
 <script src="https://unpkg.com/leaflet-minimap/dist/Control.MiniMap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.8.0/proj4.js"></script>
 <script>
-// Détection Android et ajout de classe au body pour styles/ajustements ciblés
+// Détection mobile et Android pour styles/ajustements ciblés
 const IS_ANDROID = /Android/i.test(navigator.userAgent || '');
+const IS_IOS = /iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+const IS_MOBILE = IS_ANDROID || IS_IOS || (window.matchMedia && matchMedia('(pointer: coarse)').matches);
+
 if (IS_ANDROID) {
   document.documentElement.classList.add('is-android');
+}
+if (IS_MOBILE) {
+  document.documentElement.classList.add('is-mobile');
+  // Fix 100vh mobile (barres du navigateur)
+  const setVh = () => document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+  setVh();
+  window.addEventListener('resize', setVh);
+  window.addEventListener('orientationchange', setVh);
 }
 
 // ====================== PROFESSIONAL TOAST NOTIFICATIONS ======================
